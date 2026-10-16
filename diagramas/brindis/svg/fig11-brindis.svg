@@ -1,0 +1,403 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="410.64pt" height="346.56pt" viewBox="0 0 410.64 346.56" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:date>2026-10-14T13:01:59.792369</dc:date>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>Matplotlib v3.11.1, https://matplotlib.org/</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 346.56 
+L 410.64 346.56 
+L 410.64 0 
+L 0 0 
+z
+" style="fill: #ffffff"/>
+  </g>
+  <g id="axes_1">
+   <g id="line2d_1">
+    <path d="M 42.54 44.56 
+L 42.54 70.88 
+L 62.7 70.88 
+L 62.7 97.2 
+" clip-path="url(#padc92c50b1)" style="fill: none; stroke-dasharray: 3.36,2.08; stroke-dashoffset: 0; stroke: #000000; stroke-width: 0.8"/>
+   </g>
+   <g id="line2d_2">
+    <path d="M 147.74 44.56 
+L 147.74 70.88 
+L 175.2 70.88 
+L 175.2 97.2 
+" clip-path="url(#padc92c50b1)" style="fill: none; stroke-dasharray: 3.36,2.08; stroke-dashoffset: 0; stroke: #000000; stroke-width: 0.8"/>
+   </g>
+   <g id="line2d_3">
+    <path d="M 259.44 44.56 
+L 259.44 70.88 
+L 175.2 70.88 
+L 175.2 97.2 
+" clip-path="url(#padc92c50b1)" style="fill: none; stroke-dasharray: 3.36,2.08; stroke-dashoffset: 0; stroke: #000000; stroke-width: 0.8"/>
+   </g>
+   <g id="line2d_4">
+    <path d="M 72.2 194.4 
+L 72.2 150.36 
+" clip-path="url(#padc92c50b1)" style="fill: none; stroke-dasharray: 3.36,2.08; stroke-dashoffset: 0; stroke: #000000; stroke-width: 0.8"/>
+   </g>
+   <g id="line2d_5">
+    <path d="M 183.2 194.4 
+L 183.2 160.76 
+" clip-path="url(#padc92c50b1)" style="fill: none; stroke-dasharray: 3.36,2.08; stroke-dashoffset: 0; stroke: #000000; stroke-width: 0.8"/>
+   </g>
+   <g id="line2d_6">
+    <path d="M 226.6 212.36 
+L 320.2 220.8 
+" clip-path="url(#padc92c50b1)" style="fill: none; stroke-dasharray: 3.36,2.08; stroke-dashoffset: 0; stroke: #000000; stroke-width: 0.8"/>
+   </g>
+   <g id="line2d_7">
+    <path d="M 72.2 230.32 
+L 72.2 291.6 
+" clip-path="url(#padc92c50b1)" style="fill: none; stroke-dasharray: 3.36,2.08; stroke-dashoffset: 0; stroke: #000000; stroke-width: 0.8"/>
+   </g>
+   <g id="line2d_8">
+    <path d="M 361.1 247.2 
+L 361.1 275.04 
+L 327.74 275.04 
+L 327.64974 274.238925 
+L 327.383488 273.478019 
+L 326.954593 272.795437 
+L 326.384563 272.225407 
+L 325.701981 271.796512 
+L 324.941075 271.53026 
+L 324.14 271.44 
+L 323.338925 271.53026 
+L 322.578019 271.796512 
+L 321.895437 272.225407 
+L 321.325407 272.795437 
+L 320.896512 273.478019 
+L 320.63026 274.238925 
+L 320.54 275.04 
+L 198.34 275.04 
+L 198.34 291.6 
+" clip-path="url(#padc92c50b1)" style="fill: none; stroke-dasharray: 3.36,2.08; stroke-dashoffset: 0; stroke: #000000; stroke-width: 0.8"/>
+   </g>
+   <g id="line2d_9">
+    <path d="M 324.14 247.2 
+L 324.14 291.6 
+" clip-path="url(#padc92c50b1)" style="fill: none; stroke-dasharray: 3.36,2.08; stroke-dashoffset: 0; stroke: #000000; stroke-width: 0.8"/>
+   </g>
+   <g id="line2d_10">
+    <path d="M 65.724 90 
+L 62.7 97.2 
+L 59.676 90 
+" clip-path="url(#padc92c50b1)" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="line2d_11">
+    <path d="M 178.224 90 
+L 175.2 97.2 
+L 172.176 90 
+" clip-path="url(#padc92c50b1)" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="line2d_12">
+    <path d="M 178.224 90 
+L 175.2 97.2 
+L 172.176 90 
+" clip-path="url(#padc92c50b1)" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="patch_2">
+    <path d="M 72.2 142.08 
+L 68.024 150.36 
+L 76.376 150.36 
+z
+" clip-path="url(#padc92c50b1)" style="fill: #ffffff; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_3">
+    <path d="M 183.2 152.48 
+L 179.024 160.76 
+L 187.376 160.76 
+z
+" clip-path="url(#padc92c50b1)" style="fill: #ffffff; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="line2d_13">
+    <path d="M 313.300669 217.141612 
+L 320.2 220.8 
+L 312.757518 223.165173 
+" clip-path="url(#padc92c50b1)" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="line2d_14">
+    <path d="M 75.224 284.4 
+L 72.2 291.6 
+L 69.176 284.4 
+" clip-path="url(#padc92c50b1)" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="line2d_15">
+    <path d="M 201.364 284.4 
+L 198.34 291.6 
+L 195.316 284.4 
+" clip-path="url(#padc92c50b1)" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="line2d_16">
+    <path d="M 327.164 284.4 
+L 324.14 291.6 
+L 321.116 284.4 
+" clip-path="url(#padc92c50b1)" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="patch_4">
+    <path d="M 8.64 8.64 
+L 76.44 8.64 
+L 76.44 44.56 
+L 8.64 44.56 
+z
+" clip-path="url(#padc92c50b1)" style="fill: #ffffff; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_5">
+    <path d="M 108.84 8.64 
+L 186.64 8.64 
+L 186.64 44.56 
+L 108.84 44.56 
+z
+" clip-path="url(#padc92c50b1)" style="fill: #ffffff; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_6">
+    <path d="M 219.04 8.64 
+L 299.84 8.64 
+L 299.84 44.56 
+L 219.04 44.56 
+z
+" clip-path="url(#padc92c50b1)" style="fill: #ffffff; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_7">
+    <path d="M 28.8 97.2 
+L 96.6 97.2 
+L 96.6 142.08 
+L 28.8 142.08 
+z
+" clip-path="url(#padc92c50b1)" style="fill: #ffffff; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_8">
+    <path d="M 139.8 97.2 
+L 210.6 97.2 
+L 210.6 152.48 
+L 139.8 152.48 
+z
+" clip-path="url(#padc92c50b1)" style="fill: #ffffff; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_9">
+    <path d="M 28.8 194.4 
+L 115.6 194.4 
+L 115.6 230.32 
+L 28.8 230.32 
+z
+" clip-path="url(#padc92c50b1)" style="fill: #ffffff; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_10">
+    <path d="M 139.8 194.4 
+L 226.6 194.4 
+L 226.6 230.32 
+L 139.8 230.32 
+z
+" clip-path="url(#padc92c50b1)" style="fill: #ffffff; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_11">
+    <path d="M 320.2 194.4 
+L 402 194.4 
+L 402 247.2 
+L 320.2 247.2 
+z
+" clip-path="url(#padc92c50b1)" style="fill: #ffffff; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_12">
+    <path d="M 8.64 291.6 
+L 115.44 291.6 
+L 115.44 337.92 
+L 8.64 337.92 
+z
+" clip-path="url(#padc92c50b1)" style="fill: #ffffff; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_13">
+    <path d="M 151.44 291.6 
+L 245.24 291.6 
+L 245.24 327.52 
+L 151.44 327.52 
+z
+" clip-path="url(#padc92c50b1)" style="fill: #ffffff; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_14">
+    <path d="M 281.24 291.6 
+L 367.04 291.6 
+L 367.04 327.52 
+L 281.24 327.52 
+z
+" clip-path="url(#padc92c50b1)" style="fill: #ffffff; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="text_1">
+    <text style="font-weight: 700; font-size: 8px; font-family: 'Arial'; text-anchor: middle" x="42.54" y="20.230313" transform="rotate(-0 42.54 20.230313)">AuthController</text>
+   </g>
+   <g id="line2d_17">
+    <path d="M 8.64 27.68 
+L 76.44 27.68 
+" clip-path="url(#padc92c50b1)" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linecap: square"/>
+   </g>
+   <g id="text_2">
+    <text style="font-size: 8px; font-family: 'Arial'; text-anchor: start" x="14.04" y="38.190234" transform="rotate(-0 14.04 38.190234)">+login() : Sesion</text>
+   </g>
+   <g id="text_3">
+    <text style="font-weight: 700; font-size: 8px; font-family: 'Arial'; text-anchor: middle" x="147.74" y="20.230313" transform="rotate(-0 147.74 20.230313)">ReservaController</text>
+   </g>
+   <g id="line2d_18">
+    <path d="M 108.84 27.68 
+L 186.64 27.68 
+" clip-path="url(#padc92c50b1)" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linecap: square"/>
+   </g>
+   <g id="text_4">
+    <text style="font-size: 8px; font-family: 'Arial'; text-anchor: start" x="114.24" y="38.190234" transform="rotate(-0 114.24 38.190234)">+confirmar() : id</text>
+   </g>
+   <g id="text_5">
+    <text style="font-weight: 700; font-size: 8px; font-family: 'Arial'; text-anchor: middle" x="259.44" y="20.230313" transform="rotate(-0 259.44 20.230313)">PersonalController</text>
+   </g>
+   <g id="line2d_19">
+    <path d="M 219.04 27.68 
+L 299.84 27.68 
+" clip-path="url(#padc92c50b1)" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linecap: square"/>
+   </g>
+   <g id="text_6">
+    <text style="font-size: 8px; font-family: 'Arial'; text-anchor: start" x="224.44" y="38.190234" transform="rotate(-0 224.44 38.190234)">+agenda() : Lista</text>
+   </g>
+   <g id="text_7">
+    <text style="font-size: 8px; font-family: 'Arial'; text-anchor: middle" x="62.7" y="108.070312" transform="rotate(-0 62.7 108.070312)">«interface»</text>
+   </g>
+   <g id="text_8">
+    <text style="font-style: italic; font-weight: 700; font-size: 8px; font-family: 'Arial'; text-anchor: middle" x="62.7" y="118.470313" transform="rotate(-0 62.7 118.470313)">IUsuarioService</text>
+   </g>
+   <g id="line2d_20">
+    <path d="M 28.8 125.2 
+L 96.6 125.2 
+" clip-path="url(#padc92c50b1)" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linecap: square"/>
+   </g>
+   <g id="text_9">
+    <text style="font-size: 8px; font-family: 'Arial'; text-anchor: start" x="34.2" y="135.710234" transform="rotate(-0 34.2 135.710234)">+registrar() : id</text>
+   </g>
+   <g id="text_10">
+    <text style="font-size: 8px; font-family: 'Arial'; text-anchor: middle" x="175.2" y="108.070312" transform="rotate(-0 175.2 108.070312)">«interface»</text>
+   </g>
+   <g id="text_11">
+    <text style="font-style: italic; font-weight: 700; font-size: 8px; font-family: 'Arial'; text-anchor: middle" x="175.2" y="118.470313" transform="rotate(-0 175.2 118.470313)">IReservaService</text>
+   </g>
+   <g id="line2d_21">
+    <path d="M 139.8 125.2 
+L 210.6 125.2 
+" clip-path="url(#padc92c50b1)" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linecap: square"/>
+   </g>
+   <g id="text_12">
+    <text style="font-size: 8px; font-family: 'Arial'; text-anchor: start" x="145.2" y="135.710234" transform="rotate(-0 145.2 135.710234)">+confirmar() : id</text>
+   </g>
+   <g id="text_13">
+    <text style="font-size: 8px; font-family: 'Arial'; text-anchor: start" x="145.2" y="146.110234" transform="rotate(-0 145.2 146.110234)">+cancelar() : void</text>
+   </g>
+   <g id="text_14">
+    <text style="font-weight: 700; font-size: 8px; font-family: 'Arial'; text-anchor: middle" x="72.2" y="205.990234" transform="rotate(-0 72.2 205.990234)">UsuarioServiceProxy</text>
+   </g>
+   <g id="line2d_22">
+    <path d="M 28.8 213.44 
+L 115.6 213.44 
+" clip-path="url(#padc92c50b1)" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linecap: square"/>
+   </g>
+   <g id="text_15">
+    <text style="font-size: 8px; font-family: 'Arial'; text-anchor: start" x="34.2" y="223.950234" transform="rotate(-0 34.2 223.950234)">+registrar() : id</text>
+   </g>
+   <g id="text_16">
+    <text style="font-weight: 700; font-size: 8px; font-family: 'Arial'; text-anchor: middle" x="183.2" y="205.990234" transform="rotate(-0 183.2 205.990234)">ReservaServiceProxy</text>
+   </g>
+   <g id="line2d_23">
+    <path d="M 139.8 213.44 
+L 226.6 213.44 
+" clip-path="url(#padc92c50b1)" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linecap: square"/>
+   </g>
+   <g id="text_17">
+    <text style="font-size: 8px; font-family: 'Arial'; text-anchor: start" x="145.2" y="223.950234" transform="rotate(-0 145.2 223.950234)">+confirmar() : id</text>
+   </g>
+   <g id="text_18">
+    <text style="font-weight: 700; font-size: 8px; font-family: 'Arial'; text-anchor: middle" x="361.1" y="205.990313" transform="rotate(-0 361.1 205.990313)">ReservaServiceImpl</text>
+   </g>
+   <g id="line2d_24">
+    <path d="M 320.2 213.44 
+L 402 213.44 
+" clip-path="url(#padc92c50b1)" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linecap: square"/>
+   </g>
+   <g id="text_19">
+    <text style="font-size: 8px; font-family: 'Arial'; text-anchor: start" x="325.6" y="223.950313" transform="rotate(-0 325.6 223.950313)">[director]</text>
+   </g>
+   <g id="line2d_25">
+    <path d="M 320.2 230.32 
+L 402 230.32 
+" clip-path="url(#padc92c50b1)" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linecap: square"/>
+   </g>
+   <g id="text_20">
+    <text style="font-size: 8px; font-family: 'Arial'; text-anchor: start" x="325.6" y="240.830234" transform="rotate(-0 325.6 240.830234)">+confirmar() : id</text>
+   </g>
+   <g id="text_21">
+    <text style="font-weight: 700; font-size: 8px; font-family: 'Arial'; text-anchor: middle" x="62.04" y="303.190312" transform="rotate(-0 62.04 303.190312)">FabricaUsuarios + Builder</text>
+   </g>
+   <g id="line2d_26">
+    <path d="M 8.64 310.64 
+L 115.44 310.64 
+" clip-path="url(#padc92c50b1)" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linecap: square"/>
+   </g>
+   <g id="text_22">
+    <text style="font-size: 8px; font-family: 'Arial'; text-anchor: start" x="14.04" y="321.150234" transform="rotate(-0 14.04 321.150234)">+crear() : Usuario</text>
+   </g>
+   <g id="text_23">
+    <text style="font-size: 8px; font-family: 'Arial'; text-anchor: start" x="14.04" y="331.550234" transform="rotate(-0 14.04 331.550234)">+build() : Reserva</text>
+   </g>
+   <g id="text_24">
+    <text style="font-weight: 700; font-size: 8px; font-family: 'Arial'; text-anchor: middle" x="198.34" y="303.190312" transform="rotate(-0 198.34 303.190312)">Costos + Decoradores</text>
+   </g>
+   <g id="line2d_27">
+    <path d="M 151.44 310.64 
+L 245.24 310.64 
+" clip-path="url(#padc92c50b1)" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linecap: square"/>
+   </g>
+   <g id="text_25">
+    <text style="font-size: 8px; font-family: 'Arial'; text-anchor: start" x="156.84" y="321.150234" transform="rotate(-0 156.84 321.150234)">+costo() : double</text>
+   </g>
+   <g id="text_26">
+    <text style="font-weight: 700; font-size: 8px; font-family: 'Arial'; text-anchor: middle" x="324.14" y="303.190312" transform="rotate(-0 324.14 303.190312)">DAO + ConexionBD</text>
+   </g>
+   <g id="line2d_28">
+    <path d="M 281.24 310.64 
+L 367.04 310.64 
+" clip-path="url(#padc92c50b1)" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linecap: square"/>
+   </g>
+   <g id="text_27">
+    <text style="font-size: 8px; font-family: 'Arial'; text-anchor: start" x="286.64" y="321.150234" transform="rotate(-0 286.64 321.150234)">+guardar() : id</text>
+   </g>
+   <g id="patch_15">
+    <path d="M 260.6 204.29 
+L 286.2 204.29 
+L 286.2 214.47 
+L 260.6 214.47 
+z
+" clip-path="url(#padc92c50b1)" style="fill: #ffffff"/>
+   </g>
+   <g id="text_28">
+    <text style="font-size: 7.6px; font-family: 'Arial'; text-anchor: middle" x="273.4" y="211.634723" transform="rotate(-0 273.4 211.634723)">delega</text>
+   </g>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="padc92c50b1">
+   <rect x="0" y="0" width="410.64" height="346.56"/>
+  </clipPath>
+ </defs>
+</svg>

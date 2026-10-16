@@ -1,0 +1,686 @@
+﻿% Brindis en Rust --- Analisis y diseno OO del modulo de reservas
+% Adaptación fiel del PDF original (Java/Spring) a Rust (Axum + sqlx).
+% Cambios mínimos y justos para que sea idiomático en Rust, manteniendo
+% trazabilidad con el documento base (mismos CU, RF, RN, figuras y tablas).
+\documentclass[12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+% NOTA: es-noshorthands desactiva atajos babel (", <, >) que rompen TikZ (->)
+% y listings con comillas dobles. No quitar.
+\usepackage[spanish,es-noshorthands]{babel}
+\usepackage{enumerate}
+\usepackage{fancyhdr}
+\usepackage[table]{xcolor}
+\usepackage{float}
+\usepackage{graphicx}
+\usepackage{color}
+\usepackage{caption}
+\usepackage{mathtools}
+\usepackage{amsmath}
+\usepackage{tikz}
+\usetikzlibrary{trees,positioning,arrows.meta,shapes.geometric,fit,calc}
+
+% ---------- Estilo UML para las figuras (TikZ) ----------
+\usetikzlibrary{shapes.multipart,arrows.meta,calc,positioning}
+\definecolor{umlline}{HTML}{3A3A3A}
+\definecolor{umliface}{HTML}{E4EDF7}
+\definecolor{umlabs}{HTML}{FBF1D6}
+\definecolor{umlutil}{HTML}{E6E6E6}
+\definecolor{umlcls}{HTML}{F4F4F4}
+\definecolor{umlnote}{HTML}{FFF8DC}
+\def\umlfs{\fontsize{7}{8.4}\selectfont}
+\def\umlfst{\fontsize{5}{6}\selectfont}
+\tikzset{
+  umlbox/.style={rectangle split, rectangle split parts=3, draw=umlline, line width=0.5pt,
+    font=\umlfs, align=left, inner xsep=4pt, inner ysep=2.2pt, anchor=north,
+    rectangle split part align={center,left,left}, rectangle split empty part height=0pt},
+  kc/.style={rectangle split part fill={umlcls,white,white}},
+  ki/.style={rectangle split part fill={umliface,white,white}},
+  ka/.style={rectangle split part fill={umlabs,white,white}},
+  ku/.style={rectangle split part fill={umlutil,white,white}},
+  gen/.style={umlline, line width=0.5pt, -{Triangle[open,length=7pt,width=7pt]}},
+  real/.style={gen, dashed},
+  dep/.style={umlline, line width=0.5pt, dashed, -{Straight Barb[length=5.5pt,width=7pt]}},
+  asoc/.style={umlline, line width=0.5pt, -{Straight Barb[length=5.5pt,width=7pt]}},
+  agg/.style={umlline, line width=0.5pt, {Diamond[open,length=9pt,width=6pt]}-{Straight Barb[length=5.5pt,width=7pt]}},
+  el/.style={font=\umlfs\itshape, inner sep=1.2pt, text=umlline},
+  mu/.style={font=\umlfs, inner sep=1pt, text=black},
+  nota/.style={draw=umlline, fill=umlnote, line width=0.4pt, font=\umlfs, align=left,
+    inner sep=4pt, anchor=north},
+}
+\def\umlst{}
+\newcommand{\umlname}[2]{%
+  \ifx\umlst\empty
+    \if#1i{\umlfst\guillemotleft interface\guillemotright}\\[-1pt]\textbf{#2}%
+    \else\if#1a\textbf{\textit{#2}}%
+    \else\if#1u{\umlfst\guillemotleft utility\guillemotright}\\[-1pt]\textbf{#2}%
+    \else\textbf{#2}\fi\fi\fi
+  \else
+    {\umlfst\guillemotleft\umlst\guillemotright}\\[-1pt]\if#1a\textbf{\textit{#2}}\else\textbf{#2}\fi%
+  \fi}
+% \umlcls{id}{top-center pos}{kind c|i|a|u}{width}{name}{attrs}{meths}
+\newcommand{\umlcls}[7]{%
+  \def\tA{#6}\def\tM{#7}%
+  \ifx\tA\empty\ifx\tM\empty\def\np{1}\else\def\np{2}\fi\else\ifx\tM\empty\def\np{2}\else\def\np{3}\fi\fi
+  \ifnum\np=1
+    \node[umlbox,rectangle split parts=1,k#3,text width=#4] (#1) at (#2) {\umlname{#3}{#5}};
+  \else\ifnum\np=2
+    \node[umlbox,rectangle split parts=2,k#3,text width=#4] (#1) at (#2)
+      {\umlname{#3}{#5}\nodepart{two}\ifx\tA\empty#7\else#6\fi};
+  \else
+    \node[umlbox,rectangle split parts=3,k#3,text width=#4] (#1) at (#2)
+      {\umlname{#3}{#5}\nodepart{two}#6\nodepart{three}#7};
+  \fi\fi
+  \gdef\umlst{}}
+
+\usepackage{amssymb}
+\usepackage{xspace}
+\usepackage[hidelinks]{hyperref}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{listings}
+\usepackage{url}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{seqsplit}
+\usepackage{microtype}
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.15}
+\setlength{\emergencystretch}{3em}
+\usepackage{lmodern}
+\usepackage{textcomp}
+\usepackage{upquote}
+
+\hypersetup{
+    colorlinks=false,
+    pdfborder={0 0 0}
+}
+
+\setlength{\oddsidemargin}{0.5cm}
+\setlength{\evensidemargin}{0.5cm}
+\setlength{\topmargin}{-1.6cm}
+\setlength{\leftmargin}{0.5cm}
+\setlength{\rightmargin}{0.5cm}
+\setlength{\textheight}{24.00cm}
+\setlength{\textwidth}{15.00cm}
+\parindent 0pt
+\parskip 5pt
+
+\pagestyle{fancy}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+\setlength\headheight{35.0pt}
+\addtolength{\textheight}{-35.0pt}
+
+\IfFileExists{usa.png}{\rhead{\begin{picture}(0,0) \put(-56.7,0){\includegraphics[width=30mm]{usa.png}} \end{picture}}}{}
+\renewcommand{\headrulewidth}{0.5pt}
+
+% ---------- Estilos de apoyo para los diagramas ----------
+\tikzset{
+  uc/.style={draw, ellipse, text width=3.6cm, minimum height=1.0cm,
+             align=center, font=\scriptsize, inner sep=2pt},
+  bloque/.style={draw, rounded corners, align=center, font=\scriptsize,
+             minimum height=0.8cm, text width=2.6cm},
+  hoja/.style={draw, rounded corners, align=left, font=\scriptsize,
+             minimum height=0.6cm, text width=2.4cm, inner sep=3pt},
+  wf/.style={draw, align=center, font=\scriptsize},
+  wftxt/.style={font=\scriptsize, align=left, anchor=north west, inner sep=1pt}
+}
+
+% Actor (monigote) reutilizable: {x}{y}{nombre-nodo}{etiqueta}
+\newcommand{\actorNode}[4]{%
+\begin{scope}[shift={(#1,#2)}]
+  \draw[thick] (0,0.62) circle (0.15);
+  \draw[thick] (0,0.47) -- (0,0.08);
+  \draw[thick] (-0.24,0.35) -- (0.24,0.35);
+  \draw[thick] (0,0.08) -- (-0.20,-0.25);
+  \draw[thick] (0,0.08) -- (0.20,-0.25);
+  \node[font=\scriptsize, align=center, anchor=north, text width=2.6cm] at (0,-0.34) {#4};
+  \node[inner sep=0pt, minimum size=0pt] (#3) at (0,0.30) {};
+\end{scope}}
+
+\newcommand{\inc}{$\langle\langle$include$\rangle\rangle$}
+\newcommand{\ext}{$\langle\langle$extend$\rangle\rangle$}
+
+\lstdefinelanguage{Rust}{%
+  morekeywords={trait,struct,enum,impl,pub,pub(crate),fn,mut,self,Self,mut,match,if,else,let,for,in,return,Ok,Err,Some,None,Box,dyn,async,await,where,use,mod,crate,as,ref},%
+  sensitive=true,%
+  morecomment=[l]{//},%
+  morestring=[b]",%
+}
+\lstset{language=Rust,basicstyle=\ttfamily\small,breaklines=true,
+  keywordstyle=\color{blue}\bfseries,commentstyle=\color{gray},
+  stringstyle=\color{red!60!black},frame=single,numbers=left,numberstyle=\tiny,
+  inputencoding=utf8,extendedchars=true,keepspaces=true,columns=fullflexible,
+  literate={á}{{\'a}}1 {é}{{\'e}}1 {í}{{\'i}}1 {ó}{{\'o}}1 {ú}{{\'u}}1
+           {Á}{{\'A}}1 {É}{{\'E}}1 {Í}{{\'I}}1 {Ó}{{\'O}}1 {Ú}{{\'U}}1
+           {ñ}{{\~n}}1 {Ñ}{{\~N}}1 {¿}{{?`}}1 {¡}{{!`}}1
+           {—}{{---}}1 {–}{{--}}1}
+
+\begin{document}
+\vspace{0.5cm}
+\IfFileExists{usa.png}{\begin{figure}[H]
+\centering
+\includegraphics[scale = 0.4]{usa.png}
+\end{figure}}{}
+\vspace{1.5cm}
+
+\begin{center}
+\vskip 1cm
+{\Large \bf Patrones de dise\~no de software}
+\vskip 0.4cm
+{\Large \bf An\'alisis y dise\~no orientado a objetos del m\'odulo de gesti\'on de reservas de restaurantes}
+\vskip 0.3cm
+{\large Brindis --- Sistema de reservas de restaurantes por ocasi\'on \textbf{(Implementaci\'on en Rust)}}
+\vskip 0.8cm
+{\bf Yslen Natalia Moreno Gutierrez \\ Jorge Antonio Garc\'ia Romero
+\\
+Karla Mariana Duque Callejas }
+\vskip 3cm
+{\it Universidad Sergio Arboleda \\ Escuela de ciencias exactas e ingenier\'ia \\
+Bogot\'a D.C., 8 de octubre de 2026}
+\end{center}
+
+\clearpage
+
+\tableofcontents
+\newpage
+
+\section{Introducción}
+La reserva por ocasión (cumpleaños, aniversario, propuesta, romántica, negocios, casual) exige zona, decoración y servicio distintos. Brindis guía en 4 pasos (ocasión, mesas, pedido+extras, pago) con plano interactivo y bloqueo temporal de 5 min (RN03). Tres roles: cliente (general/VIP + strikes), empleado y administrador (hereda de empleado). Arquitectura MVC por capas + DAO (Alur et al., 2003) + 4 patrones (Gamma et al., 1994). \textbf{Cambio Rust:} Thymeleaf $\rightarrow$ Askama/Tera; Spring Controllers $\rightarrow$ handlers Axum; JDBC/ConexionBD $\rightarrow$ \texttt{sqlx} + \texttt{DbPool}; \texttt{BCrypt} $\rightarrow$ crate \texttt{bcrypt}; \texttt{PreparedStatement} $\rightarrow$ queries preparadas sqlx; transacciones sqlx (RNF02/RNF03).
+
+\section{Planteamiento del problema}
+Idéntico al original: asignación ineficiente y duplicados, pérdida de alergias/ocasión, venta extra no ofrecida, cancelaciones sin control, falta de control de acceso. Se requiere módulo que reserve sencillo y personalizado y que el personal controle mesas/horarios/reservas/pagos.
+
+\section{Objetivos}
+\subsection{Objetivo general}
+Analizar, diseñar y desarrollar con el paradigma orientado a objetos (en Rust: traits + structs + enums) un módulo web de reservas con login y formulario para cliente y administrador, MVC por capas, 2 creacionales y 2 estructurales.
+\subsection{Objetivos específicos}
+\begin{enumerate}
+\item Identificar actores, RF/RNF, RN y CU.
+\item Diseñar modelo relacional y DAO.
+\item Aplicar Factory Method y Builder en Rust.
+\item Aplicar Proxy y Decorator en Rust.
+\item Implementar UI intuitiva en 4 pasos con plano.
+\end{enumerate}
+
+\section{Alcance y propuesta de valor}
+\subsection{Alcance}
+Fase 1: login + formulario (cliente en línea, personal a nombre de cliente), consulta, cancelación con reembolso/strikes, agenda del día. Pagos simulados (se registra modalidad y comprobante, sin pasarela). Fase 2 diseñada: modificación, usuarios/mesas, estadísticas, reactivación, VIP automático. Fuera: pasarela real, app móvil.
+\subsection{Propuesta de valor}
+Ver Tabla~\ref{tab:valor}: ocasión $\rightarrow$ \texttt{enum Ocasion} + Builder; plano + bloqueo $\rightarrow$ servicio disponibilidad; pedido/extras $\rightarrow$ Decorator; VIP/strikes $\rightarrow$ Factory + Proxy; alertas $\rightarrow$ Decorator.
+\begin{table}[h]\centering\caption{Elementos diferenciadores}\label{tab:valor}
+\begin{tabular}{>{\raggedright\arraybackslash}p{3cm}>{\raggedright\arraybackslash}p{7cm}>{\raggedright\arraybackslash}p{3cm}}\toprule
+Elemento & Descripción & Soporte\\\midrule
+Reserva por ocasión & Elige qué celebra; sugiere zona y filtra decoración. & \texttt{Ocasion} y Builder\\
+Plano + bloqueo & Zonas VIP/general/terraza; libre/reservada/bloqueada/seleccionada; bloqueo 5 min. & Disponibilidad\\
+Pedido + extras & Preordena y contrata; total al instante. & Decorator\\
+VIP y strikes & VIP flexible + pago en restaurante; tardías/inasistencias dan strikes. & Factory y Proxy\\
+Restricciones & Alergias como alerta en agenda. & Decorator\\\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Análisis}
+Enfoque Larman (2004); RF/RNF según Pressman y Maxim (2020).
+\subsection{Actores y roles}
+\begin{table}[H]\centering
+\caption{Actores del sistema}\label{tab:actores}
+{\small\textit{Actores del sistema}}\\[2pt]
+\begin{tabular}{|>{\raggedright\arraybackslash}p{2.6cm}|>{\raggedright\arraybackslash}p{7.2cm}|>{\raggedright\arraybackslash}p{3.2cm}|}\hline
+\textbf{Actor} & \textbf{Responsabilidades} & \textbf{{\textquestiondown}Qui{\'e}n lo crea?}\\\hline
+Cliente (general o VIP) & Inicia sesi{\'o}n, registra reservas, elige mesas en el plano, agrega pedido y servicios extra, define el pago, consulta el estado de sus reservas y las modifica o cancela. & {\'E}l mismo desde la aplicaci{\'o}n, o un empleado.\\\hline
+Empleado & Consulta la agenda del d{\'i}a, registra, modifica o cancela reservas a nombre de los clientes, crea clientes que no est{\'a}n registrados y actualiza el estado de las reservas. & Un administrador.\\\hline
+Administrador & Hace todo lo que hace el empleado y, adem{\'a}s, consulta estad{\'i}sticas, crea empleados y administradores, asciende empleados a administrador, asciende clientes a VIP y activa o desactiva usuarios. & Otro administrador.\\\hline
+\end{tabular}
+\\[2pt]{\small\textit{Nota.} Elaboraci{\'o}n propia.}
+\end{table}
+\subsection{Requerimientos funcionales}
+En la Tabla 3, la columna \textit{Fase} indica si el requerimiento se implementa en este parcial (1) o si queda dise{\~n}ado para una entrega posterior (2).
+\begin{center}{\small\textbf{Tabla 3}}\\{\small\textit{Requerimientos funcionales}}\end{center}
+\begin{longtable}{|p{1.2cm}|>{\raggedright\arraybackslash}p{8.2cm}|p{2.0cm}|c|}\hline
+\textbf{ID} & \textbf{Descripci{\'o}n} & \textbf{Prioridad} & \textbf{Fase}\\\hline
+\endhead
+RF01 & Iniciar sesi{\'o}n con correo y contrase{\~n}a y redirigir al usuario a su panel seg{\'u}n su rol. & Alta & 1\\\hline
+RF02 & Permitir que un cliente nuevo se registre por su cuenta; queda con rol cliente y tipo general. & Alta & 1\\\hline
+RF03 & Restringir cada funci{\'o}n seg{\'u}n el rol del usuario autenticado y la propiedad de la reserva. & Alta & 1\\\hline
+RF04 & Seleccionar la ocasi{\'o}n y el tipo de reserva (por mesas o restaurante completo). & Alta & 1\\\hline
+RF05 & Consultar la disponibilidad por fecha, hora, n{\'u}mero de comensales y zona. & Alta & 1\\\hline
+RF06 & Mostrar un plano interactivo y permitir seleccionar una o varias mesas, que quedan bloqueadas temporalmente. & Alta & 1\\\hline
+RF07 & Agregar un pedido anticipado con productos de la carta. & Media & 1\\\hline
+RF08 & Agregar servicios extra (decoraci{\'o}n y barra de c{\'o}cteles) y recalcular el valor total. & Alta & 1\\\hline
+RF09 & Registrar restricciones alimentarias y observaciones. & Alta & 1\\\hline
+RF10 & Seleccionar la modalidad de pago (adelanto, pago completo o pago en el restaurante cuando aplique) y emitir el comprobante. & Alta & 1\\\hline
+RF11 & Confirmar la reserva, generar un c{\'o}digo {\'u}nico y mostrar el resumen. & Alta & 1\\\hline
+RF12 & Permitir al personal registrar reservas a nombre de un cliente y crear al cliente si no existe. & Alta & 1\\\hline
+RF13 & Permitir al cliente consultar sus reservas y el estado de cada una. & Media & 1\\\hline
+RF14 & Cancelar una reserva aplicando la pol{\'i}tica de reembolso y de \textit{strikes}, y emitir el comprobante del reembolso. & Media & 1\\\hline
+RF15 & Mostrar al personal la agenda del d{\'i}a con alertas, y permitirle cambiar el estado de las reservas. & Alta & 1\\\hline
+RF16 & Modificar una reserva aplicando los precios vigentes y cobrando la diferencia del adelanto. & Media & 2\\\hline
+RF17 & Enviar credenciales gen{\'e}ricas por correo a los clientes creados por el personal y exigir el cambio de contrase{\~n}a en el primer ingreso. & Media & 2\\\hline
+RF18 & Permitir al administrador crear empleados y administradores, ascender usuarios y activarlos o desactivarlos. & Media & 2\\\hline
+RF19 & Mostrar al administrador estad{\'i}sticas generales de reservas, ocupaci{\'o}n e ingresos. & Media & 2\\\hline
+RF20 & Gestionar mesas, zonas, horarios de atenci{\'o}n, carta y planes de servicios extra. & Media & 2\\\hline
+RF21 & Desactivar clientes por inactividad y permitir su reactivaci{\'o}n con un \textit{token} enviado por correo. & Baja & 2\\\hline
+RF22 & Promover autom{\'a}ticamente a VIP a los clientes que cumplan los criterios definidos. & Baja & 2\\\hline
+\end{longtable}
+{\small\textit{Nota.} Elaboraci{\'o}n propia.}
+\subsection{Requerimientos no funcionales}
+\begin{center}{\small\textbf{Tabla 4}}\\{\small\textit{Requerimientos no funcionales}}\end{center}
+\begin{longtable}{|p{1.4cm}|p{2.6cm}|>{\raggedright\arraybackslash}p{8.6cm}|}\hline
+\textbf{ID} & \textbf{Atributo} & \textbf{Descripci{\'o}n}\\\hline
+\endhead
+RNF01 & Usabilidad & La reserva se completa en un m{\'a}ximo de cuatro pasos guiados y en menos de tres minutos para un usuario nuevo, siguiendo las heur{\'i}sticas de Nielsen (1993).\\\hline
+RNF02 & Seguridad & Las contrase{\~n}as se almacenan con \textit{hash} BCrypt; cada operaci{\'o}n pasa por un control de acceso por rol; las consultas usan consultas preparadas para evitar inyecci{\'o}n SQL.\\\hline
+RNF03 & Integridad & Una mesa no puede quedar en dos reservas activas con horarios cruzados; la verificaci{\'o}n, el registro de la reserva y su comprobante se ejecutan en una misma transacci{\'o}n.\\\hline
+RNF04 & Rendimiento & Las consultas de disponibilidad responden en menos de dos segundos con hasta 50 mesas.\\\hline
+RNF05 & Mantenibilidad & Agregar un nuevo rol, un nuevo tipo de servicio extra o una nueva ocasi{\'o}n no exige modificar las clases existentes (principio abierto/cerrado).\\\hline
+RNF06 & Trazabilidad & Todo movimiento de dinero genera un comprobante con el empleado que lo proces{\'o}, si lo hubo.\\\hline
+RNF07 & Portabilidad & La interfaz es adaptable (\textit{responsive}) y funciona en navegadores modernos de escritorio y m{\'o}vil.\\\hline
+\end{longtable}
+\subsection{Reglas de negocio}
+Los valores num{\'e}ricos de la Tabla 5 (tiempos, porcentajes y umbrales) son par{\'a}metros configurables del sistema.
+\begin{center}{\small\textbf{Tabla 5}}\\{\small\textit{Reglas de negocio}}\end{center}
+\begin{longtable}{|p{1.2cm}|p{2.6cm}|>{\raggedright\arraybackslash}p{8.8cm}|}\hline
+\textbf{ID} & \textbf{Tema} & \textbf{Regla}\\\hline
+\endhead
+RN01 & Duraci{\'o}n & Cada reserva dura 120 minutos por defecto. Una mesa no admite dos reservas activas (vigente o cliente en mesa) con franjas que se crucen.\\\hline
+RN02 & Capacidad & La suma de las capacidades de las mesas seleccionadas debe ser igual o mayor que el n{\'u}mero de comensales.\\\hline
+RN03 & Bloqueo temporal & Al seleccionar una mesa, esta queda bloqueada para esa franja durante cinco minutos. El bloqueo se libera al confirmar, al cancelar el proceso o al vencer el tiempo.\\\hline
+RN04 & Restaurante completo & Una reserva de restaurante completo asocia autom{\'a}ticamente todas las mesas en servicio y exige que ninguna tenga reservas ni bloqueos en esa franja.\\\hline
+RN05 & Horario & La reserva debe quedar dentro del horario de atenci{\'o}n y hacerse con al menos una hora de anticipaci{\'o}n y como m{\'a}ximo con 60 d{\'i}as.\\\hline
+RN06 & Modalidad de pago & Adelanto: el cliente paga un porcentaje del total (30~\% por defecto). Completo: paga el 100~\%. En el restaurante: paga el 0~\% al reservar, y solo se permite si el cliente es VIP o si la reserva la registra el personal.\\\hline
+RN07 & Precios y modificaciones & El precio de cada producto o servicio se guarda al agregarlo. Lo que se agrega en una modificaci{\'o}n usa el precio vigente en ese momento, no el de la reserva original. Si el total aumenta, el cliente paga la diferencia necesaria para mantener el porcentaje del adelanto. El saldo se liquida el d{\'i}a de la reserva.\\\hline
+RN08 & Cancelaci{\'o}n de cliente general & Si cancela al menos cuatro horas antes, recibe el reembolso total de lo pagado. Si cancela despu{\'e}s, se retiene el 10~\% de lo pagado.\\\hline
+RN09 & Cancelaci{\'o}n de cliente VIP & Puede cancelar sin penalidad hasta una hora antes. Si cancela despu{\'e}s, se retiene el 10~\% de lo pagado y recibe un \textit{strike}.\\\hline
+RN10 & \textit{Strikes} & La inasistencia y el comportamiento indebido generan un \textit{strike}. Al tercer \textit{strike}, un cliente VIP pasa a ser general, y un cliente general no puede ser promovido a VIP.\\\hline
+RN11 & Promoci{\'o}n a VIP & Un cliente pasa a VIP si lo asciende un administrador o, de forma autom{\'a}tica, si acumula 10 reservas completadas o un consumo de \$2.000.000 sin tener tres \textit{strikes}.\\\hline
+RN12 & Creaci{\'o}n de usuarios & El cliente se registra solo o lo crea un empleado; el empleado solo lo crea un administrador; el administrador solo lo crea otro administrador. Un cliente creado por el personal recibe por correo una contrase{\~n}a gen{\'e}rica que debe cambiar en su primer ingreso.\\\hline
+RN13 & Activaci{\'o}n & Un cliente sin actividad durante 180 d{\'i}as queda inactivo y puede reactivarse solo con un \textit{token} enviado a su correo. Un empleado o administrador desactivado solo puede ser reactivado por un administrador. Un administrador no puede desactivarse a s{\'i} mismo y siempre debe existir al menos un administrador activo.\\\hline
+RN14 & Comprobantes & Cada movimiento de dinero (adelanto, liquidaci{\'o}n, reembolso total o parcial) genera un comprobante.\\\hline
+RN15 & C{\'o}digo & Cada reserva tiene un c{\'o}digo alfanum{\'e}rico {\'u}nico de ocho caracteres.\\\hline
+\end{longtable}
+\subsection{Diagrama de casos de uso}
+Administrador especializa a Empleado, por lo que hereda todos sus casos de uso. CU04 es el caso central: incluye siempre CU05 (seleccionar mesas) y CU06 (definir pago), y se extiende con CU07 (pedido anticipado) y CU08 (servicios extra).
+\begin{figure}[H]\centering
+{\small\textbf{Figura 1}}\\{\small\textit{Diagrama de casos de uso de Brindis}}\\[4pt]
+\IfFileExists{../diagramas/brindis/Fig1_CasosUso.png}{\includegraphics[width=0.95\linewidth]{../diagramas/brindis/Fig1_CasosUso.png}}{\fbox{\parbox{0.9\linewidth}{\small Para ver la figura, exportar \texttt{diagramas/brindis/Fig1\_CasosUso.drawio} a PNG (draw.io: Archivo \textgreater\ Exportar como \textgreater\ PNG, 300\,ppp) con el mismo nombre. Fuente guardada en el repo.}}}
+\\[3pt]{\small\textit{Nota.} Elaboraci{\'o}n propia. La flecha con tri{\'a}ngulo vac{\'i}o entre actores indica que el administrador hereda los casos de uso del empleado. CU04 \textit{Registrar reserva} incluye CU05 y CU06 y se extiende con CU07 y CU08. \texttt{CU01} Iniciar sesi{\'o}n incluye \textit{Validar estado de cuenta} y se extiende con \textit{Registrarse} y \textit{Reactivar cuenta}.}
+\end{figure}
+An{\'a}lisis: el Cliente concentra el flujo de reserva (CU04) y sus extensiones opcionales de valor (pedido y extras), mientras que el personal comparte ese n{\'u}cleo y a{\~n}ade gesti{\'o}n (agenda CU10, modificar/cancelar CU09, registro de clientes CU11). El Administrador no repite casos: los hereda del Empleado y suma los propios (usuarios, VIP, estad{\'i}sticas). Los \textit{include} marcan lo obligatorio y los \textit{extend} lo opcional, por eso el total y los comprobantes solo aparecen cuando corresponde (RN07, RN14).
+\subsection{Casos principales}
+\begin{center}{\small\textbf{Tabla 6}}\\{\small\textit{Especificaci{\'o}n del caso de uso CU01 Iniciar sesi{\'o}n}}\end{center}
+\begin{tabular}{|p{2.8cm}|>{\raggedright\arraybackslash}p{10.2cm}|}\hline
+\textbf{Actores} & Cliente, empleado, administrador.\\\hline
+\textbf{Precondici{\'o}n} & El usuario est{\'a} registrado y activo.\\\hline
+\textbf{Flujo b{\'a}sico} & 1. El usuario ingresa su correo y contrase{\~n}a. 2. El sistema busca el usuario por correo y lo construye con la subclase de su rol. 3. El sistema compara la contrase{\~n}a con el \textit{hash} almacenado. 4. El sistema crea la sesi{\'o}n. 5. El sistema redirige al cliente a sus reservas y al personal a la agenda del d{\'i}a.\\\hline
+\textbf{Flujos alternos} & 2a. El correo no existe o la contrase{\~n}a no coincide: se muestra ``Correo o contrase{\~n}a incorrectos'' sin indicar cu{\'a}l dato fall{\'o}. 2b. El usuario est{\'a} inactivo: se informa y, si es cliente, se ofrece enviar el \textit{token} de reactivaci{\'o}n. 4a. La contrase{\~n}a es gen{\'e}rica: se exige cambiarla antes de continuar.\\\hline
+\textbf{Postcondici{\'o}n} & Existe una sesi{\'o}n activa asociada al usuario y a su rol.\\\hline
+\end{tabular}
+
+\begin{center}{\small\textbf{Tabla 7}}\\{\small\textit{Especificaci{\'o}n del caso de uso CU04 Registrar reserva}}\end{center}
+\begin{longtable}{|p{2.8cm}|>{\raggedright\arraybackslash}p{10.2cm}|}\hline
+\textbf{Actores} & Cliente (reserva en l{\'i}nea), empleado y administrador (reserva a nombre de un cliente).\\\hline
+\textbf{Precondici{\'o}n} & El usuario inici{\'o} sesi{\'o}n.\\\hline
+\textbf{Flujo b{\'a}sico} & 1. El usuario elige la ocasi{\'o}n, el tipo de reserva, la fecha, la hora y el n{\'u}mero de comensales. 2. El sistema muestra el plano con el estado de cada mesa en esa franja y resalta la zona sugerida para la ocasi{\'o}n. 3. El usuario selecciona una o varias mesas (CU05) y el sistema las bloquea cinco minutos. 4. El usuario agrega, si lo desea, un pedido anticipado (CU07) y servicios extra (CU08), e indica restricciones alimentarias. 5. El sistema recalcula el total. 6. El usuario define la modalidad y el medio de pago (CU06). 7. El usuario confirma. 8. El sistema verifica los permisos, valida las reglas RN01 a RN06, guarda la reserva, emite el comprobante y muestra el c{\'o}digo.\\\hline
+\textbf{Flujos alternos} & 1a. Si el actor es del personal, primero busca al cliente por documento; si no existe, lo registra (CU11). 1b. Si elige restaurante completo, el sistema omite el paso 3 y asocia todas las mesas (RN04). 3a. La capacidad seleccionada no alcanza: el sistema lo indica y no permite continuar. 8a. El bloqueo venci{\'o} y otro usuario tom{\'o} la mesa: el sistema informa y regresa al paso 2. 8b. Se eligi{\'o} pago en el restaurante sin cumplir RN06: el sistema lo rechaza.\\\hline
+\textbf{Postcondici{\'o}n} & La reserva queda en estado \textit{vigente}, con su c{\'o}digo, sus mesas, su detalle de pago y su comprobante.\\\hline
+\end{longtable}
+{\small\textit{Nota.} Elaboraci{\'o}n propia.}
+
+\begin{center}{\small\textbf{Tabla 8}}\\{\small\textit{Especificaci{\'o}n del caso de uso CU09 Modificar o cancelar reserva (cancelaci{\'o}n)}}\end{center}
+\begin{tabular}{|p{2.8cm}|>{\raggedright\arraybackslash}p{10.2cm}|}\hline
+\textbf{Actores} & Cliente (sus propias reservas), empleado y administrador.\\\hline
+\textbf{Precondici{\'o}n} & La reserva est{\'a} vigente.\\\hline
+\textbf{Flujo b{\'a}sico} & 1. El usuario elige la reserva y la opci{\'o}n cancelar. 2. El sistema calcula las horas que faltan y, seg{\'u}n el tipo de cliente, el valor a reembolsar (RN08, RN09). 3. El sistema muestra el reembolso y la retenci{\'o}n. 4. El usuario confirma. 5. El sistema cambia el estado a \textit{cancelada}, libera las mesas, emite el comprobante de reembolso total o parcial y, si aplica, registra un \textit{strike}.\\\hline
+\textbf{Flujos alternos} & 1a. Un cliente intenta cancelar una reserva ajena: el control de acceso lo rechaza. 2a. No hubo pagos: la reserva se cancela sin comprobante.\\\hline
+\textbf{Postcondici{\'o}n} & La reserva queda cancelada y el reembolso queda registrado.\\\hline
+\end{tabular}
+{\small\textit{Nota.} Elaboraci{\'o}n propia.}
+
+\begin{center}{\small\textbf{Tabla 9}}\\{\small\textit{Especificaci{\'o}n del caso de uso CU10 Gestionar agenda del d{\'i}a}}\end{center}
+\begin{tabular}{|p{2.8cm}|>{\raggedright\arraybackslash}p{10.2cm}|}\hline
+\textbf{Actores} & Empleado, administrador.\\\hline
+\textbf{Precondici{\'o}n} & El usuario inici{\'o} sesi{\'o}n con un rol del personal.\\\hline
+\textbf{Flujo b{\'a}sico} & 1. El usuario abre la agenda. 2. El sistema muestra las reservas del d{\'i}a ordenadas por hora, con el cliente (y si es VIP), las mesas, la ocasi{\'o}n, las alertas de restricciones y las indicaciones de servicio. 3. El usuario cambia el estado de una reserva: \textit{cliente en mesa} al llegar, \textit{completada} al liquidar el saldo o \textit{inasistida}. 4. El sistema guarda el cambio; si es una inasistencia, registra un \textit{strike}; si es una liquidaci{\'o}n, emite el comprobante.\\\hline
+\textbf{Flujos alternos} & 1a. El usuario elige otra fecha. 3a. La transici{\'o}n no es v{\'a}lida (por ejemplo, completar una reserva cancelada): el sistema la rechaza.\\\hline
+\textbf{Postcondici{\'o}n} & El estado de la reserva queda actualizado.\\\hline
+\end{tabular}
+{\small\textit{Nota.} Elaboraci{\'o}n propia.}
+\subsection{Ciclo de vida}
+VIGENTE $\rightarrow$ CLIENTE\_EN\_MESA $\rightarrow$ COMPLETADA; VIGENTE $\rightarrow$ CANCELADA/INASISTIDA; modificación sobre VIGENTE.
+
+\section{Diseño}
+\subsection{Arquitectura MVC por capas}
+La Vista presenta la informaci\'on, el Controlador atiende las peticiones y el Modelo contiene la l\'ogica y los datos. Lo cr\'itico: los controladores no acceden a la l\'ogica de reservas sin pasar por el control de acceso; la verificaci\'on de cruces, el registro de la reserva y su comprobante se ejecutan en una misma transacci\'on.
+\subsection{Diagrama de clases del modelo}
+Usuario es abstracta y se especializa en Cliente y Empleado; Administrador hereda de Empleado, lo que expresa que puede hacer todo lo del personal. Lo cr\'itico: la Reserva pertenece a un Cliente, puede haber sido creada por un Empleado, ocupa una o varias Mesas y se compone de su pedido anticipado y sus servicios extra. La enumeraci\'on Ocasion sostiene la reserva por ocasi\'on: cada valor conoce la zona sugerida y la decoraci\'on ofrecida.
+\begin{figure}[H]\centering
+{\small\textbf{Figura 4}}\\{\small\textit{Diagrama de clases del modelo (entidades)}}\\[4pt]
+\IfFileExists{../diagramas/brindis/Fig4_DiagramaClases.png}{\includegraphics[width=0.95\linewidth]{../diagramas/brindis/Fig4_DiagramaClases.png}}{\fbox{\parbox{0.9\linewidth}{\small Para ver la figura, exportar \texttt{diagramas/brindis/Fig4\_DiagramaClases.drawio} a PNG (draw.io: Archivo \textgreater\ Exportar como \textgreater\ PNG, 300\,ppp) con el mismo nombre. Fuente guardada en el repo.}}}
+\\[3pt]{\small\textit{Nota.} Elaboraci{\'o}n propia. Se omiten los m{\'e}todos \textit{get} y \textit{set}. El rombo relleno indica composici{\'o}n. Las relaciones de muchos a muchos (por ejemplo, Reserva con Mesa, ItemMenu o PlanServicioExtra) se solucionan en la base de datos con una tabla intermedia (reserva\_mesa, reserva\_detalle\_pedido, reserva\_servicio\_extra, que adem{\'a}s conservan el precio vigente RN07), pero por facilidad de lectura el diagrama las muestra como asociaci{\'o}n directa con su multiplicidad; impl{\'i}citamente la l{\'o}gica ha de contemplar esas tablas intermedias.}
+\end{figure}
+An{\'a}lisis: la jerarqu{\'i}a de usuarios concentra en \textit{Usuario} lo com{\'u}n (identidad, credenciales, estado) y deja en cada subclase lo propio (strikes y VIP en Cliente, legajo y agenda en Empleado, gesti{\'o}n en Administrador), lo que sostiene a \textit{Factory Method} y al \textit{Proxy}. La Reserva es el agregado central: sus composiciones (detalle de pedido y de pago, comprobantes) mueren con ella, mientras que Mesa, Zona, Horario y Planes existen por s{\'i} mismos y solo se asocian con su multiplicidad (\texttt{1}, \texttt{0..1}, \texttt{1..*}, \texttt{0..*}). BloqueoMesa y TokenReactivacion modelan lo temporal (RN03, RN13) sin contaminar a Mesa ni a Cliente.
+\begin{center}{\small\textbf{Tabla 10}}\\{\small\textit{Valores de la enumeraci{\'o}n Ocasion}}\end{center}
+{\footnotesize
+\begin{tabular}{|>{\raggedright\arraybackslash}p{2.6cm}|>{\raggedright\arraybackslash}p{2.4cm}|>{\raggedright\arraybackslash}p{2.8cm}|>{\raggedright\arraybackslash}p{5.0cm}|}\hline
+\textbf{Ocasi{\'o}n} & \textbf{Zona sugerida} & \textbf{Decoraci{\'o}n ofrecida} & \textbf{Indicaci{\'o}n para el personal}\\\hline
+CUMPLEANOS & General & Cumplea{\~n}os & Preparar la canci{\'o}n al servir el postre.\\\hline
+ANIVERSARIO & VIP & Aniversario & Luz tenue y m{\'u}sica suave.\\\hline
+PROPUESTA & VIP & Propuesta & Coordinar con el cliente el momento de la propuesta.\\\hline
+ROMANTICA & Terraza & Rom{\'a}ntica & Mesa apartada y servicio discreto.\\\hline
+NEGOCIOS & VIP & Ninguna & Servicio {\'a}gil y sin interrupciones.\\\hline
+CASUAL & Cualquiera & Ninguna & Servicio est{\'a}ndar.\\\hline
+\end{tabular}
+}
+\subsection{Modelo relacional \texttt{brindis\_db}}
+13 tablas normalizadas 3FN (Elmasri y Navathe, 2016): usuario, token\_reactivacion, mesa (solo DISPONIBLE/FUERA\_DE\_SERVICIO; reservada/bloqueada se calcula por franja desde reserva\_mesa + bloqueo\_mesa), horario\_atencion, reserva (codigo único, id\_creador nulable), reserva\_mesa, item\_menu, reserva\_detalle\_pedido (precio congelado), plan\_servicio\_extra, reserva\_servicio\_extra (precio congelado), detalle\_pago (0--100), comprobante\_pago (id\_empleado nulable). Índices en reserva\_mesa.id\_mesa y reserva.fecha\_hora\_inicio (RN01). Script SQL en Anexo.
+\subsection{Diagrama de clases DAO}
+\begin{figure}[H]\centering
+{\small\textbf{Figura 6}}\\{\small\textit{Diagrama de clases DAO}}\\[4pt]
+\begin{tikzpicture}
+\umlcls{gen}{3.2,0}{i}{6.0cm}{GenericDAO<T, Id>}{}{+obtener()\ \ +listar()\ \ +guardar()\ \ +eliminar()}
+\coordinate (trk) at ($(gen.south west)+(0.45,0)$);
+% --- Interfaces DAO ---
+\umlcls{u}{$(gen.south)+(0.1,-1.1)$}{i}{4.3cm}{UsuarioDAO}{}{+buscar\_por\_correo() : Usuario}
+\umlcls{m}{$(u.south)+(0,-0.4)$}{i}{4.3cm}{MesaDAO}{}{+en\_servicio() : Lista}
+\umlcls{r}{$(m.south)+(0,-0.4)$}{i}{4.3cm}{ReservaDAO}{}{+hay\_cruce() : boolean}
+\umlcls{c}{$(r.south)+(0,-0.4)$}{i}{4.3cm}{CatalogoDAO}{}{}
+\umlcls{p}{$(c.south)+(0,-0.4)$}{i}{4.3cm}{PagoDAO}{}{+emitir\_comprobante() : id}
+% --- Implementaciones ---
+\umlcls{ui}{$(u.north)+(5.5,-0.25)$}{c}{3.0cm}{UsuarioDAOImpl}{}{}
+\umlcls{mi}{$(m.north)+(5.5,-0.25)$}{c}{3.0cm}{MesaDAOImpl}{}{}
+\umlcls{ri}{$(r.north)+(5.5,-0.25)$}{c}{3.0cm}{ReservaDAOImpl}{}{}
+\umlcls{ci}{$(c.north)+(5.5,-0.12)$}{c}{3.0cm}{CatalogoDAOImpl}{}{}
+\umlcls{pi}{$(p.north)+(5.5,-0.25)$}{c}{3.0cm}{PagoDAOImpl}{}{}
+% --- Conexion ---
+\umlcls{pool}{$(ri.north)+(3.9,0.1)$}{u}{2.3cm}{ConexionBD}{-url : String}{}
+% --- Generalizacion: interfaces -> GenericDAO (tronco a la izquierda) ---
+\foreach \x in {u,m,r,c,p}{ \draw[gen] (\x.west) -- (\x.west -| trk) -- (trk); }
+% --- Realizacion: impl -> interfaz ---
+\foreach \i/\x in {ui/u,mi/m,ri/r,ci/c,pi/p}{ \draw[real] (\i.west) -- (\i.west -| \x.east); }
+% --- Asociacion con multiplicidad: muchos DAOImpl comparten una ConexionBD ---
+\coordinate (bus) at ($(pool.west)+(-0.95,0)$);
+\foreach \i in {ui,mi,ri,ci,pi}{
+  \draw[umlline,line width=0.5pt] (\i.east) -- (\i.east -| bus);
+  \node[mu] at ($(\i.east)+(0.22,0.16)$) {*};
+}
+\draw[umlline,line width=0.5pt] (ui.east -| bus) -- (pi.east -| bus);
+\draw[asoc] (bus |- pool.west) -- (pool.west);
+\node[mu] at ($(pool.west)+(-0.3,0.2)$) {1};
+\node[el] at ($(pool.west)+(-0.5,-0.22)$) {$-$pool};
+\end{tikzpicture}
+\\[3pt]{\small\textit{Nota.} Elaboraci{\'o}n propia.}
+\end{figure}
+\texttt{GenericDAO<T,ID>} $\rightarrow$ \texttt{trait GenericDao<T,Id>} async; \texttt{UsuarioDao, MesaDao, ReservaDao, CatalogoDao, PagoDao} + impls \texttt{*Sqlx} con \texttt{DbPool} (\texttt{sqlx::MySqlPool} clonable). \texttt{UsuarioDaoSqlx} usa la f\'abrica para reconstruir cada registro con la subclase de su rol. L\'inea continua+tri\'angulo: herencia; discontinua+tri\'angulo: realizaci\'on; discontinua+flecha: dependencia (sin multiplicidad); continua+flecha: asociaci\'on navegable, con la multiplicidad en cada extremo (\texttt{1}, \texttt{0..1}, \texttt{1..*}, \texttt{0..*}); rombo vac\'io: agregaci\'on. Nombre en cursiva: clase abstracta.
+\subsection{Patrones aplicados}
+Se aplican exactamente cuatro patrones del cat{\'a}logo de Gamma et al.\ (1994): dos creacionales y dos estructurales. La Tabla 11 resume el problema que resuelve cada uno.
+\begin{center}{\small\textbf{Tabla 11}}\\{\small\textit{Patrones de dise{\~n}o aplicados en Brindis}}\end{center}
+{\small
+\begin{tabular}{|>{\raggedright\arraybackslash}p{1.8cm}|>{\raggedright\arraybackslash}p{2.0cm}|>{\raggedright\arraybackslash\footnotesize\ttfamily}p{3.8cm}|>{\raggedright\arraybackslash}p{5.4cm}|}\hline
+\textbf{Tipo} & \textbf{Patr{\'o}n} & \textbf{Clases principales} & \textbf{Problema que resuelve}\\\hline
+Creacional & \textit{Factory Method} & \seqsplit{UsuarioFactory}\newline \seqsplit{ClienteFactory}\newline \seqsplit{EmpleadoFactory}\newline \seqsplit{AdministradorFactory} & Cada rol se crea con datos y reglas distintas (tipo de cliente, \textit{strikes}, credenciales gen{\'e}ricas). Centralizar la creaci{\'o}n evita condicionales repartidos y permite agregar roles sin modificar lo existente.\\\hline
+Creacional & \textit{Builder} & \seqsplit{ReservaBuilder} & La reserva asocia cliente, mesas, consumos, servicios extra y pago, con datos obligatorios y opcionales. Un constructor con m{\'a}s de diez par{\'a}metros ser{\'i}a ilegible, y la reserva solo debe existir si cumple las reglas de negocio.\\\hline
+Estructural & \textit{Proxy} & \seqsplit{ReservaServiceProxy}\newline \seqsplit{UsuarioServiceProxy} & Las mismas operaciones se permiten o se niegan seg{\'u}n el rol del usuario y la propiedad de la reserva. El control de acceso no debe mezclarse con la l{\'o}gica de negocio.\\\hline
+Estructural & \textit{Decorator} & \seqsplit{ReservaDecorator}\newline \seqsplit{DecoracionDecorator}\newline \seqsplit{BarraCoctelesDecorator} & Los servicios extra se combinan libremente y cada uno cambia el costo y las indicaciones de servicio. Crear una subclase por cada combinaci{\'o}n ser{\'i}a inviable.\\\hline
+\end{tabular}
+}
+\subsubsection{Factory Method: usuarios por rol (Fig.~7)}
+Lo cr\'itico: cada rol se crea con datos y reglas distintas (tipo y strikes del cliente, credenciales gen\'ericas RN12). Centralizar la creaci\'on evita condicionales repartidos y permite agregar roles sin modificar lo existente (RNF05). Qui\'en puede crear a qui\'en lo decide el control de acceso, no la f\'abrica.
+\begin{figure}[H]\centering
+{\small\textbf{Figura 7}}\\{\small\textit{Factory Method: creaci{\'o}n de usuarios por rol}}\\[4pt]
+\begin{tikzpicture}
+% --- Servicio y fabrica abstracta ---
+\umlcls{svc}{0,0}{c}{6.3cm}{UsuarioServiceImpl}{}{+fabrica\_para(rol : Rol) : UsuarioFactory}
+\umlcls{fac}{$(svc.south)+(0,-1.45)$}{a}{6.0cm}{UsuarioFactory}{}{+rol() : Rol\\+crear\_usuario(base, datos) : Usuario}
+% --- Fabricas concretas ---
+\umlcls{cf}{$(fac.south)+(-4.45,-1.15)$}{c}{3.7cm}{ClienteFactory}{}{+crear\_usuario() : Cliente}
+\umlcls{ef}{$(fac.south)+(0,-1.15)$}{c}{3.9cm}{EmpleadoFactory}{}{+crear\_usuario() : Empleado}
+\umlcls{af}{$(fac.south)+(4.85,-1.15)$}{c}{4.5cm}{AdministradorFactory}{}{+crear\_usuario() : Administrador}
+% --- Productos ---
+\umlcls{cli}{$(cf.south)+(0,-1.15)$}{c}{3.7cm}{Cliente}{-tipo : TipoCliente\\-strikes : int}{}
+\umlcls{emp}{$(ef.south)+(0,-1.15)$}{c}{3.9cm}{Empleado}{-legajo : String}{}
+\umlcls{adm}{$(af.south)+(0,-1.15)$}{c}{4.5cm}{Administrador}{}{}
+\umlst{}\umlcls{usu}{$(cli.south)!.5!(emp.south |- cli.south)+(0,-1.3)$}{a}{3.4cm}{Usuario}{}{}
+% --- Asociacion con multiplicidad: el servicio conoce una fabrica por rol ---
+\draw[asoc] (svc.south) -- (fac.north);
+\node[mu,anchor=west] at ($(svc.south)+(0.12,-0.22)$) {1};
+\node[mu,anchor=west] at ($(fac.north)+(0.12,0.24)$) {1..*};
+\node[el,anchor=west] at ($(svc.south)!.5!(fac.north)+(0.15,0)$) {$-$fabricas};
+% --- Generalizacion de fabricas ---
+\draw[gen] (cf.north) -- ++(0,0.5) -| (fac.south);
+\draw[gen] (af.north) -- ++(0,0.5) -| (fac.south);
+\draw[gen] (ef.north) -- (fac.south);
+% --- Dependencias <<create>> (sin multiplicidad) ---
+\foreach \f/\p in {cf/cli,ef/emp,af/adm}{
+  \draw[dep] (\f.south) -- (\p.north);
+  \node[el,anchor=west] at ($(\f.south)!.5!(\p.north)+(0.12,0)$) {crea};
+}
+% --- Generalizacion de usuarios ---
+\draw[gen] (adm.west) -- (emp.east |- adm.west);
+\coordinate (bus) at ($(cli.south)+(0,-0.55)$);
+\draw[gen] (cli.south) -- (cli.south |- bus) -| (usu.north);
+\draw[gen] (emp.south) -- (emp.south |- bus) -| (usu.north);
+\end{tikzpicture}
+\\[3pt]{\small\textit{Nota.} Elaboraci{\'o}n propia.}
+\end{figure}
+\subsubsection{Builder: reserva validada (Fig.~8)}
+Lo cr\'itico: la reserva asocia cliente, mesas, consumos, extras y pago, con datos obligatorios y opcionales. Todas las validaciones se concentran en \texttt{build()}: capacidad RN02, horario RN05 y modalidad de pago RN06. Si falta algo o se viola una regla, la reserva jam\'as llega a existir en estado inv\'alido.
+\begin{figure}[H]\centering
+{\small\textbf{Figura 8}}\\{\small\textit{Builder: construcci{\'o}n validada de la reserva}}\\[4pt]
+\begin{tikzpicture}
+\coordinate (yl) at (0,-1.0);
+\def\umlst{director}
+\umlcls{dir}{1.8,0}{c}{3.2cm}{ReservaServiceImpl}{}{+confirmar() : id}
+\umlcls{bld}{6.7,0}{c}{3.2cm}{ReservaBuilder}{}{+cliente() : Builder\\+mesas() : Builder\\+fecha() : Builder\\+pago() : Builder\\+build() : Reserva}
+\umlcls{res}{11.9,0}{c}{3.5cm}{Reserva}{-codigo : String\\-estado : EstadoReserva}{+new() : Reserva \{paquete\}}
+% --- Dependencias (sin multiplicidad) ---
+\draw[dep] (dir.east |- yl) -- (bld.west |- yl);
+\node[el] at ($(dir.east |- yl)!.5!(bld.west |- yl)+(0,0.2)$) {dirige};
+\draw[dep] (bld.east |- yl) -- (res.west |- yl);
+\node[el] at ($(bld.east |- yl)!.5!(res.west |- yl)+(0,0.2)$) {construye};
+% --- Asociaciones de Reserva (con multiplicidad) ---
+\umlcls{cli}{$(res.south)+(-1.2,-1.55)$}{c}{1.7cm}{Cliente}{}{}
+\umlcls{mes}{$(res.south)+(1.35,-1.55)$}{c}{1.7cm}{Mesa}{}{}
+\draw[asoc] ($(res.south)+(-1.2,0)$) -- (cli.north);
+\node[mu,anchor=west] at ($(res.south)+(-1.12,-0.22)$) {0..*};
+\node[mu,anchor=west] at ($(cli.north)+(0.08,0.22)$) {1};
+\node[el,anchor=east] at ($($(res.south)+(-1.2,0)$)!.5!(cli.north)+(-0.1,0)$) {$-$cliente};
+\draw[asoc] ($(res.south)+(1.35,0)$) -- (mes.north);
+\node[mu,anchor=west] at ($(res.south)+(1.43,-0.22)$) {0..*};
+\node[mu,anchor=west] at ($(mes.north)+(0.08,0.22)$) {1..*};
+\node[el,anchor=east] at ($($(res.south)+(1.35,0)$)!.5!(mes.north)+(-0.1,0)$) {$-$mesas};
+% --- Nota ---
+\node[nota,text width=4.4cm] (nt) at ($(bld.south)+(0,-0.6)$)
+  {build() concentra RN02 capacidad, RN05 horario y RN06 pago. Si algo falla, la Reserva jam\'as existe.};
+\draw[umlline,dashed,line width=0.4pt] (nt.north) -- (bld.south);
+\end{tikzpicture}
+\\[3pt]{\small\textit{Nota.} Elaboraci{\'o}n propia.}
+\end{figure}
+\subsubsection{Proxy: acceso por rol (Fig.~9)}
+Lo cr\'itico: las mismas operaciones se permiten o se niegan seg\'un el rol y la propiedad de la reserva. Un cliente solo opera a su nombre; solo el personal ve la agenda, registra por otro y cambia estados; solo el administrador ve estad\'isticas. Separar este control de la l\'ogica permite cambiar pol\'iticas sin tocar el servicio real.
+\begin{figure}[H]\centering
+{\small\textbf{Figura 9}}\\{\small\textit{Proxy: control de acceso por rol}}\\[4pt]
+\begin{tikzpicture}
+\coordinate (yc) at (0,-0.55);
+% --- Fila superior ---
+\umlcls{ctl}{1.85,0}{c}{3.3cm}{ReservaController}{}{+POST /reservas : 201}
+\umlcls{ifc}{9.0,0}{i}{3.9cm}{ReservaService}{}{+confirmar() : id\\+cancelar() : void\\+agenda() : List<Reserva>}
+% --- Fila inferior ---
+\umlcls{ses}{$(ifc.south)+(-7.75,-1.2)$}{c}{2.2cm}{UsuarioSesion}{-rol : Rol\\-id\_cliente : id}{}
+\umlcls{prx}{$(ifc.south)+(-2.95,-1.2)$}{c}{3.2cm}{ReservaServiceProxy}{}{+verificar\_rol() : void}
+\umlcls{rl}{$(ifc.south)+(2.9,-1.2)$}{c}{4.5cm}{ReservaServiceImpl}{}{+confirmar() : id \{transaccion\}}
+\coordinate (yr) at ($(prx.north)+(0,-0.55)$);
+% --- Controlador usa la interfaz ---
+\draw[dep] (ctl.east |- yc) -- (ifc.west |- yc);
+\node[el] at ($(ctl.east |- yc)!.5!(ifc.west |- yc)+(0,0.2)$) {usa};
+% --- Realizacion: proxy e impl implementan la misma interfaz ---
+\draw[real] (prx.north) -- ++(0,0.55) -| (ifc.south);
+\draw[real] (rl.north) -- ++(0,0.55) -| (ifc.south);
+% --- Asociacion con multiplicidad: el proxy envuelve a un servicio real ---
+\draw[asoc] (prx.east |- yr) -- (rl.west |- yr);
+\node[mu] at ($(prx.east |- yr)+(0.25,0.18)$) {1};
+\node[mu] at ($(rl.west |- yr)+(-0.32,0.18)$) {1};
+\node[el] at ($(prx.east |- yr)!.5!(rl.west |- yr)+(0,-0.2)$) {$-$real};
+% --- Dependencia: el proxy consulta la sesion (sin multiplicidad) ---
+\draw[dep] (prx.west |- yr) -- (ses.east |- yr);
+\node[el] at ($(prx.west |- yr)!.5!(ses.east |- yr)+(0,0.2)$) {verifica rol};
+\end{tikzpicture}
+\\[3pt]{\small\textit{Nota.} Elaboraci{\'o}n propia.}
+\end{figure}
+\subsubsection{Decorator: costo de extras (Fig.~10)}
+Lo cr\'itico: los servicios extra se combinan libremente y cada uno cambia el costo y las indicaciones (decoraci\'on 20 min antes, barra por persona). El total se calcula sin importar cu\'antos haya ni el orden. Ej.: $180.000+80.000+4\times45.000=440.000$ (CP09).
+\begin{figure}[H]\centering
+{\small\textbf{Figura 10}}\\{\small\textit{Decorator: costo de los servicios extra}}\\[4pt]
+\begin{tikzpicture}
+\umlcls{cmp}{4.78,0}{i}{3.9cm}{ComponenteReserva}{}{+costo() : double\\+descripcion() : String\\+indicaciones() : Lista}
+\umlcls{bas}{$(cmp.south)+(-2.78,-1.25)$}{c}{3.4cm}{ReservaBase}{-pedido\_total : double}{+costo() : double}
+\umlcls{dec}{$(cmp.south)+(2.77,-1.25)$}{a}{4.0cm}{ReservaDecorator}{}{}
+\umlcls{dcr}{$(dec.south)+(-2.65,-1.35)$}{c}{4.0cm}{DecoracionDecorator}{-tarifa : double}{+costo() : envuelto + tarifa}
+\umlcls{bar}{$(dec.south)+(2.65,-1.35)$}{c}{4.6cm}{BarraCoctelesDecorator}{-tarifa : double\\-por\_persona : boolean}{+costo() : envuelto + tarifa x n}
+% --- Realizacion: base y decorador implementan el componente ---
+\draw[real] (bas.north) -- ++(0,0.6) -| (cmp.south);
+\draw[real] (dec.north) -- ++(0,0.6) -| (cmp.south);
+% --- Generalizacion: decoradores concretos ---
+\draw[gen] (dcr.north) -- ++(0,0.55) -| (dec.south);
+\draw[gen] (bar.north) -- ++(0,0.55) -| (dec.south);
+% --- Agregacion con multiplicidad: un decorador envuelve exactamente un componente ---
+\draw[agg] (dec.east) -- ++(1.15,0) |- (cmp.east);
+\node[mu,anchor=west] at ($(dec.east)+(0.42,0.2)$) {0..1};
+\node[mu] at ($(cmp.east)+(0.32,0.2)$) {1};
+\node[el,anchor=west] at ($(dec.east)+(1.25,1.0)$) {$-$envuelto};
+\end{tikzpicture}
+\\[3pt]{\small\textit{Nota.} Elaboraci{\'o}n propia.}
+\end{figure}
+\subsection{Diagrama de clases de control}
+\begin{figure}[H]\centering
+{\small\textbf{Figura 11}}\\{\small\textit{Diagrama de clases de control}}\\[4pt]
+\begin{tikzpicture}
+% --- Controladores ---
+\umlcls{auth}{1.9,0}{c}{3.2cm}{AuthController}{}{+login() : Sesion}
+\umlcls{rct}{6.9,0}{c}{3.4cm}{ReservaController}{}{+confirmar() : id}
+\umlcls{pct}{12.0,0}{c}{3.4cm}{PersonalController}{}{+agenda() : Lista}
+% --- Interfaces de servicio ---
+\umlcls{usv}{$(auth.south)+(0,-1.0)$}{i}{3.2cm}{UsuarioService}{}{+registrar() : id}
+\umlcls{rsv}{$(rct.south)+(0,-1.0)$}{i}{3.6cm}{ReservaService}{}{+confirmar() : id\\+cancelar() : void\\+agenda() : List<Reserva>}
+\coordinate (y3) at ($(rsv.south)+(0,-1.0)$)
+;
+% --- Proxies ---
+\def\umlst{Proxy}\umlcls{upx}{usv.south |- y3}{c}{3.2cm}{UsuarioServiceProxy}{}{+verificar\_rol() : void}
+\def\umlst{Proxy}\umlcls{rpx}{rsv.south |- y3}{c}{3.6cm}{ReservaServiceProxy}{}{+verificar\_rol() : void}
+\coordinate (y4) at ($(rpx.south)+(0,-1.25)$)
+;
+% --- Servicios reales ---
+\umlcls{uim}{upx.south |- y4}{c}{3.2cm}{UsuarioServiceImpl}{}{+registrar() : id}
+\def\umlst{director}\umlcls{rim}{rpx.south |- y4}{c}{3.6cm}{ReservaServiceImpl}{}{+confirmar() : id}
+\coordinate (y5) at ($(rim.south)+(0,-1.3)$)
+;
+% --- Patrones y capa de datos ---
+\umlcls{fac}{uim.south |- y5}{a}{3.9cm}{UsuarioFactory}{}{+crear\_usuario() : Usuario}
+\umlcls{bld}{$(rim.south |- y5)+(-1.0,0)$}{c}{2.9cm}{ReservaBuilder}{}{+build() : Reserva}
+\umlcls{dcp}{$(rim.south |- y5)+(4.5,0)$}{i}{3.4cm}{ComponenteReserva}{}{+costo() : double}
+\def\umlst{paquete}\umlcls{dao}{$(rim.south |- y5)+(1.7,-1.9)$}{c}{5.0cm}{dao}{}{UsuarioDAO, MesaDAO, ReservaDAO,\\CatalogoDAO, PagoDAO, ConexionBD}
+% --- Controladores -> interfaces (dependencias, sin multiplicidad) ---
+\draw[dep] (auth.south) -- (usv.north);
+\draw[dep] (rct.south) -- (rsv.north);
+\coordinate (px) at ($(rsv.north east)+(-0.6,0)$);
+\draw[dep] (pct.south) -- ++(0,-0.5) -| (px);
+% --- Proxy realiza la interfaz ---
+\draw[real] (upx.north) -- (usv.south);
+\draw[real] (rpx.north) -- (rsv.south);
+% --- Proxy -> servicio real (asociacion 1 a 1) ---
+\foreach \p/\i in {upx/uim,rpx/rim}{
+  \draw[asoc] (\p.south) -- (\i.north);
+  \node[mu,anchor=west] at ($(\p.south)+(0.1,-0.2)$) {1};
+  \node[mu,anchor=west] at ($(\i.north)+(0.1,0.2)$) {1};
+  \node[el,anchor=west] at ($(\p.south)!.5!(\i.north)+(0.1,0)$) {$-$real};
+}
+% --- Servicio de usuarios -> fabricas (1 a 1..*) ---
+\draw[asoc] (uim.south) -- (fac.north);
+\node[mu,anchor=west] at ($(uim.south)+(0.1,-0.2)$) {1};
+\node[mu,anchor=west] at ($(fac.north)+(0.1,0.2)$) {1..*};
+\node[el,anchor=west] at ($(uim.south)!.5!(fac.north)+(0.1,0)$) {$-$fabricas};
+% --- Servicio de reservas -> builder, decoradores y DAO (dependencias) ---
+\draw[dep] ($(rim.south)+(-1.0,0)$) -- (bld.north);
+\node[el,anchor=east] at ($($(rim.south)+(-1.0,0)$)!.5!(bld.north)+(-0.1,0)$) {dirige};
+\draw[dep] (rim.east) -- (rim.east -| dcp.north) -- (dcp.north);
+\node[el] at ($(rim.east)!.5!(rim.east -| dcp.north)+(0,0.2)$) {compone};
+\draw[dep] ($(rim.south)+(1.7,0)$) -- (dao.north);
+\node[el,anchor=west] at ($($(rim.south)+(1.7,0)$)!.5!(dao.north)+(0.1,0)$) {usa};
+% --- Servicio de usuarios -> DAO (canal izquierdo) ---
+\coordinate (xl) at (-0.6,0);
+\draw[dep] (uim.west) -- (uim.west -| xl) |- (dao.west);
+\end{tikzpicture}
+\\[3pt]{\small\textit{Nota.} Elaboraci{\'o}n propia.}
+\end{figure}
+Los controladores dependen de las interfaces de servicio, que en ejecuci\'on est\'an implementadas por los proxies; el servicio real dirige al builder y compone los decoradores; el servicio de usuarios elige la f\'abrica seg\'un el rol; y solo los servicios acceden a los DAO.
+\subsection{Secuencia CU04}
+El controlador hace una sola llamada; el proxy verifica el permiso antes de delegar; y el servicio real usa el builder y los decoradores dentro de una misma transacci\'on: disponibilidad, construcci\'on, c\'alculo total, guardado y comprobante.
+\subsection{UI}
+4 pasos con progreso, vino de marca; plano verde libre, rojo reservada, gris bloqueada, dorado seleccionada; mensajes Nielsen (1993). Prototipos Figs.~13--16 (baja fidelidad).
+\section{Implementaci{\'o}n: backend cr{\'i}tico y patrones}
+Lo importante del backend son cinco piezas, una por patr{\'o}n m{\'a}s la transacci{\'o}n. El resto (vistas, DTO) solo transporta datos. C{\'o}digo completo en \texttt{src/}: compila con \texttt{cargo check} y el caso CP09 pasa con \texttt{cargo test}.
+\subsection{Capas y transacci{\'o}n (lo que une todo)}
+El controlador hace una sola llamada; el proxy verifica; el servicio real abre una transacci{\'o}n que agrupa disponibilidad (RN01), construcci{\'o}n (RN02/RN05/RN06), c{\'a}lculo con decoradores y comprobante (RN14). Si algo falla, nada se guarda (RNF03).
+\subsection{Factory Method: crear por rol}
+Lo cr{\'i}tico es \texttt{crear\_usuario()}: cada f{\'a}brica decide qu{\'e} struct nace, y \texttt{registrar} hace lo com{\'u}n (validar duplicados RN12, cifrar, guardar). As{\'i} agregar ``Cajero'' no toca lo existente (RNF05).
+\begin{lstlisting}
+fn crear_usuario(&self, base: Base, d: &Datos) -> Usuario {
+  Usuario::Cliente(Cliente { base, tipo: General, strikes: 0 })
+}
+\end{lstlisting}
+\subsection{Builder: reserva que no nace inv{\'a}lida}
+Lo cr{\'i}tico est{\'a} en \texttt{build()}: capacidad RN02 y horario RN05. El constructor es de paquete, solo el builder crea.
+\begin{lstlisting}
+let cap: u32 = self.capacidades.iter().sum();
+if cap < n { return Err(Capacidad); }
+Ok(Reserva::new(..))
+\end{lstlisting}
+\subsection{Proxy: permiso antes de delegar}
+Lo cr{\'i}tico es verificar sesi{\'o}n y propiedad antes de llamar al real: cliente solo lo suyo (CP05), personal agenda (RF15), admin estad{\'i}sticas. Cambiar pol{\'i}ticas no toca negocio.
+\begin{lstlisting}
+if cliente && reserva.cliente != sesion.id { return Denegado; }
+self.real.confirmar(sesion, reserva).await
+\end{lstlisting}
+\subsection{Decorator: total con extras combinables}
+Lo cr{\'i}tico es envolver: base (pedido) + decoraci{\'o}n (tarifa fija, aviso 20 min) + barra (tarifa por persona x comensales). Orden irrelevante; nuevo servicio es un decorador m{\'a}s. CP09: 180.000 + 80.000 + 4 x 45.000 = 440.000.
+\begin{lstlisting}
+costo() = envuelto.costo() + tarifa * comensales
+\end{lstlisting}
+\section{Casos de prueba}
+\begin{center}{\small\textbf{Tabla 12}}\\{\small\textit{Casos de prueba funcionales}}\end{center}
+\begin{longtable}{|p{1.0cm}|>{\raggedright\arraybackslash}p{5.4cm}|>{\raggedright\arraybackslash}p{5.0cm}|c|}\hline
+\textbf{ID} & \textbf{Escenario} & \textbf{Resultado esperado} & \textbf{{\textquestiondown}Cumple?}\\\hline
+\endhead
+CP01 & Inicio de sesi{\'o}n con credenciales v{\'a}lidas de cliente. & Redirige a ``Mis reservas''. & \\\hline
+CP02 & Inicio de sesi{\'o}n con contrase{\~n}a incorrecta. & Mensaje gen{\'e}rico de error. & \\\hline
+CP03 & Registro de un cliente nuevo desde la aplicaci{\'o}n. & Queda con rol cliente, tipo general y cero \textit{strikes} (\textit{Factory Method}). & \\\hline
+CP04 & Un cliente intenta abrir la agenda del personal. & Acceso denegado (\textit{Proxy}). & \\\hline
+CP05 & Un cliente intenta cancelar la reserva de otro cliente. & Acceso denegado (\textit{Proxy}). & \\\hline
+CP06 & Dos usuarios seleccionan la misma mesa en la misma franja. & El segundo la ve bloqueada y no puede tomarla (RN03). & \\\hline
+CP07 & Reservar para 6 personas con mesas que suman 4 puestos. & Se rechaza por RN02 (\textit{Builder}). & \\\hline
+CP08 & Cliente general elige pago en el restaurante. & Se rechaza por RN06 (\textit{Builder}). & \\\hline
+CP09 & Pedido de \$180.000, decoraci{\'o}n de \$80.000 y barra de \$45.000 por persona para 4 personas. & Total de \$440.000 (\textit{Decorator}). & \\\hline
+CP10 & Cliente general cancela 2 horas antes, con \$132.000 pagados. & Reembolso de \$118.800 y comprobante de reembolso parcial (RN08). & \\\hline
+CP11 & Cliente VIP cancela 30 minutos antes. & Retenci{\'o}n del 10~\% y un \textit{strike} (RN09). & \\\hline
+CP12 & El personal marca una inasistencia a un cliente VIP con dos \textit{strikes}. & El cliente pasa a general (RN10). & \\\hline
+CP13 & Un empleado registra una reserva para un cliente nuevo. & Se crea el cliente con contrase{\~n}a gen{\'e}rica y la reserva queda con el empleado como creador. & \\\hline
+CP14 & Reserva de restaurante completo en una franja libre. & Se asocian todas las mesas en servicio (RN04). & \\\hline
+\end{longtable}
+\section{Video explicativo}
+Link YouTube: (pegar aqu\'i). Guion: programaci\'on por capas/MVC, Factory + Builder, Proxy + Decorator y ejecuci\'on (login, 4 pasos, agenda, cancelaci\'on).
+\section{Conclusiones}
+Factory centraliz\'o la creaci\'on por rol; Builder impide reservas inv\'alidas; Proxy separ\'o el acceso de la l\'ogica; Decorator combin\'o los extras sin explosi\'on de subclases. El estado de mesa por franja + bloqueo evita duplicados; ocasi\'on + plano + alertas acercan a la operaci\'on real; cancelaci\'on y strikes protegen al restaurante.
+\begin{thebibliography}{9}
+\bibitem{alur} Alur, D., Crupi, J., \& Malks, D. (2003). \textit{Core J2EE patterns} (2.\textordfeminine\ ed.). Prentice Hall.
+\bibitem{elmasri} Elmasri, R., \& Navathe, S. B. (2016). \textit{Fundamentals of database systems} (7.\textordfeminine\ ed.). Pearson.
+\bibitem{fowler} Fowler, M. (2002). \textit{Patterns of enterprise application architecture}. Addison-Wesley.
+\bibitem{gamma} Gamma, E., Helm, R., Johnson, R., \& Vlissides, J. (1994). \textit{Design patterns}. Addison-Wesley.
+\bibitem{larman} Larman, C. (2004). \textit{Applying UML and patterns} (3.\textordfeminine\ ed.). Prentice Hall.
+\bibitem{nielsen} Nielsen, J. (1993). \textit{Usability engineering}. Academic Press.
+\bibitem{pressman} Pressman, R. S., \& Maxim, B. R. (2020). \textit{Software engineering} (9.\textordfeminine\ ed.). McGraw-Hill.
+\end{thebibliography}
+\appendix
+\section{Anexo: validaci\'on de diagramas}
+Las figuras 6 a 11 est\'an dibujadas en TikZ dentro de este mismo documento (vectoriales, con la tipograf\'ia del texto) y se revisaron una a una: ninguna l\'inea cruza cajas ni hay etiquetas pisadas, y cada asociaci\'on lleva su multiplicidad.
+\end{document}
+

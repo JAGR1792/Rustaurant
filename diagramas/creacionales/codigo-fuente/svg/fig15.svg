@@ -1,0 +1,309 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="397.705625pt" height="395.12pt" viewBox="0 0 397.705625 395.12" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:date>2026-09-21T13:56:56.919766</dc:date>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>Matplotlib v3.11.1, https://matplotlib.org/</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 395.12 
+L 397.705625 395.12 
+L 397.705625 0 
+L 0 0 
+z
+" style="fill: #ffffff"/>
+  </g>
+  <g id="axes_1">
+   <g id="line2d_1">
+    <path d="M 96 30.96 
+L 135.6 30.96 
+" clip-path="url(#pf4cf170a51)" style="fill: none; stroke-dasharray: 3.36,2.08; stroke-dashoffset: 0; stroke: #000000; stroke-width: 0.8"/>
+   </g>
+   <g id="line2d_2">
+    <path d="M 192.429688 114.16 
+L 192.429688 158.8 
+" clip-path="url(#pf4cf170a51)" style="fill: none; stroke-dasharray: 3.36,2.08; stroke-dashoffset: 0; stroke: #000000; stroke-width: 0.8"/>
+   </g>
+   <g id="line2d_3">
+    <path d="M 192.429688 270.56 
+L 192.429688 225.92 
+" clip-path="url(#pf4cf170a51)" style="fill: none; stroke-dasharray: 3.36,2.08; stroke-dashoffset: 0; stroke: #000000; stroke-width: 0.8"/>
+   </g>
+   <g id="line2d_4">
+    <path d="M 288.859375 192.36 
+L 249.259375 192.36 
+" clip-path="url(#pf4cf170a51)" style="fill: none; stroke-dasharray: 3.36,2.08; stroke-dashoffset: 0; stroke: #000000; stroke-width: 0.8"/>
+   </g>
+   <g id="line2d_5">
+    <path d="M 128.4 27.936 
+L 135.6 30.96 
+L 128.4 33.984 
+" clip-path="url(#pf4cf170a51)" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="line2d_6">
+    <path d="M 195.453688 151.6 
+L 192.429688 158.8 
+L 189.405688 151.6 
+" clip-path="url(#pf4cf170a51)" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="line2d_7">
+    <path d="M 189.405688 233.12 
+L 192.429688 225.92 
+L 195.453688 233.12 
+" clip-path="url(#pf4cf170a51)" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="line2d_8">
+    <path d="M 256.459375 195.384 
+L 249.259375 192.36 
+L 256.459375 189.336 
+" clip-path="url(#pf4cf170a51)" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="patch_2">
+    <path d="M 7.2 10.8 
+L 96 10.8 
+L 96 46.72 
+L 7.2 46.72 
+z
+" clip-path="url(#pf4cf170a51)" style="fill: #ffffff; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_3">
+    <path d="M 135.6 10.8 
+L 249.259375 10.8 
+L 249.259375 114.16 
+L 135.6 114.16 
+z
+" clip-path="url(#pf4cf170a51)" style="fill: #ffffff; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_4">
+    <path d="M 135.6 158.8 
+L 249.259375 158.8 
+L 249.259375 225.92 
+L 135.6 225.92 
+z
+" clip-path="url(#pf4cf170a51)" style="fill: #ffffff; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_5">
+    <path d="M 135.6 270.56 
+L 249.259375 270.56 
+L 249.259375 384.32 
+L 135.6 384.32 
+z
+" clip-path="url(#pf4cf170a51)" style="fill: #ffffff; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_6">
+    <path d="M 288.859375 130.28 
+L 389.065625 130.28 
+L 389.065625 254.44 
+L 288.859375 254.44 
+z
+" clip-path="url(#pf4cf170a51)" style="fill: #ffffff; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="text_1">
+    <text style="font-weight: 700; font-size: 8px; font-family: 'Arial'; text-anchor: middle" x="51.6" y="22.390313" transform="rotate(-0 51.6 22.390313)">AuxiliarEncomiendas</text>
+   </g>
+   <g id="line2d_9">
+    <path d="M 7.2 29.84 
+L 96 29.84 
+" clip-path="url(#pf4cf170a51)" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linecap: square"/>
+   </g>
+   <g id="text_2">
+    <text style="font-size: 8px; font-family: 'Arial'; text-anchor: start" x="12.6" y="40.350234" transform="rotate(-0 12.6 40.350234)">+registrar() : void</text>
+   </g>
+   <g id="text_3">
+    <text style="font-size: 8px; font-family: 'Arial'; text-anchor: middle" x="192.429688" y="21.670234" transform="rotate(-0 192.429688 21.670234)">«singleton»</text>
+   </g>
+   <g id="text_4">
+    <text style="font-weight: 700; font-size: 8px; font-family: 'Arial'; text-anchor: middle" x="192.429688" y="32.070313" transform="rotate(-0 192.429688 32.070313)">SecuenciadorGuia</text>
+   </g>
+   <g id="line2d_10">
+    <path d="M 135.6 38.8 
+L 249.259375 38.8 
+" clip-path="url(#pf4cf170a51)" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linecap: square"/>
+   </g>
+   <g id="text_5">
+    <text style="font-size: 8px; font-family: 'Arial'; text-anchor: start" x="141" y="49.310313" transform="rotate(-0 141 49.310313)">-instancia : SecuenciadorGuia</text>
+   </g>
+   <g id="text_6">
+    <text style="font-size: 8px; font-family: 'Arial'; text-anchor: start" x="141" y="59.710313" transform="rotate(-0 141 59.710313)">-consecutivo : int</text>
+   </g>
+   <g id="line2d_11">
+    <path d="M 135.6 66.08 
+L 249.259375 66.08 
+" clip-path="url(#pf4cf170a51)" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linecap: square"/>
+   </g>
+   <g id="text_7">
+    <text style="font-size: 8px; font-family: 'Arial'; text-anchor: start" x="141" y="76.590234" transform="rotate(-0 141 76.590234)">-SecuenciadorGuia()</text>
+   </g>
+   <g id="text_8">
+    <text style="font-size: 8px; font-family: 'Arial'; text-anchor: start" x="141" y="86.990234" transform="rotate(-0 141 86.990234)">+obtenerInstancia() :</text>
+   </g>
+   <g id="text_9">
+    <text style="font-size: 8px; font-family: 'Arial'; text-anchor: start" x="141" y="97.390313" transform="rotate(-0 141 97.390313)">   SecuenciadorGuia</text>
+   </g>
+   <g id="text_10">
+    <text style="font-size: 8px; font-family: 'Arial'; text-anchor: start" x="141" y="107.790234" transform="rotate(-0 141 107.790234)">+siguiente() : string</text>
+   </g>
+   <g id="text_11">
+    <text style="font-weight: 700; font-size: 8px; font-family: 'Arial'; text-anchor: middle" x="192.429688" y="170.390313" transform="rotate(-0 192.429688 170.390313)">Envio</text>
+   </g>
+   <g id="line2d_12">
+    <path d="M 135.6 177.84 
+L 249.259375 177.84 
+" clip-path="url(#pf4cf170a51)" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linecap: square"/>
+   </g>
+   <g id="text_12">
+    <text style="font-size: 8px; font-family: 'Arial'; text-anchor: start" x="141" y="188.350234" transform="rotate(-0 141 188.350234)">-guia : string</text>
+   </g>
+   <g id="text_13">
+    <text style="font-size: 8px; font-family: 'Arial'; text-anchor: start" x="141" y="198.750313" transform="rotate(-0 141 198.750313)">-pesoFacturable : double</text>
+   </g>
+   <g id="text_14">
+    <text style="font-size: 8px; font-family: 'Arial'; text-anchor: start" x="141" y="209.150313" transform="rotate(-0 141 209.150313)">-pesoVolumetrico : double</text>
+   </g>
+   <g id="text_15">
+    <text style="font-size: 8px; font-family: 'Arial'; text-anchor: start" x="141" y="219.550234" transform="rotate(-0 141 219.550234)">-estado : string</text>
+   </g>
+   <g id="text_16">
+    <text style="font-size: 8px; font-family: 'Arial'; text-anchor: middle" x="192.429688" y="281.430234" transform="rotate(-0 192.429688 281.430234)">«singleton»</text>
+   </g>
+   <g id="text_17">
+    <text style="font-weight: 700; font-size: 8px; font-family: 'Arial'; text-anchor: middle" x="192.429688" y="291.830313" transform="rotate(-0 192.429688 291.830313)">GestorModoOffline</text>
+   </g>
+   <g id="line2d_13">
+    <path d="M 135.6 298.56 
+L 249.259375 298.56 
+" clip-path="url(#pf4cf170a51)" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linecap: square"/>
+   </g>
+   <g id="text_18">
+    <text style="font-size: 8px; font-family: 'Arial'; text-anchor: start" x="141" y="309.072578" transform="rotate(-0 141 309.072578)">-instancia : GestorModoOffline</text>
+   </g>
+   <g id="text_19">
+    <text style="font-size: 8px; font-family: 'Arial'; text-anchor: start" x="141" y="319.470313" transform="rotate(-0 141 319.470313)">-cola : lista</text>
+   </g>
+   <g id="line2d_14">
+    <path d="M 135.6 325.84 
+L 249.259375 325.84 
+" clip-path="url(#pf4cf170a51)" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linecap: square"/>
+   </g>
+   <g id="text_20">
+    <text style="font-size: 8px; font-family: 'Arial'; text-anchor: start" x="141" y="336.3525" transform="rotate(-0 141 336.3525)">-GestorModoOffline()</text>
+   </g>
+   <g id="text_21">
+    <text style="font-size: 8px; font-family: 'Arial'; text-anchor: start" x="141" y="346.750234" transform="rotate(-0 141 346.750234)">+obtenerInstancia() :</text>
+   </g>
+   <g id="text_22">
+    <text style="font-size: 8px; font-family: 'Arial'; text-anchor: start" x="141" y="357.152578" transform="rotate(-0 141 357.152578)">   GestorModoOffline</text>
+   </g>
+   <g id="text_23">
+    <text style="font-size: 8px; font-family: 'Arial'; text-anchor: start" x="141" y="367.550234" transform="rotate(-0 141 367.550234)">+encolar(op) : void</text>
+   </g>
+   <g id="text_24">
+    <text style="font-size: 8px; font-family: 'Arial'; text-anchor: start" x="141" y="377.950234" transform="rotate(-0 141 377.950234)">+sincronizar() : void</text>
+   </g>
+   <g id="text_25">
+    <text style="font-size: 8px; font-family: 'Arial'; text-anchor: middle" x="338.9625" y="141.150234" transform="rotate(-0 338.9625 141.150234)">«singleton»</text>
+   </g>
+   <g id="text_26">
+    <text style="font-weight: 700; font-size: 8px; font-family: 'Arial'; text-anchor: middle" x="338.9625" y="151.550313" transform="rotate(-0 338.9625 151.550313)">ValidadorCapacidadBus</text>
+   </g>
+   <g id="line2d_15">
+    <path d="M 288.859375 158.28 
+L 389.065625 158.28 
+" clip-path="url(#pf4cf170a51)" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linecap: square"/>
+   </g>
+   <g id="text_27">
+    <text style="font-size: 8px; font-family: 'Arial'; text-anchor: start" x="294.259375" y="168.790313" transform="rotate(-0 294.259375 168.790313)">-instancia :</text>
+   </g>
+   <g id="text_28">
+    <text style="font-size: 8px; font-family: 'Arial'; text-anchor: start" x="294.259375" y="179.190313" transform="rotate(-0 294.259375 179.190313)">   ValidadorCapacidadBus</text>
+   </g>
+   <g id="text_29">
+    <text style="font-size: 8px; font-family: 'Arial'; text-anchor: start" x="294.259375" y="189.590234" transform="rotate(-0 294.259375 189.590234)">-cargaPorViaje : mapa</text>
+   </g>
+   <g id="line2d_16">
+    <path d="M 288.859375 195.96 
+L 389.065625 195.96 
+" clip-path="url(#pf4cf170a51)" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linecap: square"/>
+   </g>
+   <g id="text_30">
+    <text style="font-size: 8px; font-family: 'Arial'; text-anchor: start" x="294.259375" y="206.470234" transform="rotate(-0 294.259375 206.470234)">-ValidadorCapacidadBus()</text>
+   </g>
+   <g id="text_31">
+    <text style="font-size: 8px; font-family: 'Arial'; text-anchor: start" x="294.259375" y="216.870234" transform="rotate(-0 294.259375 216.870234)">+obtenerInstancia() :</text>
+   </g>
+   <g id="text_32">
+    <text style="font-size: 8px; font-family: 'Arial'; text-anchor: start" x="294.259375" y="227.270313" transform="rotate(-0 294.259375 227.270313)">   ValidadorCapacidadBus</text>
+   </g>
+   <g id="text_33">
+    <text style="font-size: 8px; font-family: 'Arial'; text-anchor: start" x="294.259375" y="237.670234" transform="rotate(-0 294.259375 237.670234)">+validar(viaje, peso,</text>
+   </g>
+   <g id="text_34">
+    <text style="font-size: 8px; font-family: 'Arial'; text-anchor: start" x="294.259375" y="248.070234" transform="rotate(-0 294.259375 248.070234)">   prioridad) : bool</text>
+   </g>
+   <g id="patch_7">
+    <path d="M 108 18.67 
+L 123.6 18.67 
+L 123.6 28.85 
+L 108 28.85 
+z
+" clip-path="url(#pf4cf170a51)" style="fill: #ffffff"/>
+   </g>
+   <g id="patch_8">
+    <path d="M 199.629688 131.39 
+L 229.229688 131.39 
+L 229.229688 141.57 
+L 199.629688 141.57 
+z
+" clip-path="url(#pf4cf170a51)" style="fill: #ffffff"/>
+   </g>
+   <g id="patch_9">
+    <path d="M 199.629688 243.15 
+L 232.229688 243.15 
+L 232.229688 253.33 
+L 199.629688 253.33 
+z
+" clip-path="url(#pf4cf170a51)" style="fill: #ffffff"/>
+   </g>
+   <g id="patch_10">
+    <path d="M 253.759375 180.07 
+L 284.359375 180.07 
+L 284.359375 190.25 
+L 253.759375 190.25 
+z
+" clip-path="url(#pf4cf170a51)" style="fill: #ffffff"/>
+   </g>
+   <g id="text_35">
+    <text style="font-size: 7.6px; font-family: 'Arial'; text-anchor: middle" x="115.8" y="26.014797" transform="rotate(-0 115.8 26.014797)">usa</text>
+   </g>
+   <g id="text_36">
+    <text style="font-size: 7.6px; font-family: 'Arial'; text-anchor: middle" x="214.429688" y="138.734797" transform="rotate(-0 214.429688 138.734797)">numera</text>
+   </g>
+   <g id="text_37">
+    <text style="font-size: 7.6px; font-family: 'Arial'; text-anchor: middle" x="215.929688" y="250.494797" transform="rotate(-0 215.929688 250.494797)">respalda</text>
+   </g>
+   <g id="text_38">
+    <text style="font-size: 7.6px; font-family: 'Arial'; text-anchor: middle" x="269.059375" y="187.414797" transform="rotate(-0 269.059375 187.414797)">autoriza</text>
+   </g>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="pf4cf170a51">
+   <rect x="0" y="0" width="397.705625" height="395.12"/>
+  </clipPath>
+ </defs>
+</svg>

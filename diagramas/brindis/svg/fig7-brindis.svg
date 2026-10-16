@@ -1,0 +1,345 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="443.0025pt" height="281.76pt" viewBox="0 0 443.0025 281.76" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:date>2026-10-14T13:02:00.668718</dc:date>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>Matplotlib v3.11.1, https://matplotlib.org/</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 281.76 
+L 443.0025 281.76 
+L 443.0025 0 
+L 0 0 
+z
+" style="fill: #ffffff"/>
+  </g>
+  <g id="axes_1">
+   <g id="line2d_1">
+    <path d="M 158.44 35.04 
+L 234.04 35.04 
+" clip-path="url(#p04fff8d7e4)" style="fill: none; stroke-dasharray: 3.36,2.08; stroke-dashoffset: 0; stroke: #000000; stroke-width: 0.8"/>
+   </g>
+   <g id="line2d_2">
+    <path d="M 303.94 104.4 
+L 303.94 72.2 
+" clip-path="url(#p04fff8d7e4)" style="fill: none; stroke: #000000; stroke-width: 0.8"/>
+   </g>
+   <g id="line2d_3">
+    <path d="M 303.94 104.4 
+L 74.6 104.4 
+" clip-path="url(#p04fff8d7e4)" style="fill: none; stroke: #000000; stroke-width: 0.8"/>
+   </g>
+   <g id="line2d_4">
+    <path d="M 303.94 104.4 
+L 373.18125 104.4 
+" clip-path="url(#p04fff8d7e4)" style="fill: none; stroke: #000000; stroke-width: 0.8"/>
+   </g>
+   <g id="line2d_5">
+    <path d="M 74.6 104.4 
+L 74.6 126 
+" clip-path="url(#p04fff8d7e4)" style="fill: none; stroke: #000000; stroke-width: 0.8"/>
+   </g>
+   <g id="line2d_6">
+    <path d="M 218 104.4 
+L 218 126 
+" clip-path="url(#p04fff8d7e4)" style="fill: none; stroke: #000000; stroke-width: 0.8"/>
+   </g>
+   <g id="line2d_7">
+    <path d="M 373.18125 104.4 
+L 373.18125 126 
+" clip-path="url(#p04fff8d7e4)" style="fill: none; stroke: #000000; stroke-width: 0.8"/>
+   </g>
+   <g id="line2d_8">
+    <path d="M 74.6 161.92 
+L 74.6 226.8 
+" clip-path="url(#p04fff8d7e4)" style="fill: none; stroke-dasharray: 3.36,2.08; stroke-dashoffset: 0; stroke: #000000; stroke-width: 0.8"/>
+   </g>
+   <g id="line2d_9">
+    <path d="M 218 161.92 
+L 218 226.8 
+" clip-path="url(#p04fff8d7e4)" style="fill: none; stroke-dasharray: 3.36,2.08; stroke-dashoffset: 0; stroke: #000000; stroke-width: 0.8"/>
+   </g>
+   <g id="line2d_10">
+    <path d="M 373.18125 161.92 
+L 373.18125 226.8 
+" clip-path="url(#p04fff8d7e4)" style="fill: none; stroke-dasharray: 3.36,2.08; stroke-dashoffset: 0; stroke: #000000; stroke-width: 0.8"/>
+   </g>
+   <g id="line2d_11">
+    <path d="M 312 244.76 
+L 231.68 244.76 
+" clip-path="url(#p04fff8d7e4)" style="fill: none; stroke: #000000; stroke-width: 0.8"/>
+   </g>
+   <g id="line2d_12">
+    <path d="M 226.84 32.016 
+L 234.04 35.04 
+L 226.84 38.064 
+" clip-path="url(#p04fff8d7e4)" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="patch_2">
+    <path d="M 303.94 63.92 
+L 299.764 72.2 
+L 308.116 72.2 
+z
+" clip-path="url(#p04fff8d7e4)" style="fill: #ffffff; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="line2d_13">
+    <path d="M 77.624 219.6 
+L 74.6 226.8 
+L 71.576 219.6 
+" clip-path="url(#p04fff8d7e4)" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="line2d_14">
+    <path d="M 221.024 219.6 
+L 218 226.8 
+L 214.976 219.6 
+" clip-path="url(#p04fff8d7e4)" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="line2d_15">
+    <path d="M 376.20525 219.6 
+L 373.18125 226.8 
+L 370.15725 219.6 
+" clip-path="url(#p04fff8d7e4)" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="patch_3">
+    <path d="M 223.4 244.76 
+L 231.68 248.936 
+L 231.68 240.584 
+z
+" clip-path="url(#p04fff8d7e4)" style="fill: #ffffff; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_4">
+    <path d="M 8.64 8.64 
+L 158.44 8.64 
+L 158.44 61.44 
+L 8.64 61.44 
+z
+" clip-path="url(#p04fff8d7e4)" style="fill: #ffffff; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_5">
+    <path d="M 234.04 8.64 
+L 373.84 8.64 
+L 373.84 63.92 
+L 234.04 63.92 
+z
+" clip-path="url(#p04fff8d7e4)" style="fill: #ffffff; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_6">
+    <path d="M 25.2 126 
+L 124 126 
+L 124 161.92 
+L 25.2 161.92 
+z
+" clip-path="url(#p04fff8d7e4)" style="fill: #ffffff; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_7">
+    <path d="M 163.6 126 
+L 272.4 126 
+L 272.4 161.92 
+L 163.6 161.92 
+z
+" clip-path="url(#p04fff8d7e4)" style="fill: #ffffff; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_8">
+    <path d="M 312 126 
+L 434.3625 126 
+L 434.3625 161.92 
+L 312 161.92 
+z
+" clip-path="url(#p04fff8d7e4)" style="fill: #ffffff; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_9">
+    <path d="M 25.2 226.8 
+L 95.5625 226.8 
+L 95.5625 273.12 
+L 25.2 273.12 
+z
+" clip-path="url(#p04fff8d7e4)" style="fill: #ffffff; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_10">
+    <path d="M 163.6 226.8 
+L 223.4 226.8 
+L 223.4 262.72 
+L 163.6 262.72 
+z
+" clip-path="url(#p04fff8d7e4)" style="fill: #ffffff; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_11">
+    <path d="M 312 226.8 
+L 398.8 226.8 
+L 398.8 262.72 
+L 312 262.72 
+z
+" clip-path="url(#p04fff8d7e4)" style="fill: #ffffff; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="text_1">
+    <text style="font-weight: 700; font-size: 8px; font-family: 'Arial'; text-anchor: middle" x="83.54" y="20.230312" transform="rotate(-0 83.54 20.230312)">UsuarioService</text>
+   </g>
+   <g id="line2d_16">
+    <path d="M 8.64 27.68 
+L 158.44 27.68 
+" clip-path="url(#p04fff8d7e4)" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linecap: square"/>
+   </g>
+   <g id="text_2">
+    <text style="font-size: 8px; font-family: 'Arial'; text-anchor: start" x="14.04" y="38.190234" transform="rotate(-0 14.04 38.190234)">-fabricas : Map&lt;Rol, UsuarioFactory&gt;</text>
+   </g>
+   <g id="line2d_17">
+    <path d="M 8.64 44.56 
+L 158.44 44.56 
+" clip-path="url(#p04fff8d7e4)" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linecap: square"/>
+   </g>
+   <g id="text_3">
+    <text style="font-size: 8px; font-family: 'Arial'; text-anchor: start" x="14.04" y="55.070234" transform="rotate(-0 14.04 55.070234)">+fabrica_para(rol : Rol) : UsuarioFactory</text>
+   </g>
+   <g id="text_4">
+    <text style="font-size: 8px; font-family: 'Arial'; text-anchor: middle" x="303.94" y="19.510312" transform="rotate(-0 303.94 19.510312)">«abstracta»</text>
+   </g>
+   <g id="text_5">
+    <text style="font-style: italic; font-weight: 700; font-size: 8px; font-family: 'Arial'; text-anchor: middle" x="303.94" y="29.910234" transform="rotate(-0 303.94 29.910234)">UsuarioFactory</text>
+   </g>
+   <g id="line2d_18">
+    <path d="M 234.04 36.64 
+L 373.84 36.64 
+" clip-path="url(#p04fff8d7e4)" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linecap: square"/>
+   </g>
+   <g id="text_6">
+    <text style="font-size: 8px; font-family: 'Arial'; text-anchor: start" x="239.44" y="47.150234" transform="rotate(-0 239.44 47.150234)">+rol() : Rol</text>
+   </g>
+   <g id="text_7">
+    <text style="font-size: 8px; font-family: 'Arial'; text-anchor: start" x="239.44" y="57.550234" transform="rotate(-0 239.44 57.550234)">+crear_usuario(base, datos) : Usuario</text>
+   </g>
+   <g id="text_8">
+    <text style="font-weight: 700; font-size: 8px; font-family: 'Arial'; text-anchor: middle" x="74.6" y="137.590234" transform="rotate(-0 74.6 137.590234)">ClienteFactory</text>
+   </g>
+   <g id="line2d_19">
+    <path d="M 25.2 145.04 
+L 124 145.04 
+" clip-path="url(#p04fff8d7e4)" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linecap: square"/>
+   </g>
+   <g id="text_9">
+    <text style="font-size: 8px; font-family: 'Arial'; text-anchor: start" x="30.6" y="155.550234" transform="rotate(-0 30.6 155.550234)">+crear_usuario() : Cliente</text>
+   </g>
+   <g id="text_10">
+    <text style="font-weight: 700; font-size: 8px; font-family: 'Arial'; text-anchor: middle" x="218" y="137.590234" transform="rotate(-0 218 137.590234)">EmpleadoFactory</text>
+   </g>
+   <g id="line2d_20">
+    <path d="M 163.6 145.04 
+L 272.4 145.04 
+" clip-path="url(#p04fff8d7e4)" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linecap: square"/>
+   </g>
+   <g id="text_11">
+    <text style="font-size: 8px; font-family: 'Arial'; text-anchor: start" x="169" y="155.550234" transform="rotate(-0 169 155.550234)">+crear_usuario() : Empleado</text>
+   </g>
+   <g id="text_12">
+    <text style="font-weight: 700; font-size: 8px; font-family: 'Arial'; text-anchor: middle" x="373.18125" y="137.590234" transform="rotate(-0 373.18125 137.590234)">AdministradorFactory</text>
+   </g>
+   <g id="line2d_21">
+    <path d="M 312 145.04 
+L 434.3625 145.04 
+" clip-path="url(#p04fff8d7e4)" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linecap: square"/>
+   </g>
+   <g id="text_13">
+    <text style="font-size: 8px; font-family: 'Arial'; text-anchor: start" x="317.4" y="155.550234" transform="rotate(-0 317.4 155.550234)">+crear_usuario() : Administrador</text>
+   </g>
+   <g id="text_14">
+    <text style="font-weight: 700; font-size: 8px; font-family: 'Arial'; text-anchor: middle" x="60.38125" y="238.390312" transform="rotate(-0 60.38125 238.390312)">Cliente</text>
+   </g>
+   <g id="line2d_22">
+    <path d="M 25.2 245.84 
+L 95.5625 245.84 
+" clip-path="url(#p04fff8d7e4)" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linecap: square"/>
+   </g>
+   <g id="text_15">
+    <text style="font-size: 8px; font-family: 'Arial'; text-anchor: start" x="30.6" y="256.350312" transform="rotate(-0 30.6 256.350312)">-tipo : TipoCliente</text>
+   </g>
+   <g id="text_16">
+    <text style="font-size: 8px; font-family: 'Arial'; text-anchor: start" x="30.6" y="266.750312" transform="rotate(-0 30.6 266.750312)">-strikes : int</text>
+   </g>
+   <g id="text_17">
+    <text style="font-weight: 700; font-size: 8px; font-family: 'Arial'; text-anchor: middle" x="193.5" y="238.390312" transform="rotate(-0 193.5 238.390312)">Empleado</text>
+   </g>
+   <g id="line2d_23">
+    <path d="M 163.6 245.84 
+L 223.4 245.84 
+" clip-path="url(#p04fff8d7e4)" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linecap: square"/>
+   </g>
+   <g id="text_18">
+    <text style="font-size: 8px; font-family: 'Arial'; text-anchor: start" x="169" y="256.350234" transform="rotate(-0 169 256.350234)">-legajo : String</text>
+   </g>
+   <g id="text_19">
+    <text style="font-weight: 700; font-size: 8px; font-family: 'Arial'; text-anchor: middle" x="355.4" y="238.390312" transform="rotate(-0 355.4 238.390312)">Administrador</text>
+   </g>
+   <g id="line2d_24">
+    <path d="M 312 245.84 
+L 398.8 245.84 
+" clip-path="url(#p04fff8d7e4)" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linecap: square"/>
+   </g>
+   <g id="text_20">
+    <text style="font-size: 8px; font-family: 'Arial'; text-anchor: start" x="317.4" y="256.350312" transform="rotate(-0 317.4 256.350312)">-empleado : Empleado</text>
+   </g>
+   <g id="patch_12">
+    <path d="M 186.44 20.59 
+L 206.04 20.59 
+L 206.04 30.77 
+L 186.44 30.77 
+z
+" clip-path="url(#p04fff8d7e4)" style="fill: #ffffff"/>
+   </g>
+   <g id="patch_13">
+    <path d="M 84.68 189.27 
+L 103.28 189.27 
+L 103.28 199.45 
+L 84.68 199.45 
+z
+" clip-path="url(#p04fff8d7e4)" style="fill: #ffffff"/>
+   </g>
+   <g id="patch_14">
+    <path d="M 228.08 189.27 
+L 246.68 189.27 
+L 246.68 199.45 
+L 228.08 199.45 
+z
+" clip-path="url(#p04fff8d7e4)" style="fill: #ffffff"/>
+   </g>
+   <g id="patch_15">
+    <path d="M 383.26125 189.27 
+L 401.86125 189.27 
+L 401.86125 199.45 
+L 383.26125 199.45 
+z
+" clip-path="url(#p04fff8d7e4)" style="fill: #ffffff"/>
+   </g>
+   <g id="text_21">
+    <text style="font-size: 7.6px; font-family: 'Arial'; text-anchor: middle" x="196.24" y="27.934723" transform="rotate(-0 196.24 27.934723)">elige</text>
+   </g>
+   <g id="text_22">
+    <text style="font-size: 7.6px; font-family: 'Arial'; text-anchor: middle" x="93.98" y="196.614797" transform="rotate(-0 93.98 196.614797)">crea</text>
+   </g>
+   <g id="text_23">
+    <text style="font-size: 7.6px; font-family: 'Arial'; text-anchor: middle" x="237.38" y="196.614797" transform="rotate(-0 237.38 196.614797)">crea</text>
+   </g>
+   <g id="text_24">
+    <text style="font-size: 7.6px; font-family: 'Arial'; text-anchor: middle" x="392.56125" y="196.614797" transform="rotate(-0 392.56125 196.614797)">crea</text>
+   </g>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="p04fff8d7e4">
+   <rect x="0" y="0" width="443.0025" height="281.76"/>
+  </clipPath>
+ </defs>
+</svg>

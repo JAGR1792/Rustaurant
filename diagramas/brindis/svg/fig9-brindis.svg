@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="413.28pt" height="225.41pt" viewBox="0 0 413.28 225.41" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:date>2026-10-14T13:02:01.377573</dc:date>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>Matplotlib v3.11.1, https://matplotlib.org/</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 225.41 
+L 413.28 225.41 
+L 413.28 0 
+L 0 0 
+z
+" style="fill: #ffffff"/>
+  </g>
+  <g id="axes_1">
+   <g id="line2d_1">
+    <path d="M 97.299375 37.44 
+L 147.699375 37.44 
+" clip-path="url(#paa138f6e3a)" style="fill: none; stroke-dasharray: 3.36,2.08; stroke-dashoffset: 0; stroke: #000000; stroke-width: 0.8"/>
+   </g>
+   <g id="line2d_2">
+    <path d="M 199.099375 111.6 
+L 199.099375 82.6 
+" clip-path="url(#paa138f6e3a)" style="fill: none; stroke-dasharray: 3.36,2.08; stroke-dashoffset: 0; stroke: #000000; stroke-width: 0.8"/>
+   </g>
+   <g id="line2d_3">
+    <path d="M 199.099375 111.6 
+L 52.54 111.6 
+" clip-path="url(#paa138f6e3a)" style="fill: none; stroke-dasharray: 3.36,2.08; stroke-dashoffset: 0; stroke: #000000; stroke-width: 0.8"/>
+   </g>
+   <g id="line2d_4">
+    <path d="M 199.099375 111.6 
+L 232.54 111.6 
+" clip-path="url(#paa138f6e3a)" style="fill: none; stroke-dasharray: 3.36,2.08; stroke-dashoffset: 0; stroke: #000000; stroke-width: 0.8"/>
+   </g>
+   <g id="line2d_5">
+    <path d="M 52.54 111.6 
+L 52.54 133.2 
+" clip-path="url(#paa138f6e3a)" style="fill: none; stroke-dasharray: 3.36,2.08; stroke-dashoffset: 0; stroke: #000000; stroke-width: 0.8"/>
+   </g>
+   <g id="line2d_6">
+    <path d="M 232.54 111.6 
+L 232.54 133.2 
+" clip-path="url(#paa138f6e3a)" style="fill: none; stroke-dasharray: 3.36,2.08; stroke-dashoffset: 0; stroke: #000000; stroke-width: 0.8"/>
+   </g>
+   <g id="line2d_7">
+    <path d="M 52.54 186 
+L 52.54 219.6 
+L 372.24 219.6 
+L 372.24 179.52 
+" clip-path="url(#paa138f6e3a)" style="fill: none; stroke-dasharray: 3.36,2.08; stroke-dashoffset: 0; stroke: #000000; stroke-width: 0.8"/>
+   </g>
+   <g id="line2d_8">
+    <path d="M 96.44 159.6 
+L 175.64 159.6 
+" clip-path="url(#paa138f6e3a)" style="fill: none; stroke-dasharray: 3.36,2.08; stroke-dashoffset: 0; stroke: #000000; stroke-width: 0.8"/>
+   </g>
+   <g id="line2d_9">
+    <path d="M 140.499375 34.416 
+L 147.699375 37.44 
+L 140.499375 40.464 
+" clip-path="url(#paa138f6e3a)" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="patch_2">
+    <path d="M 199.099375 74.32 
+L 194.923375 82.6 
+L 203.275375 82.6 
+z
+" clip-path="url(#paa138f6e3a)" style="fill: #ffffff; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="line2d_10">
+    <path d="M 369.216 186.72 
+L 372.24 179.52 
+L 375.264 186.72 
+" clip-path="url(#paa138f6e3a)" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="line2d_11">
+    <path d="M 168.44 156.576 
+L 175.64 159.6 
+L 168.44 162.624 
+" clip-path="url(#paa138f6e3a)" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="patch_3">
+    <path d="M 8.64 8.64 
+L 97.299375 8.64 
+L 97.299375 44.56 
+L 8.64 44.56 
+z
+" clip-path="url(#paa138f6e3a)" style="fill: #ffffff; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_4">
+    <path d="M 147.699375 8.64 
+L 250.499375 8.64 
+L 250.499375 74.32 
+L 147.699375 74.32 
+z
+" clip-path="url(#paa138f6e3a)" style="fill: #ffffff; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_5">
+    <path d="M 8.64 133.2 
+L 96.44 133.2 
+L 96.44 186 
+L 8.64 186 
+z
+" clip-path="url(#paa138f6e3a)" style="fill: #ffffff; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_6">
+    <path d="M 175.64 133.2 
+L 289.44 133.2 
+L 289.44 169.12 
+L 175.64 169.12 
+z
+" clip-path="url(#paa138f6e3a)" style="fill: #ffffff; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_7">
+    <path d="M 339.84 133.2 
+L 404.64 133.2 
+L 404.64 179.52 
+L 339.84 179.52 
+z
+" clip-path="url(#paa138f6e3a)" style="fill: #ffffff; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="text_1">
+    <text style="font-weight: 700; font-size: 8px; font-family: 'Arial'; text-anchor: middle" x="52.969687" y="20.230312" transform="rotate(-0 52.969687 20.230312)">ReservaController</text>
+   </g>
+   <g id="line2d_12">
+    <path d="M 8.64 27.68 
+L 97.299375 27.68 
+" clip-path="url(#paa138f6e3a)" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linecap: square"/>
+   </g>
+   <g id="text_2">
+    <text style="font-size: 8px; font-family: 'Arial'; text-anchor: start" x="14.04" y="38.192578" transform="rotate(-0 14.04 38.192578)">+POST /reservas : 201</text>
+   </g>
+   <g id="text_3">
+    <text style="font-size: 8px; font-family: 'Arial'; text-anchor: middle" x="199.099375" y="19.510312" transform="rotate(-0 199.099375 19.510312)">«interface»</text>
+   </g>
+   <g id="text_4">
+    <text style="font-style: italic; font-weight: 700; font-size: 8px; font-family: 'Arial'; text-anchor: middle" x="199.099375" y="29.910313" transform="rotate(-0 199.099375 29.910313)">ReservaService</text>
+   </g>
+   <g id="line2d_13">
+    <path d="M 147.699375 36.64 
+L 250.499375 36.64 
+" clip-path="url(#paa138f6e3a)" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linecap: square"/>
+   </g>
+   <g id="text_5">
+    <text style="font-size: 8px; font-family: 'Arial'; text-anchor: start" x="153.099375" y="47.150234" transform="rotate(-0 153.099375 47.150234)">+confirmar() : id</text>
+   </g>
+   <g id="text_6">
+    <text style="font-size: 8px; font-family: 'Arial'; text-anchor: start" x="153.099375" y="57.550234" transform="rotate(-0 153.099375 57.550234)">+cancelar() : void</text>
+   </g>
+   <g id="text_7">
+    <text style="font-size: 8px; font-family: 'Arial'; text-anchor: start" x="153.099375" y="67.950234" transform="rotate(-0 153.099375 67.950234)">+agenda() : List&lt;Reserva&gt;</text>
+   </g>
+   <g id="text_8">
+    <text style="font-weight: 700; font-size: 8px; font-family: 'Arial'; text-anchor: middle" x="52.54" y="144.790234" transform="rotate(-0 52.54 144.790234)">ReservaServiceProxy</text>
+   </g>
+   <g id="line2d_14">
+    <path d="M 8.64 152.24 
+L 96.44 152.24 
+" clip-path="url(#paa138f6e3a)" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linecap: square"/>
+   </g>
+   <g id="text_9">
+    <text style="font-size: 8px; font-family: 'Arial'; text-anchor: start" x="14.04" y="162.750313" transform="rotate(-0 14.04 162.750313)">-real : ReservaService</text>
+   </g>
+   <g id="line2d_15">
+    <path d="M 8.64 169.12 
+L 96.44 169.12 
+" clip-path="url(#paa138f6e3a)" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linecap: square"/>
+   </g>
+   <g id="text_10">
+    <text style="font-size: 8px; font-family: 'Arial'; text-anchor: start" x="14.04" y="179.630234" transform="rotate(-0 14.04 179.630234)">+verificar_rol() : void</text>
+   </g>
+   <g id="text_11">
+    <text style="font-weight: 700; font-size: 8px; font-family: 'Arial'; text-anchor: middle" x="232.54" y="144.790312" transform="rotate(-0 232.54 144.790312)">ReservaServiceImpl</text>
+   </g>
+   <g id="line2d_16">
+    <path d="M 175.64 152.24 
+L 289.44 152.24 
+" clip-path="url(#paa138f6e3a)" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linecap: square"/>
+   </g>
+   <g id="text_12">
+    <text style="font-size: 8px; font-family: 'Arial'; text-anchor: start" x="181.04" y="162.750234" transform="rotate(-0 181.04 162.750234)">+confirmar() : id  [transaccion]</text>
+   </g>
+   <g id="text_13">
+    <text style="font-weight: 700; font-size: 8px; font-family: 'Arial'; text-anchor: middle" x="372.24" y="144.790312" transform="rotate(-0 372.24 144.790312)">UsuarioSesion</text>
+   </g>
+   <g id="line2d_17">
+    <path d="M 339.84 152.24 
+L 404.64 152.24 
+" clip-path="url(#paa138f6e3a)" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linecap: square"/>
+   </g>
+   <g id="text_14">
+    <text style="font-size: 8px; font-family: 'Arial'; text-anchor: start" x="345.24" y="162.750313" transform="rotate(-0 345.24 162.750313)">-rol : Rol</text>
+   </g>
+   <g id="text_15">
+    <text style="font-size: 8px; font-family: 'Arial'; text-anchor: start" x="345.24" y="173.150313" transform="rotate(-0 345.24 173.150313)">-id_cliente : id</text>
+   </g>
+   <g id="patch_8">
+    <path d="M 114.699375 25.15 
+L 130.299375 25.15 
+L 130.299375 35.33 
+L 114.699375 35.33 
+z
+" clip-path="url(#paa138f6e3a)" style="fill: #ffffff"/>
+   </g>
+   <g id="patch_9">
+    <path d="M 192.59 206.59 
+L 232.19 206.59 
+L 232.19 216.77 
+L 192.59 216.77 
+z
+" clip-path="url(#paa138f6e3a)" style="fill: #ffffff"/>
+   </g>
+   <g id="patch_10">
+    <path d="M 123.24 146.59 
+L 148.84 146.59 
+L 148.84 156.77 
+L 123.24 156.77 
+z
+" clip-path="url(#paa138f6e3a)" style="fill: #ffffff"/>
+   </g>
+   <g id="text_16">
+    <text style="font-size: 7.6px; font-family: 'Arial'; text-anchor: middle" x="122.499375" y="32.494797" transform="rotate(-0 122.499375 32.494797)">usa</text>
+   </g>
+   <g id="text_17">
+    <text style="font-size: 7.6px; font-family: 'Arial'; text-anchor: middle" x="212.39" y="213.934797" transform="rotate(-0 212.39 213.934797)">verifica rol</text>
+   </g>
+   <g id="text_18">
+    <text style="font-size: 7.6px; font-family: 'Arial'; text-anchor: middle" x="136.04" y="153.934723" transform="rotate(-0 136.04 153.934723)">delega</text>
+   </g>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="paa138f6e3a">
+   <rect x="0" y="0" width="413.28" height="225.41"/>
+  </clipPath>
+ </defs>
+</svg>
