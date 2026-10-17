@@ -27,7 +27,9 @@ marfil/borgoña/carbón con dorado apagado, tipografías self-hosted
 componentes en CSS vanilla. Las fotos (carta, salón y mesas) vienen de
 Wikimedia Commons con licencia verificada: `static/img/fotos/descargar_fotos.py`
 las regenera y `creditos.md` lista autor, licencia y enlace (ADR 0005).
-Los PNG deterministas de `generar_*.py` quedan como respaldo offline.
+Cada foto viaja en WebP con respaldo JPEG vía `<picture>`
+(`convertir_webp.py`, ADR 0007). Los PNG deterministas de `generar_*.py`
+quedan como respaldo offline.
 
 El PDF del documento se genera en `documentacion/brindis_rust.pdf`.
 
@@ -61,7 +63,7 @@ static/css/           # tema.css + fuentes.css + chroma.css + counter.css
 static/js/            # plano.js (plano SVG, ficha y pedido guiado) + ui.js (toasts y confirmacion)
                       # + chroma.js (carta) + counter.js (cuenta regresiva)
 static/fuentes/       # Cormorant Garamond + Inter (woff2) + descargar_fuentes.py
-static/img/fotos/     # fotos reales de Commons + descargar_fotos.py + creditos.md
+static/img/fotos/     # fotos Commons (jpg+webp) + descargar_fotos.py + convertir_webp.py + creditos.md
 static/img/carta/     # PNGs de platos + generar_carta.py (respaldo offline)
 static/img/salon/     # salon-hero/salon-acceso.png + generar_salon.py
 static/img/mesas/     # mesa-general/terraza/vip.png + generar_mesas.py

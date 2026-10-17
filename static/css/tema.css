@@ -28,6 +28,8 @@
 }
 
 * { box-sizing: border-box; }
+/* <picture> solo envuelve la foto (webp + respaldo): sin caja propia. */
+picture { display: contents; }
 ::selection { background: rgba(168, 138, 89, .28); }
 
 body {

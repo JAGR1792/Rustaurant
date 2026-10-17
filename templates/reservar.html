@@ -72,7 +72,10 @@
           <p class="ficha-linea">Pulsa una mesa libre para ver su foto, su zona y su capacidad.</p>
         </div>
         <div id="ficha-contenido" hidden>
-          <img class="ficha-foto" id="ficha-foto" src="/static/img/fotos/mesa-general.jpg" alt="" width="800" height="600">
+          <picture>
+            <source id="ficha-webp" srcset="/static/img/fotos/mesa-general.webp" type="image/webp">
+            <img class="ficha-foto" id="ficha-foto" src="/static/img/fotos/mesa-general.jpg" alt="" width="800" height="600">
+          </picture>
           <p class="eyebrow">Tu mesa</p>
           <h3 id="ficha-titulo">M—</h3>
           <p class="ficha-linea" id="ficha-zona"></p>
@@ -104,7 +107,10 @@
       <div class="pedido-lista">
         {% for it in items %}
         <div class="plato">
-          <img class="plato-foto" src="{{ it.imagen }}" alt="" width="88" height="88" loading="lazy" decoding="async">
+          <picture class="plato-picture">
+            <source srcset="{{ it.imagen_webp }}" type="image/webp">
+            <img class="plato-foto" src="{{ it.imagen }}" alt="" width="88" height="88" loading="lazy" decoding="async">
+          </picture>
           <div class="plato-info">
             <strong>{{ it.nombre }}</strong>
             <span class="plato-precio">$ {{ it.precio_fmt }}</span>

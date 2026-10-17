@@ -7,7 +7,7 @@ Para cada foto del MANIFIESTO:
 1. consulta la API de Commons (extmetadata),
 2. verifica que la licencia esté en la lista permitida,
 3. descarga la miniatura al ancho pedido con User-Agent identificable,
-4. recomprime a JPEG (si hay Pillow) y la guarda en esta carpeta,
+4. recomprime a JPEG (si hay Pillow) y deja también la variante WebP,
 5. escribe `creditos.md` y `creditos.json` con autor, licencia y enlace.
 
 Uso:  python static/img/fotos/descargar_fotos.py
@@ -101,6 +101,16 @@ def recomprimir(ruta: Path) -> None:
         img.save(ruta, "JPEG", quality=82, optimize=True)
 
 
+def guardar_webp(ruta: Path) -> None:
+    """Variante WebP que sirve el <picture> de la UI (respaldo: el JPEG)."""
+    try:
+        from PIL import Image
+    except ImportError:
+        return
+    with Image.open(ruta) as img:
+        img.convert("RGB").save(ruta.with_suffix(".webp"), "WEBP", quality=80, method=6)
+
+
 def main() -> int:
     creditos = []
     fallos = 0
@@ -117,6 +127,7 @@ def main() -> int:
             ruta = DESTINO / destino
             ruta.write_bytes(pedir(url))
             recomprimir(ruta)
+            guardar_webp(ruta)
             kb = ruta.stat().st_size // 1024
             creditos.append(
                 {

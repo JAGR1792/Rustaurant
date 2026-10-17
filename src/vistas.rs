@@ -162,6 +162,7 @@ struct ItemVista {
     precio: i64,
     precio_fmt: String,
     imagen: String,
+    imagen_webp: String,
 }
 
 /// Tarjeta de "La carta" en la portada (efecto chroma del frontend).
@@ -171,6 +172,7 @@ struct ItemCartaVista {
     titulo: String,
     subtitulo: String,
     imagen: String,
+    imagen_webp: String,
     accent: String,
     url: String,
 }
@@ -338,18 +340,45 @@ fn tipo_legible(tipo: &str) -> &'static str {
     }
 }
 
-/// Foto real de un plato por id (Wikimedia Commons; ver
+/// Par de la foto real de un plato: WebP para el `<picture>` de la UI y
+/// el JPEG/PNG original como respaldo (ver
 /// `static/img/fotos/descargar_fotos.py` y `creditos.md`). Un id nuevo
 /// cae al PNG genérico de `static/img/carta`.
-fn foto_item(id: i64) -> &'static str {
+struct Foto {
+    jpg: &'static str,
+    webp: &'static str,
+}
+
+fn foto_item(id: i64) -> Foto {
     match id {
-        1 => "/static/img/fotos/carta-01-ceviche.jpg",
-        2 => "/static/img/fotos/carta-02-picana.jpg",
-        3 => "/static/img/fotos/carta-03-tres-leches.jpg",
-        4 => "/static/img/fotos/carta-04-limonada-coco.jpg",
-        5 => "/static/img/fotos/carta-05-salmon.jpg",
-        6 => "/static/img/fotos/carta-06-coctel.jpg",
-        _ => "/static/img/carta/00-generico.png",
+        1 => Foto {
+            jpg: "/static/img/fotos/carta-01-ceviche.jpg",
+            webp: "/static/img/fotos/carta-01-ceviche.webp",
+        },
+        2 => Foto {
+            jpg: "/static/img/fotos/carta-02-picana.jpg",
+            webp: "/static/img/fotos/carta-02-picana.webp",
+        },
+        3 => Foto {
+            jpg: "/static/img/fotos/carta-03-tres-leches.jpg",
+            webp: "/static/img/fotos/carta-03-tres-leches.webp",
+        },
+        4 => Foto {
+            jpg: "/static/img/fotos/carta-04-limonada-coco.jpg",
+            webp: "/static/img/fotos/carta-04-limonada-coco.webp",
+        },
+        5 => Foto {
+            jpg: "/static/img/fotos/carta-05-salmon.jpg",
+            webp: "/static/img/fotos/carta-05-salmon.webp",
+        },
+        6 => Foto {
+            jpg: "/static/img/fotos/carta-06-coctel.jpg",
+            webp: "/static/img/fotos/carta-06-coctel.webp",
+        },
+        _ => Foto {
+            jpg: "/static/img/carta/00-generico.png",
+            webp: "/static/img/carta/00-generico.webp",
+        },
     }
 }
 
@@ -367,10 +396,12 @@ fn carta(d: &Datos) -> Vec<ItemCartaVista> {
                 6 => "#ff7eb6",
                 _ => "#a88a59",
             };
+            let foto = foto_item(i.id);
             ItemCartaVista {
                 titulo: i.nombre.clone(),
                 subtitulo: format!("{} · {}", tipo_legible(&i.tipo), cop(i.precio_vigente)),
-                imagen: foto_item(i.id).into(),
+                imagen: foto.jpg.into(),
+                imagen_webp: foto.webp.into(),
                 accent: accent.into(),
                 url: "/reservar".into(),
             }
@@ -417,12 +448,16 @@ fn render_reservar(
         (
             d.items
                 .iter()
-                .map(|i| ItemVista {
-                    id: i.id,
-                    nombre: i.nombre.clone(),
-                    precio: i.precio_vigente,
-                    precio_fmt: cop(i.precio_vigente),
-                    imagen: foto_item(i.id).into(),
+                .map(|i| {
+                    let foto = foto_item(i.id);
+                    ItemVista {
+                        id: i.id,
+                        nombre: i.nombre.clone(),
+                        precio: i.precio_vigente,
+                        precio_fmt: cop(i.precio_vigente),
+                        imagen: foto.jpg.into(),
+                        imagen_webp: foto.webp.into(),
+                    }
                 })
                 .collect::<Vec<_>>(),
             d.planes
@@ -1049,12 +1084,14 @@ mod tests {
         for p in &platos {
             assert!(!p.titulo.is_empty());
             assert!(p.imagen.starts_with("/static/img/"));
+            assert!(p.imagen_webp.ends_with(".webp"));
             assert!(p.accent.starts_with('#'));
             assert!(!p.subtitulo.is_empty(), "sin subtitulo: {}", p.titulo);
             assert_eq!(p.url, "/reservar");
         }
         assert_eq!(platos[0].titulo, "Ceviche de camarón");
         assert!(platos[0].imagen.ends_with("carta-01-ceviche.jpg"));
+        assert!(platos[0].imagen_webp.ends_with("carta-01-ceviche.webp"));
         assert!(platos[0].subtitulo.contains("Entrada"));
         assert!(
             platos[0].subtitulo.contains("15.000"),

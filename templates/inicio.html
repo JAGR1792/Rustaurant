@@ -19,7 +19,10 @@
     </p>
   </div>
   <figure class="hero-figura">
-    <img src="/static/img/fotos/salon-hero.jpg" alt="Interior cálido de un restaurante parisino: mesas vestidas entre columnas de madera y lámparas con pantalla roja" width="1920" height="1080" fetchpriority="high">
+    <picture>
+      <source srcset="/static/img/fotos/salon-hero.webp" type="image/webp">
+      <img src="/static/img/fotos/salon-hero.jpg" alt="Interior cálido de un restaurante parisino: mesas vestidas entre columnas de madera y lámparas con pantalla roja" width="1920" height="1080" fetchpriority="high">
+    </picture>
   </figure>
 </section>
 
@@ -35,10 +38,16 @@
          style="--chroma-accent: {{ p.accent }}">
         <span class="chroma-wash" aria-hidden="true"></span>
         <span class="chroma-media" data-chroma-area>
-          <img class="chroma-mono" src="{{ p.imagen }}" alt="" loading="lazy" decoding="async"
-               width="800" height="800" draggable="false">
-          <img class="chroma-color" src="{{ p.imagen }}" alt="" loading="lazy" decoding="async"
-               width="800" height="800" draggable="false" aria-hidden="true">
+          <picture>
+            <source srcset="{{ p.imagen_webp }}" type="image/webp">
+            <img class="chroma-mono" src="{{ p.imagen }}" alt="" loading="lazy" decoding="async"
+                 width="800" height="800" draggable="false">
+          </picture>
+          <picture>
+            <source srcset="{{ p.imagen_webp }}" type="image/webp">
+            <img class="chroma-color" src="{{ p.imagen }}" alt="" loading="lazy" decoding="async"
+                 width="800" height="800" draggable="false" aria-hidden="true">
+          </picture>
           <span class="chroma-media-rim" aria-hidden="true"></span>
         </span>
         <span class="chroma-info">
