@@ -1,0 +1,38 @@
+<!doctype html>
+{# Layout original Brindis. Ideas de estructura vistas en SIGTVA/Camilo
+   (skip-link, nav por rol, contenedor de toasts y modal propio),
+   reescritas desde cero con marca vino y sin copiar codigo ajeno. #}
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block titulo %}Brindis{% endblock %}</title>
+  <meta name="description" content="Brindis: reservas por ocasion con plano interactivo.">
+  <link rel="stylesheet" href="/static/css/tema.css">
+  {% block head %}{% endblock %}
+</head>
+<body>
+  <a class="saltar" href="#contenido">Saltar al contenido</a>
+  <header class="barra">
+    <a class="logo" href="/" aria-label="Brindis, inicio">Brindis</a>
+    <nav class="menu" aria-label="Principal">
+      <a href="/reservar">Reservar</a>
+      <a href="/mis-reservas">Mis reservas</a>
+      {% if es_personal %}<a href="/agenda">Agenda</a>{% endif %}
+      {% if usuario != "" %}
+      <span class="usuario">Hola, {{ usuario }}</span>
+      <a href="/logout">Salir</a>
+      {% else %}
+      <a href="/login">Entrar</a>
+      {% endif %}
+    </nav>
+  </header>
+  <main id="contenido">
+    {% block contenido %}{% endblock %}
+  </main>
+  <div id="toasts" aria-live="polite"></div>
+  <dialog id="modal"></dialog>
+  <script src="/static/js/ui.js" defer></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

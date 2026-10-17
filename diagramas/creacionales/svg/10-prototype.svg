@@ -1,0 +1,293 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="460.8pt" height="163.92pt" viewBox="0 0 460.8 163.92" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:date>2026-09-21T04:55:57.707144</dc:date>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>Matplotlib v3.10.8, https://matplotlib.org/</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 163.92 
+L 460.8 163.92 
+L 460.8 0 
+L 0 0 
+z
+" style="fill: #ffffff"/>
+  </g>
+  <g id="axes_1">
+   <g id="line2d_1">
+    <path d="M 111.35 131.28 
+L 260.025 131.28 
+" clip-path="url(#p3c02d8cba8)" style="fill: none; stroke-dasharray: 0.84,1.54; stroke-dashoffset: 0; stroke: #666666; stroke-width: 0.7"/>
+   </g>
+   <g id="line2d_2">
+    <path d="M 44.75 28.8 
+L 113.15 28.8 
+" clip-path="url(#p3c02d8cba8)" style="fill: none; stroke-dasharray: 3.36,2.08; stroke-dashoffset: 0; stroke: #000000; stroke-width: 0.8"/>
+   </g>
+   <g id="line2d_3">
+    <path d="M 225.69 50.4 
+L 285.45 50.4 
+" clip-path="url(#p3c02d8cba8)" style="fill: none; stroke: #000000; stroke-width: 0.8"/>
+   </g>
+   <g id="line2d_4">
+    <path d="M 326.225 79.44 
+L 326.225 63.96 
+" clip-path="url(#p3c02d8cba8)" style="fill: none; stroke-dasharray: 3.36,2.08; stroke-dashoffset: 0; stroke: #000000; stroke-width: 0.8"/>
+   </g>
+   <g id="line2d_5">
+    <path d="M 326.225 79.44 
+L 303.05 79.44 
+" clip-path="url(#p3c02d8cba8)" style="fill: none; stroke-dasharray: 3.36,2.08; stroke-dashoffset: 0; stroke: #000000; stroke-width: 0.8"/>
+   </g>
+   <g id="line2d_6">
+    <path d="M 326.225 79.44 
+L 410.6375 79.44 
+" clip-path="url(#p3c02d8cba8)" style="fill: none; stroke-dasharray: 3.36,2.08; stroke-dashoffset: 0; stroke: #000000; stroke-width: 0.8"/>
+   </g>
+   <g id="line2d_7">
+    <path d="M 303.05 79.44 
+L 303.05 102.48 
+" clip-path="url(#p3c02d8cba8)" style="fill: none; stroke-dasharray: 3.36,2.08; stroke-dashoffset: 0; stroke: #000000; stroke-width: 0.8"/>
+   </g>
+   <g id="line2d_8">
+    <path d="M 410.6375 79.44 
+L 410.6375 102.48 
+" clip-path="url(#p3c02d8cba8)" style="fill: none; stroke-dasharray: 3.36,2.08; stroke-dashoffset: 0; stroke: #000000; stroke-width: 0.8"/>
+   </g>
+   <g id="line2d_9">
+    <path d="M 105.95 25.776 
+L 113.15 28.8 
+L 105.95 31.824 
+" clip-path="url(#p3c02d8cba8)" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="patch_2">
+    <path d="M 213.45 50.4 
+L 219.57 54.144 
+L 225.69 50.4 
+L 219.57 46.656 
+z
+" clip-path="url(#p3c02d8cba8)" style="fill: #ffffff; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_3">
+    <path d="M 326.225 55.68 
+L 322.049 63.96 
+L 330.401 63.96 
+z
+" clip-path="url(#p3c02d8cba8)" style="fill: #ffffff; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_4">
+    <path d="M 7.2 10.8 
+L 44.75 10.8 
+L 44.75 39.2 
+L 7.2 39.2 
+z
+" clip-path="url(#p3c02d8cba8)" style="fill: #ffffff; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_5">
+    <path d="M 113.15 10.8 
+L 213.45 10.8 
+L 213.45 82.96 
+L 113.15 82.96 
+z
+" clip-path="url(#p3c02d8cba8)" style="fill: #ffffff; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_6">
+    <path d="M 285.45 10.8 
+L 367 10.8 
+L 367 55.68 
+L 285.45 55.68 
+z
+" clip-path="url(#p3c02d8cba8)" style="fill: #ffffff; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_7">
+    <path d="M 260.025 102.48 
+L 346.075 102.48 
+L 346.075 155.28 
+L 260.025 155.28 
+z
+" clip-path="url(#p3c02d8cba8)" style="fill: #ffffff; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_8">
+    <path d="M 367.675 102.48 
+L 453.6 102.48 
+L 453.6 155.28 
+L 367.675 155.28 
+z
+" clip-path="url(#p3c02d8cba8)" style="fill: #ffffff; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_9">
+    <path d="M 7.2 106.08 
+L 103.43 106.08 
+L 111.35 114 
+L 111.35 143.424 
+L 7.2 143.424 
+z
+" clip-path="url(#p3c02d8cba8)" style="fill: #fff7cc; stroke: #8a7a2a; stroke-width: 0.7; stroke-linejoin: miter"/>
+   </g>
+   <g id="text_1">
+    <text style="font-weight: 700; font-size: 8px; font-family: 'Liberation Sans'; text-anchor: middle" x="25.975" y="22.38875" transform="rotate(-0 25.975 22.38875)">Cliente</text>
+   </g>
+   <g id="line2d_10">
+    <path d="M 7.2 29.84 
+L 44.75 29.84 
+" clip-path="url(#p3c02d8cba8)" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linecap: square"/>
+   </g>
+   <g id="text_2">
+    <text style="font-size: 8px; font-family: 'Liberation Sans'; text-anchor: middle" x="163.3" y="21.66875" transform="rotate(-0 163.3 21.66875)">«singleton»</text>
+   </g>
+   <g id="text_3">
+    <text style="font-weight: 700; font-size: 8px; font-family: 'Liberation Sans'; text-anchor: middle" x="163.3" y="32.05125" transform="rotate(-0 163.3 32.05125)">RegistroPrototipos</text>
+   </g>
+   <g id="line2d_11">
+    <path d="M 113.15 38.8 
+L 213.45 38.8 
+" clip-path="url(#p3c02d8cba8)" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linecap: square"/>
+   </g>
+   <g id="text_4">
+    <text style="font-size: 8px; font-family: 'Liberation Sans'; text-anchor: start" x="118.55" y="49.30875" transform="rotate(-0 118.55 49.30875)">-prototipos : map</text>
+   </g>
+   <g id="line2d_12">
+    <path d="M 113.15 55.68 
+L 213.45 55.68 
+" clip-path="url(#p3c02d8cba8)" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linecap: square"/>
+   </g>
+   <g id="text_5">
+    <text style="font-size: 8px; font-family: 'Liberation Sans'; text-anchor: start" x="118.55" y="66.18875" transform="rotate(-0 118.55 66.18875)">+registrar(clave, p) : void</text>
+   </g>
+   <g id="text_6">
+    <text style="font-size: 8px; font-family: 'Liberation Sans'; text-anchor: start" x="118.55" y="76.58875" transform="rotate(-0 118.55 76.58875)">+clonar(clave) : Prototipo</text>
+   </g>
+   <g id="text_7">
+    <text style="font-size: 8px; font-family: 'Liberation Sans'; text-anchor: middle" x="326.225" y="21.66875" transform="rotate(-0 326.225 21.66875)">«interface»</text>
+   </g>
+   <g id="text_8">
+    <text style="font-style: italic; font-weight: 700; font-size: 8px; font-family: 'Liberation Sans'; text-anchor: middle" x="326.225" y="32.06875" transform="rotate(-0 326.225 32.06875)">Prototipo</text>
+   </g>
+   <g id="line2d_13">
+    <path d="M 285.45 38.8 
+L 367 38.8 
+" clip-path="url(#p3c02d8cba8)" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linecap: square"/>
+   </g>
+   <g id="text_9">
+    <text style="font-size: 8px; font-family: 'Liberation Sans'; text-anchor: start" x="290.85" y="49.30875" transform="rotate(-0 290.85 49.30875)">+clonar() : Prototipo</text>
+   </g>
+   <g id="text_10">
+    <text style="font-weight: 700; font-size: 8px; font-family: 'Liberation Sans'; text-anchor: middle" x="303.05" y="114.06875" transform="rotate(-0 303.05 114.06875)">PrototipoConcreto1</text>
+   </g>
+   <g id="line2d_14">
+    <path d="M 260.025 121.52 
+L 346.075 121.52 
+" clip-path="url(#p3c02d8cba8)" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linecap: square"/>
+   </g>
+   <g id="text_11">
+    <text style="font-size: 8px; font-family: 'Liberation Sans'; text-anchor: start" x="265.425" y="132.02875" transform="rotate(-0 265.425 132.02875)">-campo1 : string</text>
+   </g>
+   <g id="line2d_15">
+    <path d="M 260.025 138.4 
+L 346.075 138.4 
+" clip-path="url(#p3c02d8cba8)" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linecap: square"/>
+   </g>
+   <g id="text_12">
+    <text style="font-size: 8px; font-family: 'Liberation Sans'; text-anchor: start" x="265.425" y="148.90875" transform="rotate(-0 265.425 148.90875)">+clonar() : Prototipo</text>
+   </g>
+   <g id="text_13">
+    <text style="font-weight: 700; font-size: 8px; font-family: 'Liberation Sans'; text-anchor: middle" x="410.6375" y="114.06875" transform="rotate(-0 410.6375 114.06875)">PrototipoConcreto2</text>
+   </g>
+   <g id="line2d_16">
+    <path d="M 367.675 121.52 
+L 453.6 121.52 
+" clip-path="url(#p3c02d8cba8)" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linecap: square"/>
+   </g>
+   <g id="text_14">
+    <text style="font-size: 8px; font-family: 'Liberation Sans'; text-anchor: start" x="373.075" y="132.02875" transform="rotate(-0 373.075 132.02875)">-campo2 : int</text>
+   </g>
+   <g id="line2d_17">
+    <path d="M 367.675 138.4 
+L 453.6 138.4 
+" clip-path="url(#p3c02d8cba8)" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linecap: square"/>
+   </g>
+   <g id="text_15">
+    <text style="font-size: 8px; font-family: 'Liberation Sans'; text-anchor: start" x="373.075" y="148.90875" transform="rotate(-0 373.075 148.90875)">+clonar() : Prototipo</text>
+   </g>
+   <g id="line2d_18">
+    <path d="M 103.43 106.08 
+L 103.43 114 
+L 111.35 114 
+" clip-path="url(#p3c02d8cba8)" style="fill: none; stroke: #8a7a2a; stroke-width: 0.6; stroke-linecap: square"/>
+   </g>
+   <g id="text_16">
+    <text style="font-size: 7.36px; font-family: 'Liberation Sans'; text-anchor: start" x="12.24" y="117.08725" transform="rotate(-0 12.24 117.08725)">clonar() devuelve una copia</text>
+   </g>
+   <g id="text_17">
+    <text style="font-size: 7.36px; font-family: 'Liberation Sans'; text-anchor: start" x="12.24" y="126.65525" transform="rotate(-0 12.24 126.65525)">del ejemplar: superficial</text>
+   </g>
+   <g id="text_18">
+    <text style="font-size: 7.36px; font-family: 'Liberation Sans'; text-anchor: start" x="12.24" y="136.266375" transform="rotate(-0 12.24 136.266375)">o profunda, según la clase</text>
+   </g>
+   <g id="patch_10">
+    <path d="M 59.5875 16.51 
+L 98.3125 16.51 
+L 98.3125 26.69 
+L 59.5875 26.69 
+z
+" clip-path="url(#p3c02d8cba8)" style="fill: #ffffff"/>
+   </g>
+   <g id="patch_11">
+    <path d="M 235.65 38.11 
+L 263.25 38.11 
+L 263.25 48.29 
+L 235.65 48.29 
+z
+" clip-path="url(#p3c02d8cba8)" style="fill: #ffffff"/>
+   </g>
+   <g id="patch_12">
+    <path d="M 229.0275 51.568 
+L 236.7525 51.568 
+L 236.7525 61.472 
+L 229.0275 61.472 
+z
+" clip-path="url(#p3c02d8cba8)" style="fill: #ffffff"/>
+   </g>
+   <g id="patch_13">
+    <path d="M 268.7275 39.328 
+L 283.4525 39.328 
+L 283.4525 49.232 
+L 268.7275 49.232 
+z
+" clip-path="url(#p3c02d8cba8)" style="fill: #ffffff"/>
+   </g>
+   <g id="text_19">
+    <text style="font-size: 7.6px; font-family: 'Liberation Sans'; text-anchor: middle" x="78.95" y="23.853313" transform="rotate(-0 78.95 23.853313)">pide copia</text>
+   </g>
+   <g id="text_20">
+    <text style="font-size: 7.6px; font-family: 'Liberation Sans'; text-anchor: middle" x="249.45" y="45.453312" transform="rotate(-0 249.45 45.453312)">guarda</text>
+   </g>
+   <g id="text_21">
+    <text style="font-size: 7.36px; font-family: 'Liberation Sans'; text-anchor: middle" x="232.89" y="58.71125" transform="rotate(-0 232.89 58.71125)">1</text>
+   </g>
+   <g id="text_22">
+    <text style="font-size: 7.36px; font-family: 'Liberation Sans'; text-anchor: middle" x="276.09" y="46.47125" transform="rotate(-0 276.09 46.47125)">0..*</text>
+   </g>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="p3c02d8cba8">
+   <rect x="0" y="0" width="460.8" height="163.92"/>
+  </clipPath>
+ </defs>
+</svg>

@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{# Portada: propuesta de valor, zonas del salon y cuentas de demostracion. #}
+{% block titulo %}Brindis — reservas por ocasión{% endblock %}
+{% block contenido %}
+<section class="hero">
+  <h1>Celebra sin preocuparte por la mesa</h1>
+  <p>Brindis reserva por ocasión: elige zona, pedido anticipado y servicios
+  extra en un asistente de 4 pasos. El plano muestra la disponibilidad real
+  de cada mesa.</p>
+  <p><a class="boton" href="/reservar">Reservar ahora</a></p>
+</section>
+<section>
+  <h2>Zonas del salón</h2>
+  <div class="tarjetas">
+    {% for z in zonas %}
+    <article class="tarjeta">
+      <strong>Zona {{ z.nombre }}</strong>
+      <span>{{ z.mesas }} mesas · {{ z.puestos }} puestos</span>
+    </article>
+    {% endfor %}
+  </div>
+</section>
+<section>
+  <h2>Cuentas de demostración</h2>
+  <ul>
+    <li>Cliente: <code>cliente@brindis.co</code> / <code>Cliente123!</code></li>
+    <li>VIP: <code>vip@brindis.co</code> / <code>Vip123!</code></li>
+    <li>Empleado: <code>empleado@brindis.co</code> / <code>Empleado123!</code></li>
+    <li>Admin: <code>admin@brindis.co</code> / <code>Admin123!</code></li>
+  </ul>
+</section>
+{% endblock %}

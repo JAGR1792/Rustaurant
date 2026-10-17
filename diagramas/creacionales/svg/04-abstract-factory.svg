@@ -1,0 +1,464 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="424.935pt" height="346.128pt" viewBox="0 0 424.935 346.128" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:date>2026-09-21T04:55:56.085032</dc:date>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>Matplotlib v3.10.8, https://matplotlib.org/</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 346.128 
+L 424.935 346.128 
+L 424.935 0 
+L 0 0 
+z
+" style="fill: #ffffff"/>
+  </g>
+  <g id="axes_1">
+   <g id="line2d_1">
+    <path d="M 108.105 41.68 
+L 299.305 41.68 
+" clip-path="url(#p7cfa0b60a1)" style="fill: none; stroke-dasharray: 0.84,1.54; stroke-dashoffset: 0; stroke: #666666; stroke-width: 0.7"/>
+   </g>
+   <g id="line2d_2">
+    <path d="M 335.78 283.28 
+L 335.78 319.28 
+" clip-path="url(#p7cfa0b60a1)" style="fill: none; stroke-dasharray: 0.84,1.54; stroke-dashoffset: 0; stroke: #666666; stroke-width: 0.7"/>
+   </g>
+   <g id="line2d_3">
+    <path d="M 337.5175 73.28 
+L 337.5175 102.08 
+" clip-path="url(#p7cfa0b60a1)" style="fill: none; stroke-dasharray: 3.36,2.08; stroke-dashoffset: 0; stroke: #000000; stroke-width: 0.8"/>
+   </g>
+   <g id="line2d_4">
+    <path d="M 404.775 269.08 
+L 404.775 165.64 
+" clip-path="url(#p7cfa0b60a1)" style="fill: none; stroke-dasharray: 3.36,2.08; stroke-dashoffset: 0; stroke: #000000; stroke-width: 0.8"/>
+   </g>
+   <g id="line2d_5">
+    <path d="M 404.775 200.36 
+L 338.73 200.36 
+" clip-path="url(#p7cfa0b60a1)" style="fill: none; stroke-dasharray: 3.36,2.08; stroke-dashoffset: 0; stroke: #000000; stroke-width: 0.8"/>
+   </g>
+   <g id="line2d_6">
+    <path d="M 404.775 269.08 
+L 338.73 269.08 
+" clip-path="url(#p7cfa0b60a1)" style="fill: none; stroke-dasharray: 3.36,2.08; stroke-dashoffset: 0; stroke: #000000; stroke-width: 0.8"/>
+   </g>
+   <g id="line2d_7">
+    <path d="M 20.16 269.08 
+L 20.16 155.24 
+" clip-path="url(#p7cfa0b60a1)" style="fill: none; stroke-dasharray: 3.36,2.08; stroke-dashoffset: 0; stroke: #000000; stroke-width: 0.8"/>
+   </g>
+   <g id="line2d_8">
+    <path d="M 20.16 200.36 
+L 42.955 200.36 
+" clip-path="url(#p7cfa0b60a1)" style="fill: none; stroke-dasharray: 3.36,2.08; stroke-dashoffset: 0; stroke: #000000; stroke-width: 0.8"/>
+   </g>
+   <g id="line2d_9">
+    <path d="M 20.16 269.08 
+L 42.955 269.08 
+" clip-path="url(#p7cfa0b60a1)" style="fill: none; stroke-dasharray: 3.36,2.08; stroke-dashoffset: 0; stroke: #000000; stroke-width: 0.8"/>
+   </g>
+   <g id="line2d_10">
+    <path d="M 130.81 269.08 
+L 130.81 155.24 
+" clip-path="url(#p7cfa0b60a1)" style="fill: none; stroke-dasharray: 3.36,2.08; stroke-dashoffset: 0; stroke: #000000; stroke-width: 0.8"/>
+   </g>
+   <g id="line2d_11">
+    <path d="M 130.81 200.36 
+L 153.605 200.36 
+" clip-path="url(#p7cfa0b60a1)" style="fill: none; stroke-dasharray: 3.36,2.08; stroke-dashoffset: 0; stroke: #000000; stroke-width: 0.8"/>
+   </g>
+   <g id="line2d_12">
+    <path d="M 130.81 269.08 
+L 153.605 269.08 
+" clip-path="url(#p7cfa0b60a1)" style="fill: none; stroke-dasharray: 3.36,2.08; stroke-dashoffset: 0; stroke: #000000; stroke-width: 0.8"/>
+   </g>
+   <g id="line2d_13">
+    <path d="M 281.78 214.56 
+L 281.78 231.84 
+L 134.41 231.84 
+L 134.31974 231.038925 
+L 134.053488 230.278019 
+L 133.624593 229.595437 
+L 133.054563 229.025407 
+L 132.371981 228.596512 
+L 131.611075 228.33026 
+L 130.81 228.24 
+L 130.008925 228.33026 
+L 129.248019 228.596512 
+L 128.565437 229.025407 
+L 127.995407 229.595437 
+L 127.566512 230.278019 
+L 127.30026 231.038925 
+L 127.21 231.84 
+L 71.0425 231.84 
+" clip-path="url(#p7cfa0b60a1)" style="fill: none; stroke-dasharray: 3.36,2.08; stroke-dashoffset: 0; stroke: #1f4e79; stroke-width: 0.8"/>
+   </g>
+   <g id="line2d_14">
+    <path d="M 71.0425 231.84 
+L 71.0425 214.56 
+" clip-path="url(#p7cfa0b60a1)" style="fill: none; stroke-dasharray: 3.36,2.08; stroke-dashoffset: 0; stroke: #1f4e79; stroke-width: 0.8"/>
+   </g>
+   <g id="line2d_15">
+    <path d="M 181.6925 231.84 
+L 181.6925 214.56 
+" clip-path="url(#p7cfa0b60a1)" style="fill: none; stroke-dasharray: 3.36,2.08; stroke-dashoffset: 0; stroke: #1f4e79; stroke-width: 0.8"/>
+   </g>
+   <g id="line2d_16">
+    <path d="M 281.78 283.28 
+L 281.78 300.56 
+L 71.0425 300.56 
+" clip-path="url(#p7cfa0b60a1)" style="fill: none; stroke-dasharray: 3.36,2.08; stroke-dashoffset: 0; stroke: #1f4e79; stroke-width: 0.8"/>
+   </g>
+   <g id="line2d_17">
+    <path d="M 71.0425 300.56 
+L 71.0425 283.28 
+" clip-path="url(#p7cfa0b60a1)" style="fill: none; stroke-dasharray: 3.36,2.08; stroke-dashoffset: 0; stroke: #1f4e79; stroke-width: 0.8"/>
+   </g>
+   <g id="line2d_18">
+    <path d="M 181.6925 300.56 
+L 181.6925 283.28 
+" clip-path="url(#p7cfa0b60a1)" style="fill: none; stroke-dasharray: 3.36,2.08; stroke-dashoffset: 0; stroke: #1f4e79; stroke-width: 0.8"/>
+   </g>
+   <g id="line2d_19">
+    <path d="M 340.5415 94.88 
+L 337.5175 102.08 
+L 334.4935 94.88 
+" clip-path="url(#p7cfa0b60a1)" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="patch_2">
+    <path d="M 404.775 157.36 
+L 400.599 165.64 
+L 408.951 165.64 
+z
+" clip-path="url(#p7cfa0b60a1)" style="fill: #ffffff; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_3">
+    <path d="M 20.16 146.96 
+L 15.984 155.24 
+L 24.336 155.24 
+z
+" clip-path="url(#p7cfa0b60a1)" style="fill: #ffffff; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_4">
+    <path d="M 130.81 146.96 
+L 126.634 155.24 
+L 134.986 155.24 
+z
+" clip-path="url(#p7cfa0b60a1)" style="fill: #ffffff; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="line2d_20">
+    <path d="M 68.0185 221.76 
+L 71.0425 214.56 
+L 74.0665 221.76 
+" clip-path="url(#p7cfa0b60a1)" style="fill: none; stroke: #1f4e79; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="line2d_21">
+    <path d="M 178.6685 221.76 
+L 181.6925 214.56 
+L 184.7165 221.76 
+" clip-path="url(#p7cfa0b60a1)" style="fill: none; stroke: #1f4e79; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="line2d_22">
+    <path d="M 68.0185 290.48 
+L 71.0425 283.28 
+L 74.0665 290.48 
+" clip-path="url(#p7cfa0b60a1)" style="fill: none; stroke: #1f4e79; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="line2d_23">
+    <path d="M 178.6685 290.48 
+L 181.6925 283.28 
+L 184.7165 290.48 
+" clip-path="url(#p7cfa0b60a1)" style="fill: none; stroke: #1f4e79; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="patch_5">
+    <path d="M 10.08 102.08 
+L 99.13 102.08 
+L 99.13 146.96 
+L 10.08 146.96 
+z
+" clip-path="url(#p7cfa0b60a1)" style="fill: #ffffff; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_6">
+    <path d="M 120.73 102.08 
+L 209.78 102.08 
+L 209.78 146.96 
+L 120.73 146.96 
+z
+" clip-path="url(#p7cfa0b60a1)" style="fill: #ffffff; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_7">
+    <path d="M 42.955 186.16 
+L 99.13 186.16 
+L 99.13 214.56 
+L 42.955 214.56 
+z
+" clip-path="url(#p7cfa0b60a1)" style="fill: #e3eefa; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_8">
+    <path d="M 153.605 186.16 
+L 209.78 186.16 
+L 209.78 214.56 
+L 153.605 214.56 
+z
+" clip-path="url(#p7cfa0b60a1)" style="fill: #e3eefa; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_9">
+    <path d="M 42.955 254.88 
+L 99.13 254.88 
+L 99.13 283.28 
+L 42.955 283.28 
+z
+" clip-path="url(#p7cfa0b60a1)" style="fill: #e5f4e3; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_10">
+    <path d="M 153.605 254.88 
+L 209.78 254.88 
+L 209.78 283.28 
+L 153.605 283.28 
+z
+" clip-path="url(#p7cfa0b60a1)" style="fill: #e5f4e3; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_11">
+    <path d="M 260.18 102.08 
+L 414.855 102.08 
+L 414.855 157.36 
+L 260.18 157.36 
+z
+" clip-path="url(#p7cfa0b60a1)" style="fill: #ffffff; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_12">
+    <path d="M 260.18 186.16 
+L 338.73 186.16 
+L 338.73 214.56 
+L 260.18 214.56 
+z
+" clip-path="url(#p7cfa0b60a1)" style="fill: #e3eefa; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_13">
+    <path d="M 260.18 254.88 
+L 338.73 254.88 
+L 338.73 283.28 
+L 260.18 283.28 
+z
+" clip-path="url(#p7cfa0b60a1)" style="fill: #e5f4e3; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_14">
+    <path d="M 299.305 10.08 
+L 414.855 10.08 
+L 414.855 73.28 
+L 299.305 73.28 
+z
+" clip-path="url(#p7cfa0b60a1)" style="fill: #ffffff; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_15">
+    <path d="M 10.08 13.68 
+L 100.185 13.68 
+L 108.105 21.6 
+L 108.105 41.456 
+L 10.08 41.456 
+z
+" clip-path="url(#p7cfa0b60a1)" style="fill: #fff7cc; stroke: #8a7a2a; stroke-width: 0.7; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_16">
+    <path d="M 299.78 319.28 
+L 386.26 319.28 
+L 394.18 327.2 
+L 394.18 337.488 
+L 299.78 337.488 
+z
+" clip-path="url(#p7cfa0b60a1)" style="fill: #fff7cc; stroke: #8a7a2a; stroke-width: 0.7; stroke-linejoin: miter"/>
+   </g>
+   <g id="text_1">
+    <text style="font-size: 8px; font-family: 'Liberation Sans'; text-anchor: middle" x="54.605" y="112.94875" transform="rotate(-0 54.605 112.94875)">«interface»</text>
+   </g>
+   <g id="text_2">
+    <text style="font-style: italic; font-weight: 700; font-size: 8px; font-family: 'Liberation Sans'; text-anchor: middle" x="54.605" y="123.34875" transform="rotate(-0 54.605 123.34875)">ProductoAbstractoA</text>
+   </g>
+   <g id="line2d_24">
+    <path d="M 10.08 130.08 
+L 99.13 130.08 
+" clip-path="url(#p7cfa0b60a1)" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linecap: square"/>
+   </g>
+   <g id="text_3">
+    <text style="font-size: 8px; font-family: 'Liberation Sans'; text-anchor: start" x="15.48" y="140.58875" transform="rotate(-0 15.48 140.58875)">+operacionA() : void</text>
+   </g>
+   <g id="text_4">
+    <text style="font-size: 8px; font-family: 'Liberation Sans'; text-anchor: middle" x="165.255" y="112.94875" transform="rotate(-0 165.255 112.94875)">«interface»</text>
+   </g>
+   <g id="text_5">
+    <text style="font-style: italic; font-weight: 700; font-size: 8px; font-family: 'Liberation Sans'; text-anchor: middle" x="165.255" y="123.34875" transform="rotate(-0 165.255 123.34875)">ProductoAbstractoB</text>
+   </g>
+   <g id="line2d_25">
+    <path d="M 120.73 130.08 
+L 209.78 130.08 
+" clip-path="url(#p7cfa0b60a1)" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linecap: square"/>
+   </g>
+   <g id="text_6">
+    <text style="font-size: 8px; font-family: 'Liberation Sans'; text-anchor: start" x="126.13" y="140.58875" transform="rotate(-0 126.13 140.58875)">+operacionB() : void</text>
+   </g>
+   <g id="text_7">
+    <text style="font-weight: 700; font-size: 8px; font-family: 'Liberation Sans'; text-anchor: middle" x="71.0425" y="197.74875" transform="rotate(-0 71.0425 197.74875)">ProductoA1</text>
+   </g>
+   <g id="line2d_26">
+    <path d="M 42.955 205.2 
+L 99.13 205.2 
+" clip-path="url(#p7cfa0b60a1)" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linecap: square"/>
+   </g>
+   <g id="text_8">
+    <text style="font-weight: 700; font-size: 8px; font-family: 'Liberation Sans'; text-anchor: middle" x="181.6925" y="197.74875" transform="rotate(-0 181.6925 197.74875)">ProductoB1</text>
+   </g>
+   <g id="line2d_27">
+    <path d="M 153.605 205.2 
+L 209.78 205.2 
+" clip-path="url(#p7cfa0b60a1)" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linecap: square"/>
+   </g>
+   <g id="text_9">
+    <text style="font-weight: 700; font-size: 8px; font-family: 'Liberation Sans'; text-anchor: middle" x="71.0425" y="266.46875" transform="rotate(-0 71.0425 266.46875)">ProductoA2</text>
+   </g>
+   <g id="line2d_28">
+    <path d="M 42.955 273.92 
+L 99.13 273.92 
+" clip-path="url(#p7cfa0b60a1)" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linecap: square"/>
+   </g>
+   <g id="text_10">
+    <text style="font-weight: 700; font-size: 8px; font-family: 'Liberation Sans'; text-anchor: middle" x="181.6925" y="266.46875" transform="rotate(-0 181.6925 266.46875)">ProductoB2</text>
+   </g>
+   <g id="line2d_29">
+    <path d="M 153.605 273.92 
+L 209.78 273.92 
+" clip-path="url(#p7cfa0b60a1)" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linecap: square"/>
+   </g>
+   <g id="text_11">
+    <text style="font-size: 8px; font-family: 'Liberation Sans'; text-anchor: middle" x="337.5175" y="112.94875" transform="rotate(-0 337.5175 112.94875)">«interface»</text>
+   </g>
+   <g id="text_12">
+    <text style="font-style: italic; font-weight: 700; font-size: 8px; font-family: 'Liberation Sans'; text-anchor: middle" x="337.5175" y="123.34875" transform="rotate(-0 337.5175 123.34875)">FabricaAbstracta</text>
+   </g>
+   <g id="line2d_30">
+    <path d="M 260.18 130.08 
+L 414.855 130.08 
+" clip-path="url(#p7cfa0b60a1)" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linecap: square"/>
+   </g>
+   <g id="text_13">
+    <text style="font-size: 8px; font-family: 'Liberation Sans'; text-anchor: start" x="265.58" y="140.58875" transform="rotate(-0 265.58 140.58875)">+crearProductoA() : ProductoAbstractoA</text>
+   </g>
+   <g id="text_14">
+    <text style="font-size: 8px; font-family: 'Liberation Sans'; text-anchor: start" x="265.58" y="150.98875" transform="rotate(-0 265.58 150.98875)">+crearProductoB() : ProductoAbstractoB</text>
+   </g>
+   <g id="text_15">
+    <text style="font-weight: 700; font-size: 8px; font-family: 'Liberation Sans'; text-anchor: middle" x="299.455" y="197.74875" transform="rotate(-0 299.455 197.74875)">FabricaConcreta1</text>
+   </g>
+   <g id="line2d_31">
+    <path d="M 260.18 205.2 
+L 338.73 205.2 
+" clip-path="url(#p7cfa0b60a1)" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linecap: square"/>
+   </g>
+   <g id="text_16">
+    <text style="font-weight: 700; font-size: 8px; font-family: 'Liberation Sans'; text-anchor: middle" x="299.455" y="266.46875" transform="rotate(-0 299.455 266.46875)">FabricaConcreta2</text>
+   </g>
+   <g id="line2d_32">
+    <path d="M 260.18 273.92 
+L 338.73 273.92 
+" clip-path="url(#p7cfa0b60a1)" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linecap: square"/>
+   </g>
+   <g id="text_17">
+    <text style="font-weight: 700; font-size: 8px; font-family: 'Liberation Sans'; text-anchor: middle" x="357.08" y="21.66875" transform="rotate(-0 357.08 21.66875)">Cliente</text>
+   </g>
+   <g id="line2d_33">
+    <path d="M 299.305 29.12 
+L 414.855 29.12 
+" clip-path="url(#p7cfa0b60a1)" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linecap: square"/>
+   </g>
+   <g id="text_18">
+    <text style="font-size: 8px; font-family: 'Liberation Sans'; text-anchor: start" x="304.705" y="39.62875" transform="rotate(-0 304.705 39.62875)">-fabrica : FabricaAbstracta</text>
+   </g>
+   <g id="line2d_34">
+    <path d="M 299.305 46 
+L 414.855 46 
+" clip-path="url(#p7cfa0b60a1)" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linecap: square"/>
+   </g>
+   <g id="text_19">
+    <text style="font-size: 8px; font-family: 'Liberation Sans'; text-anchor: start" x="304.705" y="56.50875" transform="rotate(-0 304.705 56.50875)">+Cliente(f : FabricaAbstracta)</text>
+   </g>
+   <g id="text_20">
+    <text style="font-size: 8px; font-family: 'Liberation Sans'; text-anchor: start" x="304.705" y="66.90875" transform="rotate(-0 304.705 66.90875)">+operacion() : void</text>
+   </g>
+   <g id="line2d_35">
+    <path d="M 100.185 13.68 
+L 100.185 21.6 
+L 108.105 21.6 
+" clip-path="url(#p7cfa0b60a1)" style="fill: none; stroke: #8a7a2a; stroke-width: 0.6; stroke-linecap: square"/>
+   </g>
+   <g id="text_21">
+    <text style="font-size: 7.36px; font-family: 'Liberation Sans'; text-anchor: start" x="15.12" y="24.68725" transform="rotate(-0 15.12 24.68725)">ProductoAbstractoA pa =</text>
+   </g>
+   <g id="text_22">
+    <text style="font-size: 7.36px; font-family: 'Liberation Sans'; text-anchor: start" x="15.12" y="34.25525" transform="rotate(-0 15.12 34.25525)">  fabrica.crearProductoA()</text>
+   </g>
+   <g id="line2d_36">
+    <path d="M 386.26 319.28 
+L 386.26 327.2 
+L 394.18 327.2 
+" clip-path="url(#p7cfa0b60a1)" style="fill: none; stroke: #8a7a2a; stroke-width: 0.6; stroke-linecap: square"/>
+   </g>
+   <g id="text_23">
+    <text style="font-size: 7.36px; font-family: 'Liberation Sans'; text-anchor: start" x="304.82" y="330.28725" transform="rotate(-0 304.82 330.28725)">return new ProductoA2()</text>
+   </g>
+   <g id="patch_17">
+    <path d="M 346.1575 82.59 
+L 362.1325 82.59 
+L 362.1325 92.77 
+L 346.1575 92.77 
+z
+" clip-path="url(#p7cfa0b60a1)" style="fill: #ffffff"/>
+   </g>
+   <g id="patch_18">
+    <path d="M 225.7425 234.31 
+L 244.2175 234.31 
+L 244.2175 244.49 
+L 225.7425 244.49 
+z
+" clip-path="url(#p7cfa0b60a1)" style="fill: #ffffff"/>
+   </g>
+   <g id="patch_19">
+    <path d="M 225.7425 303.03 
+L 244.2175 303.03 
+L 244.2175 313.21 
+L 225.7425 313.21 
+z
+" clip-path="url(#p7cfa0b60a1)" style="fill: #ffffff"/>
+   </g>
+   <g id="text_24">
+    <text style="font-size: 7.6px; font-family: 'Liberation Sans'; text-anchor: middle" x="354.145" y="89.933312" transform="rotate(-0 354.145 89.933312)">usa</text>
+   </g>
+   <g id="text_25">
+    <text style="font-size: 7.6px; font-family: 'Liberation Sans'; text-anchor: middle" x="234.98" y="241.653312" transform="rotate(-0 234.98 241.653312)">crea</text>
+   </g>
+   <g id="text_26">
+    <text style="font-size: 7.6px; font-family: 'Liberation Sans'; text-anchor: middle" x="234.98" y="310.373312" transform="rotate(-0 234.98 310.373312)">crea</text>
+   </g>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="p7cfa0b60a1">
+   <rect x="0" y="0" width="424.935" height="346.128"/>
+  </clipPath>
+ </defs>
+</svg>

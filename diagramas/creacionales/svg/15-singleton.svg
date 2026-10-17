@@ -1,0 +1,439 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="456.565pt" height="387.97pt" viewBox="0 0 456.565 387.97" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:date>2026-09-21T04:55:58.716596</dc:date>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>Matplotlib v3.10.8, https://matplotlib.org/</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 387.97 
+L 456.565 387.97 
+L 456.565 0 
+L 0 0 
+z
+" style="fill: #ffffff"/>
+  </g>
+  <g id="axes_1">
+   <g id="line2d_1">
+    <path d="M 151.25 30.96 
+L 190.85 30.96 
+" clip-path="url(#p27c2a06d5f)" style="fill: none; stroke-dasharray: 3.36,2.08; stroke-dashoffset: 0; stroke: #000000; stroke-width: 0.8"/>
+   </g>
+   <g id="line2d_2">
+    <path d="M 79.225 46.07 
+L 79.225 166.995 
+" clip-path="url(#p27c2a06d5f)" style="fill: none; stroke-dasharray: 3.36,2.08; stroke-dashoffset: 0; stroke: #000000; stroke-width: 0.8"/>
+   </g>
+   <g id="line2d_3">
+    <path d="M 151.25 188.9475 
+L 190.85 188.9475 
+" clip-path="url(#p27c2a06d5f)" style="fill: none; stroke-dasharray: 3.36,2.08; stroke-dashoffset: 0; stroke: #000000; stroke-width: 0.8"/>
+   </g>
+   <g id="line2d_4">
+    <path d="M 79.225 210.9 
+L 79.225 266.335 
+" clip-path="url(#p27c2a06d5f)" style="fill: none; stroke-dasharray: 3.36,2.08; stroke-dashoffset: 0; stroke: #000000; stroke-width: 0.8"/>
+   </g>
+   <g id="line2d_5">
+    <path d="M 248.75 111.56 
+L 248.75 156.2 
+" clip-path="url(#p27c2a06d5f)" style="fill: none; stroke-dasharray: 3.36,2.08; stroke-dashoffset: 0; stroke: #000000; stroke-width: 0.8"/>
+   </g>
+   <g id="line2d_6">
+    <path d="M 248.75 266.335 
+L 248.75 221.695 
+" clip-path="url(#p27c2a06d5f)" style="fill: none; stroke-dasharray: 3.36,2.08; stroke-dashoffset: 0; stroke: #000000; stroke-width: 0.8"/>
+   </g>
+   <g id="line2d_7">
+    <path d="M 346.25 188.9475 
+L 306.65 188.9475 
+" clip-path="url(#p27c2a06d5f)" style="fill: none; stroke-dasharray: 3.36,2.08; stroke-dashoffset: 0; stroke: #000000; stroke-width: 0.8"/>
+   </g>
+   <g id="line2d_8">
+    <path d="M 183.65 27.936 
+L 190.85 30.96 
+L 183.65 33.984 
+" clip-path="url(#p27c2a06d5f)" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="line2d_9">
+    <path d="M 82.249 159.795 
+L 79.225 166.995 
+L 76.201 159.795 
+" clip-path="url(#p27c2a06d5f)" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="line2d_10">
+    <path d="M 183.65 185.9235 
+L 190.85 188.9475 
+L 183.65 191.9715 
+" clip-path="url(#p27c2a06d5f)" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="line2d_11">
+    <path d="M 82.249 259.135 
+L 79.225 266.335 
+L 76.201 259.135 
+" clip-path="url(#p27c2a06d5f)" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="line2d_12">
+    <path d="M 251.774 149 
+L 248.75 156.2 
+L 245.726 149 
+" clip-path="url(#p27c2a06d5f)" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="line2d_13">
+    <path d="M 245.726 228.895 
+L 248.75 221.695 
+L 251.774 228.895 
+" clip-path="url(#p27c2a06d5f)" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="line2d_14">
+    <path d="M 313.85 191.9715 
+L 306.65 188.9475 
+L 313.85 185.9235 
+" clip-path="url(#p27c2a06d5f)" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="patch_2">
+    <path d="M 7.2 10.8 
+L 151.25 10.8 
+L 151.25 46.07 
+L 7.2 46.07 
+z
+" clip-path="url(#p27c2a06d5f)" style="fill: #ffffff; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_3">
+    <path d="M 7.2 166.995 
+L 151.25 166.995 
+L 151.25 210.9 
+L 7.2 210.9 
+z
+" clip-path="url(#p27c2a06d5f)" style="fill: #ffffff; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_4">
+    <path d="M 7.2 266.335 
+L 151.25 266.335 
+L 151.25 367.095 
+L 7.2 367.095 
+z
+" clip-path="url(#p27c2a06d5f)" style="fill: #ffffff; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_5">
+    <path d="M 190.85 10.8 
+L 306.65 10.8 
+L 306.65 111.56 
+L 190.85 111.56 
+z
+" clip-path="url(#p27c2a06d5f)" style="fill: #ffffff; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_6">
+    <path d="M 190.85 156.2 
+L 306.65 156.2 
+L 306.65 221.695 
+L 190.85 221.695 
+z
+" clip-path="url(#p27c2a06d5f)" style="fill: #ffffff; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_7">
+    <path d="M 190.85 266.335 
+L 306.65 266.335 
+L 306.65 377.17 
+L 190.85 377.17 
+z
+" clip-path="url(#p27c2a06d5f)" style="fill: #ffffff; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_8">
+    <path d="M 346.25 128.4925 
+L 447.925 128.4925 
+L 447.925 249.4025 
+L 346.25 249.4025 
+z
+" clip-path="url(#p27c2a06d5f)" style="fill: #ffffff; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="text_1">
+    <text style="font-weight: 700; font-size: 7.75px; font-family: 'Liberation Sans'; text-anchor: middle" x="79.225" y="22.161602" transform="rotate(-0 79.225 22.161602)">AuxiliarEncomiendas</text>
+   </g>
+   <g id="line2d_15">
+    <path d="M 7.2 29.515 
+L 151.25 29.515 
+" clip-path="url(#p27c2a06d5f)" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linecap: square"/>
+   </g>
+   <g id="text_2">
+    <text style="font-size: 7.75px; font-family: 'Liberation Sans'; text-anchor: start" x="12.6" y="39.796602" transform="rotate(-0 12.6 39.796602)">+registrar() : void</text>
+   </g>
+   <g id="text_3">
+    <text style="font-size: 7.75px; font-family: 'Liberation Sans'; text-anchor: middle" x="79.225" y="177.636602" transform="rotate(-0 79.225 177.636602)">«utility»</text>
+   </g>
+   <g id="text_4">
+    <text style="font-weight: 700; font-size: 7.75px; font-family: 'Liberation Sans'; text-anchor: middle" x="79.225" y="187.711602" transform="rotate(-0 79.225 187.711602)">CalculadorPeso</text>
+   </g>
+   <g id="line2d_16">
+    <path d="M 7.2 194.345 
+L 151.25 194.345 
+" clip-path="url(#p27c2a06d5f)" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linecap: square"/>
+   </g>
+   <g id="text_5">
+    <text style="font-size: 7.75px; font-family: 'Liberation Sans'; text-anchor: start" x="12.6" y="204.626602" transform="rotate(-0 12.6 204.626602)">+calcular(pesoReal, medidas) : double</text>
+   </g>
+   <g id="text_6">
+    <text style="font-size: 7.75px; font-family: 'Liberation Sans'; text-anchor: middle" x="79.225" y="276.976602" transform="rotate(-0 79.225 276.976602)">«singleton»</text>
+   </g>
+   <g id="text_7">
+    <text style="font-weight: 700; font-size: 7.75px; font-family: 'Liberation Sans'; text-anchor: middle" x="79.225" y="287.034648" transform="rotate(-0 79.225 287.034648)">ConfiguracionTarifas</text>
+   </g>
+   <g id="line2d_17">
+    <path d="M 7.2 293.685 
+L 151.25 293.685 
+" clip-path="url(#p27c2a06d5f)" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linecap: square"/>
+   </g>
+   <g id="text_8">
+    <text style="font-size: 7.75px; font-family: 'Liberation Sans'; text-anchor: start" x="12.6" y="303.966602" transform="rotate(-0 12.6 303.966602)">-instancia : ConfiguracionTarifas</text>
+   </g>
+   <g id="text_9">
+    <text style="font-size: 7.75px; font-family: 'Liberation Sans'; text-anchor: start" x="12.6" y="314.041602" transform="rotate(-0 12.6 314.041602)">-divisorVolumetrico : int = 4000</text>
+   </g>
+   <g id="text_10">
+    <text style="font-size: 7.75px; font-family: 'Liberation Sans'; text-anchor: start" x="12.6" y="324.116602" transform="rotate(-0 12.6 324.116602)">-recargoPrioritario : double = 0.35</text>
+   </g>
+   <g id="line2d_18">
+    <path d="M 7.2 330.39 
+L 151.25 330.39 
+" clip-path="url(#p27c2a06d5f)" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linecap: square"/>
+   </g>
+   <g id="text_11">
+    <text style="font-size: 7.75px; font-family: 'Liberation Sans'; text-anchor: start" x="12.6" y="340.671602" transform="rotate(-0 12.6 340.671602)">-ConfiguracionTarifas()</text>
+   </g>
+   <g id="text_12">
+    <text style="font-size: 7.75px; font-family: 'Liberation Sans'; text-anchor: start" x="12.6" y="350.746602" transform="rotate(-0 12.6 350.746602)">+obtenerInstancia() :</text>
+   </g>
+   <g id="text_13">
+    <text style="font-size: 7.75px; font-family: 'Liberation Sans'; text-anchor: start" x="12.6" y="360.821602" transform="rotate(-0 12.6 360.821602)">   ConfiguracionTarifas</text>
+   </g>
+   <g id="text_14">
+    <text style="font-size: 7.75px; font-family: 'Liberation Sans'; text-anchor: middle" x="248.75" y="21.441602" transform="rotate(-0 248.75 21.441602)">«singleton»</text>
+   </g>
+   <g id="text_15">
+    <text style="font-weight: 700; font-size: 7.75px; font-family: 'Liberation Sans'; text-anchor: middle" x="248.75" y="31.516602" transform="rotate(-0 248.75 31.516602)">SecuenciadorGuia</text>
+   </g>
+   <g id="line2d_19">
+    <path d="M 190.85 38.15 
+L 306.65 38.15 
+" clip-path="url(#p27c2a06d5f)" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linecap: square"/>
+   </g>
+   <g id="text_16">
+    <text style="font-size: 7.75px; font-family: 'Liberation Sans'; text-anchor: start" x="196.25" y="48.431602" transform="rotate(-0 196.25 48.431602)">-instancia : SecuenciadorGuia</text>
+   </g>
+   <g id="text_17">
+    <text style="font-size: 7.75px; font-family: 'Liberation Sans'; text-anchor: start" x="196.25" y="58.506602" transform="rotate(-0 196.25 58.506602)">-consecutivo : int</text>
+   </g>
+   <g id="line2d_20">
+    <path d="M 190.85 64.78 
+L 306.65 64.78 
+" clip-path="url(#p27c2a06d5f)" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linecap: square"/>
+   </g>
+   <g id="text_18">
+    <text style="font-size: 7.75px; font-family: 'Liberation Sans'; text-anchor: start" x="196.25" y="75.061602" transform="rotate(-0 196.25 75.061602)">-SecuenciadorGuia()</text>
+   </g>
+   <g id="text_19">
+    <text style="font-size: 7.75px; font-family: 'Liberation Sans'; text-anchor: start" x="196.25" y="85.136602" transform="rotate(-0 196.25 85.136602)">+obtenerInstancia() :</text>
+   </g>
+   <g id="text_20">
+    <text style="font-size: 7.75px; font-family: 'Liberation Sans'; text-anchor: start" x="196.25" y="95.211602" transform="rotate(-0 196.25 95.211602)">   SecuenciadorGuia</text>
+   </g>
+   <g id="text_21">
+    <text style="font-size: 7.75px; font-family: 'Liberation Sans'; text-anchor: start" x="196.25" y="105.286602" transform="rotate(-0 196.25 105.286602)">+siguiente() : string</text>
+   </g>
+   <g id="text_22">
+    <text style="font-weight: 700; font-size: 7.75px; font-family: 'Liberation Sans'; text-anchor: middle" x="248.75" y="167.561602" transform="rotate(-0 248.75 167.561602)">Envio</text>
+   </g>
+   <g id="line2d_21">
+    <path d="M 190.85 174.915 
+L 306.65 174.915 
+" clip-path="url(#p27c2a06d5f)" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linecap: square"/>
+   </g>
+   <g id="text_23">
+    <text style="font-size: 7.75px; font-family: 'Liberation Sans'; text-anchor: start" x="196.25" y="185.196602" transform="rotate(-0 196.25 185.196602)">-guia : string</text>
+   </g>
+   <g id="text_24">
+    <text style="font-size: 7.75px; font-family: 'Liberation Sans'; text-anchor: start" x="196.25" y="195.271602" transform="rotate(-0 196.25 195.271602)">-pesoFacturable : double</text>
+   </g>
+   <g id="text_25">
+    <text style="font-size: 7.75px; font-family: 'Liberation Sans'; text-anchor: start" x="196.25" y="205.346602" transform="rotate(-0 196.25 205.346602)">-pesoVolumetrico : double</text>
+   </g>
+   <g id="text_26">
+    <text style="font-size: 7.75px; font-family: 'Liberation Sans'; text-anchor: start" x="196.25" y="215.421602" transform="rotate(-0 196.25 215.421602)">-estado : string</text>
+   </g>
+   <g id="text_27">
+    <text style="font-size: 7.75px; font-family: 'Liberation Sans'; text-anchor: middle" x="248.75" y="276.976602" transform="rotate(-0 248.75 276.976602)">«singleton»</text>
+   </g>
+   <g id="text_28">
+    <text style="font-weight: 700; font-size: 7.75px; font-family: 'Liberation Sans'; text-anchor: middle" x="248.75" y="287.051602" transform="rotate(-0 248.75 287.051602)">GestorModoOffline</text>
+   </g>
+   <g id="line2d_22">
+    <path d="M 190.85 293.685 
+L 306.65 293.685 
+" clip-path="url(#p27c2a06d5f)" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linecap: square"/>
+   </g>
+   <g id="text_29">
+    <text style="font-size: 7.75px; font-family: 'Liberation Sans'; text-anchor: start" x="196.25" y="303.966602" transform="rotate(-0 196.25 303.966602)">-instancia : GestorModoOffline</text>
+   </g>
+   <g id="text_30">
+    <text style="font-size: 7.75px; font-family: 'Liberation Sans'; text-anchor: start" x="196.25" y="314.041602" transform="rotate(-0 196.25 314.041602)">-cola : lista</text>
+   </g>
+   <g id="line2d_23">
+    <path d="M 190.85 320.315 
+L 306.65 320.315 
+" clip-path="url(#p27c2a06d5f)" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linecap: square"/>
+   </g>
+   <g id="text_31">
+    <text style="font-size: 7.75px; font-family: 'Liberation Sans'; text-anchor: start" x="196.25" y="330.596602" transform="rotate(-0 196.25 330.596602)">-GestorModoOffline()</text>
+   </g>
+   <g id="text_32">
+    <text style="font-size: 7.75px; font-family: 'Liberation Sans'; text-anchor: start" x="196.25" y="340.671602" transform="rotate(-0 196.25 340.671602)">+obtenerInstancia() :</text>
+   </g>
+   <g id="text_33">
+    <text style="font-size: 7.75px; font-family: 'Liberation Sans'; text-anchor: start" x="196.25" y="350.746602" transform="rotate(-0 196.25 350.746602)">   GestorModoOffline</text>
+   </g>
+   <g id="text_34">
+    <text style="font-size: 7.75px; font-family: 'Liberation Sans'; text-anchor: start" x="196.25" y="360.821602" transform="rotate(-0 196.25 360.821602)">+encolar(op) : void</text>
+   </g>
+   <g id="text_35">
+    <text style="font-size: 7.75px; font-family: 'Liberation Sans'; text-anchor: start" x="196.25" y="370.896602" transform="rotate(-0 196.25 370.896602)">+sincronizar() : void</text>
+   </g>
+   <g id="text_36">
+    <text style="font-size: 7.75px; font-family: 'Liberation Sans'; text-anchor: middle" x="397.0875" y="139.134102" transform="rotate(-0 397.0875 139.134102)">«singleton»</text>
+   </g>
+   <g id="text_37">
+    <text style="font-weight: 700; font-size: 7.75px; font-family: 'Liberation Sans'; text-anchor: middle" x="397.0875" y="149.209102" transform="rotate(-0 397.0875 149.209102)">ValidadorCapacidadBus</text>
+   </g>
+   <g id="line2d_24">
+    <path d="M 346.25 155.8425 
+L 447.925 155.8425 
+" clip-path="url(#p27c2a06d5f)" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linecap: square"/>
+   </g>
+   <g id="text_38">
+    <text style="font-size: 7.75px; font-family: 'Liberation Sans'; text-anchor: start" x="351.65" y="166.124102" transform="rotate(-0 351.65 166.124102)">-instancia :</text>
+   </g>
+   <g id="text_39">
+    <text style="font-size: 7.75px; font-family: 'Liberation Sans'; text-anchor: start" x="351.65" y="176.199102" transform="rotate(-0 351.65 176.199102)">   ValidadorCapacidadBus</text>
+   </g>
+   <g id="text_40">
+    <text style="font-size: 7.75px; font-family: 'Liberation Sans'; text-anchor: start" x="351.65" y="186.274102" transform="rotate(-0 351.65 186.274102)">-cargaPorViaje : mapa</text>
+   </g>
+   <g id="line2d_25">
+    <path d="M 346.25 192.5475 
+L 447.925 192.5475 
+" clip-path="url(#p27c2a06d5f)" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linecap: square"/>
+   </g>
+   <g id="text_41">
+    <text style="font-size: 7.75px; font-family: 'Liberation Sans'; text-anchor: start" x="351.65" y="202.829102" transform="rotate(-0 351.65 202.829102)">-ValidadorCapacidadBus()</text>
+   </g>
+   <g id="text_42">
+    <text style="font-size: 7.75px; font-family: 'Liberation Sans'; text-anchor: start" x="351.65" y="212.904102" transform="rotate(-0 351.65 212.904102)">+obtenerInstancia() :</text>
+   </g>
+   <g id="text_43">
+    <text style="font-size: 7.75px; font-family: 'Liberation Sans'; text-anchor: start" x="351.65" y="222.979102" transform="rotate(-0 351.65 222.979102)">   ValidadorCapacidadBus</text>
+   </g>
+   <g id="text_44">
+    <text style="font-size: 7.75px; font-family: 'Liberation Sans'; text-anchor: start" x="351.65" y="233.054102" transform="rotate(-0 351.65 233.054102)">+validar(viaje, peso,</text>
+   </g>
+   <g id="text_45">
+    <text style="font-size: 7.75px; font-family: 'Liberation Sans'; text-anchor: start" x="351.65" y="243.129102" transform="rotate(-0 351.65 243.129102)">   prioridad) : bool</text>
+   </g>
+   <g id="patch_9">
+    <path d="M 163.3125 18.806562 
+L 178.7875 18.806562 
+L 178.7875 28.713437 
+L 163.3125 28.713437 
+z
+" clip-path="url(#p27c2a06d5f)" style="fill: #ffffff"/>
+   </g>
+   <g id="patch_10">
+    <path d="M 86.425 101.579063 
+L 101.9 101.579063 
+L 101.9 111.485938 
+L 86.425 111.485938 
+z
+" clip-path="url(#p27c2a06d5f)" style="fill: #ffffff"/>
+   </g>
+   <g id="patch_11">
+    <path d="M 157.9375 176.794062 
+L 184.1625 176.794062 
+L 184.1625 186.700938 
+L 157.9375 186.700938 
+z
+" clip-path="url(#p27c2a06d5f)" style="fill: #ffffff"/>
+   </g>
+   <g id="patch_12">
+    <path d="M 86.425 233.664062 
+L 138.65 233.664062 
+L 138.65 243.570938 
+L 86.425 243.570938 
+z
+" clip-path="url(#p27c2a06d5f)" style="fill: #ffffff"/>
+   </g>
+   <g id="patch_13">
+    <path d="M 255.95 128.926562 
+L 284.425 128.926562 
+L 284.425 138.833437 
+L 255.95 138.833437 
+z
+" clip-path="url(#p27c2a06d5f)" style="fill: #ffffff"/>
+   </g>
+   <g id="patch_14">
+    <path d="M 255.95 239.061562 
+L 287.55 239.061562 
+L 287.55 248.968437 
+L 255.95 248.968437 
+z
+" clip-path="url(#p27c2a06d5f)" style="fill: #ffffff"/>
+   </g>
+   <g id="patch_15">
+    <path d="M 311.7125 176.794062 
+L 341.1875 176.794062 
+L 341.1875 186.700938 
+L 311.7125 186.700938 
+z
+" clip-path="url(#p27c2a06d5f)" style="fill: #ffffff"/>
+   </g>
+   <g id="text_46">
+    <text style="font-size: 7.3625px; font-family: 'Liberation Sans'; text-anchor: middle" x="171.05" y="25.951896" transform="rotate(-0 171.05 25.951896)">usa</text>
+   </g>
+   <g id="text_47">
+    <text style="font-size: 7.3625px; font-family: 'Liberation Sans'; text-anchor: middle" x="94.1625" y="108.724396" transform="rotate(-0 94.1625 108.724396)">usa</text>
+   </g>
+   <g id="text_48">
+    <text style="font-size: 7.3625px; font-family: 'Liberation Sans'; text-anchor: middle" x="171.05" y="183.939396" transform="rotate(-0 171.05 183.939396)">calcula</text>
+   </g>
+   <g id="text_49">
+    <text style="font-size: 7.3625px; font-family: 'Liberation Sans'; text-anchor: middle" x="112.5375" y="240.852536" transform="rotate(-0 112.5375 240.852536)">lee parámetros</text>
+   </g>
+   <g id="text_50">
+    <text style="font-size: 7.3625px; font-family: 'Liberation Sans'; text-anchor: middle" x="270.1875" y="136.071896" transform="rotate(-0 270.1875 136.071896)">numera</text>
+   </g>
+   <g id="text_51">
+    <text style="font-size: 7.3625px; font-family: 'Liberation Sans'; text-anchor: middle" x="271.75" y="246.206896" transform="rotate(-0 271.75 246.206896)">respalda</text>
+   </g>
+   <g id="text_52">
+    <text style="font-size: 7.3625px; font-family: 'Liberation Sans'; text-anchor: middle" x="326.45" y="183.939396" transform="rotate(-0 326.45 183.939396)">autoriza</text>
+   </g>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="p27c2a06d5f">
+   <rect x="0" y="0" width="456.565" height="387.97"/>
+  </clipPath>
+ </defs>
+</svg>

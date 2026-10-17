@@ -1,0 +1,387 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="460.8pt" height="367.36pt" viewBox="0 0 460.8 367.36" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:date>2026-09-21T04:55:58.455377</dc:date>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>Matplotlib v3.10.8, https://matplotlib.org/</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 367.36 
+L 460.8 367.36 
+L 460.8 0 
+L 0 0 
+z
+" style="fill: #ffffff"/>
+  </g>
+  <g id="axes_1">
+   <g id="line2d_1">
+    <path d="M 74.125 169.2 
+L 97.165 169.2 
+" clip-path="url(#p0303face56)" style="fill: none; stroke-dasharray: 3.36,2.08; stroke-dashoffset: 0; stroke: #000000; stroke-width: 0.8"/>
+   </g>
+   <g id="line2d_2">
+    <path d="M 97.165 32.4 
+L 97.165 285.2 
+" clip-path="url(#p0303face56)" style="fill: none; stroke-dasharray: 3.36,2.08; stroke-dashoffset: 0; stroke: #000000; stroke-width: 0.8"/>
+   </g>
+   <g id="line2d_3">
+    <path d="M 97.165 32.4 
+L 136.765 32.4 
+" clip-path="url(#p0303face56)" style="fill: none; stroke-dasharray: 3.36,2.08; stroke-dashoffset: 0; stroke: #000000; stroke-width: 0.8"/>
+   </g>
+   <g id="line2d_4">
+    <path d="M 97.165 169.2 
+L 136.765 169.2 
+" clip-path="url(#p0303face56)" style="fill: none; stroke-dasharray: 3.36,2.08; stroke-dashoffset: 0; stroke: #000000; stroke-width: 0.8"/>
+   </g>
+   <g id="line2d_5">
+    <path d="M 97.165 285.2 
+L 136.765 285.2 
+" clip-path="url(#p0303face56)" style="fill: none; stroke-dasharray: 3.36,2.08; stroke-dashoffset: 0; stroke: #000000; stroke-width: 0.8"/>
+   </g>
+   <g id="line2d_6">
+    <path d="M 307.065 50.4 
+L 382.665 50.4 
+" clip-path="url(#p0303face56)" style="fill: none; stroke: #000000; stroke-width: 0.8"/>
+   </g>
+   <g id="line2d_7">
+    <path d="M 307.065 194.08 
+L 415.94 194.08 
+L 415.94 292.12 
+" clip-path="url(#p0303face56)" style="fill: none; stroke-dasharray: 3.36,2.08; stroke-dashoffset: 0; stroke: #000000; stroke-width: 0.8"/>
+   </g>
+   <g id="line2d_8">
+    <path d="M 307.065 310.08 
+L 382.665 310.08 
+" clip-path="url(#p0303face56)" style="fill: none; stroke-dasharray: 3.36,2.08; stroke-dashoffset: 0; stroke: #000000; stroke-width: 0.8"/>
+   </g>
+   <g id="line2d_9">
+    <path d="M 129.565 29.376 
+L 136.765 32.4 
+L 129.565 35.424 
+" clip-path="url(#p0303face56)" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="line2d_10">
+    <path d="M 129.565 166.176 
+L 136.765 169.2 
+L 129.565 172.224 
+" clip-path="url(#p0303face56)" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="line2d_11">
+    <path d="M 129.565 282.176 
+L 136.765 285.2 
+L 129.565 288.224 
+" clip-path="url(#p0303face56)" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="line2d_12">
+    <path d="M 375.465 47.376 
+L 382.665 50.4 
+L 375.465 53.424 
+" clip-path="url(#p0303face56)" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="line2d_13">
+    <path d="M 418.964 284.92 
+L 415.94 292.12 
+L 412.916 284.92 
+" clip-path="url(#p0303face56)" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="line2d_14">
+    <path d="M 375.465 307.056 
+L 382.665 310.08 
+L 375.465 313.104 
+" clip-path="url(#p0303face56)" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter; stroke-linecap: square"/>
+   </g>
+   <g id="patch_2">
+    <path d="M 7.2 151.2 
+L 74.125 151.2 
+L 74.125 187.12 
+L 7.2 187.12 
+z
+" clip-path="url(#p0303face56)" style="fill: #ffffff; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_3">
+    <path d="M 136.765 10.8 
+L 307.065 10.8 
+L 307.065 124.56 
+L 136.765 124.56 
+z
+" clip-path="url(#p0303face56)" style="fill: #ffffff; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_4">
+    <path d="M 136.765 147.6 
+L 307.065 147.6 
+L 307.065 240.56 
+L 136.765 240.56 
+z
+" clip-path="url(#p0303face56)" style="fill: #ffffff; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_5">
+    <path d="M 136.765 263.6 
+L 307.065 263.6 
+L 307.065 356.56 
+L 136.765 356.56 
+z
+" clip-path="url(#p0303face56)" style="fill: #ffffff; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_6">
+    <path d="M 382.665 28.8 
+L 449.215 28.8 
+L 449.215 75.12 
+L 382.665 75.12 
+z
+" clip-path="url(#p0303face56)" style="fill: #ffffff; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_7">
+    <path d="M 382.665 292.12 
+L 449.215 292.12 
+L 449.215 328.04 
+L 382.665 328.04 
+z
+" clip-path="url(#p0303face56)" style="fill: #ffffff; stroke: #000000; stroke-width: 0.8; stroke-linejoin: miter"/>
+   </g>
+   <g id="text_1">
+    <text style="font-weight: 700; font-size: 8px; font-family: 'Liberation Sans'; text-anchor: middle" x="40.6625" y="162.78875" transform="rotate(-0 40.6625 162.78875)">Taquillero</text>
+   </g>
+   <g id="line2d_15">
+    <path d="M 7.2 170.24 
+L 74.125 170.24 
+" clip-path="url(#p0303face56)" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linecap: square"/>
+   </g>
+   <g id="text_2">
+    <text style="font-size: 8px; font-family: 'Liberation Sans'; text-anchor: start" x="12.6" y="180.74875" transform="rotate(-0 12.6 180.74875)">+vender() : void</text>
+   </g>
+   <g id="text_3">
+    <text style="font-size: 8px; font-family: 'Liberation Sans'; text-anchor: middle" x="221.915" y="21.66875" transform="rotate(-0 221.915 21.66875)">«singleton»</text>
+   </g>
+   <g id="text_4">
+    <text style="font-weight: 700; font-size: 8px; font-family: 'Liberation Sans'; text-anchor: middle" x="221.915" y="32.06875" transform="rotate(-0 221.915 32.06875)">GestorBloqueoSillas</text>
+   </g>
+   <g id="line2d_16">
+    <path d="M 136.765 38.8 
+L 307.065 38.8 
+" clip-path="url(#p0303face56)" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linecap: square"/>
+   </g>
+   <g id="text_5">
+    <text style="font-size: 8px; font-family: 'Liberation Sans'; text-anchor: start" x="142.165" y="49.30875" transform="rotate(-0 142.165 49.30875)">-instancia : GestorBloqueoSillas</text>
+   </g>
+   <g id="text_6">
+    <text style="font-size: 8px; font-family: 'Liberation Sans'; text-anchor: start" x="142.165" y="59.70875" transform="rotate(-0 142.165 59.70875)">-bloqueos : mapa</text>
+   </g>
+   <g id="line2d_17">
+    <path d="M 136.765 66.08 
+L 307.065 66.08 
+" clip-path="url(#p0303face56)" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linecap: square"/>
+   </g>
+   <g id="text_7">
+    <text style="font-size: 8px; font-family: 'Liberation Sans'; text-anchor: start" x="142.165" y="76.58875" transform="rotate(-0 142.165 76.58875)">-GestorBloqueoSillas()</text>
+   </g>
+   <g id="text_8">
+    <text style="font-size: 8px; font-family: 'Liberation Sans'; text-anchor: start" x="142.165" y="86.98875" transform="rotate(-0 142.165 86.98875)">+obtenerInstancia() : GestorBloqueoSillas</text>
+   </g>
+   <g id="text_9">
+    <text style="font-size: 8px; font-family: 'Liberation Sans'; text-anchor: start" x="142.165" y="97.38875" transform="rotate(-0 142.165 97.38875)">+bloquear(silla, canal) : bool</text>
+   </g>
+   <g id="text_10">
+    <text style="font-size: 8px; font-family: 'Liberation Sans'; text-anchor: start" x="142.165" y="107.78875" transform="rotate(-0 142.165 107.78875)">+liberar(silla) : void</text>
+   </g>
+   <g id="text_11">
+    <text style="font-size: 8px; font-family: 'Liberation Sans'; text-anchor: start" x="142.165" y="118.18875" transform="rotate(-0 142.165 118.18875)">+expirarBloqueos() : void</text>
+   </g>
+   <g id="text_12">
+    <text style="font-size: 8px; font-family: 'Liberation Sans'; text-anchor: middle" x="221.915" y="158.46875" transform="rotate(-0 221.915 158.46875)">«singleton»</text>
+   </g>
+   <g id="text_13">
+    <text style="font-weight: 700; font-size: 8px; font-family: 'Liberation Sans'; text-anchor: middle" x="221.915" y="168.86875" transform="rotate(-0 221.915 168.86875)">SecuenciadorTiquete</text>
+   </g>
+   <g id="line2d_18">
+    <path d="M 136.765 175.6 
+L 307.065 175.6 
+" clip-path="url(#p0303face56)" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linecap: square"/>
+   </g>
+   <g id="text_14">
+    <text style="font-size: 8px; font-family: 'Liberation Sans'; text-anchor: start" x="142.165" y="186.10875" transform="rotate(-0 142.165 186.10875)">-instancia : SecuenciadorTiquete</text>
+   </g>
+   <g id="text_15">
+    <text style="font-size: 8px; font-family: 'Liberation Sans'; text-anchor: start" x="142.165" y="196.50875" transform="rotate(-0 142.165 196.50875)">-consecutivo : int</text>
+   </g>
+   <g id="line2d_19">
+    <path d="M 136.765 202.88 
+L 307.065 202.88 
+" clip-path="url(#p0303face56)" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linecap: square"/>
+   </g>
+   <g id="text_16">
+    <text style="font-size: 8px; font-family: 'Liberation Sans'; text-anchor: start" x="142.165" y="213.38875" transform="rotate(-0 142.165 213.38875)">-SecuenciadorTiquete()</text>
+   </g>
+   <g id="text_17">
+    <text style="font-size: 8px; font-family: 'Liberation Sans'; text-anchor: start" x="142.165" y="223.78875" transform="rotate(-0 142.165 223.78875)">+obtenerInstancia() : SecuenciadorTiquete</text>
+   </g>
+   <g id="text_18">
+    <text style="font-size: 8px; font-family: 'Liberation Sans'; text-anchor: start" x="142.165" y="234.18875" transform="rotate(-0 142.165 234.18875)">+siguiente() : string</text>
+   </g>
+   <g id="text_19">
+    <text style="font-size: 8px; font-family: 'Liberation Sans'; text-anchor: middle" x="221.915" y="274.46875" transform="rotate(-0 221.915 274.46875)">«singleton»</text>
+   </g>
+   <g id="text_20">
+    <text style="font-weight: 700; font-size: 8px; font-family: 'Liberation Sans'; text-anchor: middle" x="221.915" y="284.86875" transform="rotate(-0 221.915 284.86875)">ValidadorTarifaEspecial</text>
+   </g>
+   <g id="line2d_20">
+    <path d="M 136.765 291.6 
+L 307.065 291.6 
+" clip-path="url(#p0303face56)" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linecap: square"/>
+   </g>
+   <g id="text_21">
+    <text style="font-size: 8px; font-family: 'Liberation Sans'; text-anchor: start" x="142.165" y="302.10875" transform="rotate(-0 142.165 302.10875)">-instancia : ValidadorTarifaEspecial</text>
+   </g>
+   <g id="text_22">
+    <text style="font-size: 8px; font-family: 'Liberation Sans'; text-anchor: start" x="142.165" y="312.50875" transform="rotate(-0 142.165 312.50875)">-cache : mapa</text>
+   </g>
+   <g id="line2d_21">
+    <path d="M 136.765 318.88 
+L 307.065 318.88 
+" clip-path="url(#p0303face56)" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linecap: square"/>
+   </g>
+   <g id="text_23">
+    <text style="font-size: 8px; font-family: 'Liberation Sans'; text-anchor: start" x="142.165" y="329.38875" transform="rotate(-0 142.165 329.38875)">-ValidadorTarifaEspecial()</text>
+   </g>
+   <g id="text_24">
+    <text style="font-size: 8px; font-family: 'Liberation Sans'; text-anchor: start" x="142.165" y="339.78875" transform="rotate(-0 142.165 339.78875)">+obtenerInstancia() : ValidadorTarifaEspecial</text>
+   </g>
+   <g id="text_25">
+    <text style="font-size: 8px; font-family: 'Liberation Sans'; text-anchor: start" x="142.165" y="350.18875" transform="rotate(-0 142.165 350.18875)">+validar(tarifa, datos) : bool</text>
+   </g>
+   <g id="text_26">
+    <text style="font-weight: 700; font-size: 8px; font-family: 'Liberation Sans'; text-anchor: middle" x="415.94" y="40.38875" transform="rotate(-0 415.94 40.38875)">Silla</text>
+   </g>
+   <g id="line2d_22">
+    <path d="M 382.665 47.84 
+L 449.215 47.84 
+" clip-path="url(#p0303face56)" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linecap: square"/>
+   </g>
+   <g id="text_27">
+    <text style="font-size: 8px; font-family: 'Liberation Sans'; text-anchor: start" x="388.065" y="58.34875" transform="rotate(-0 388.065 58.34875)">-numero : int</text>
+   </g>
+   <g id="text_28">
+    <text style="font-size: 8px; font-family: 'Liberation Sans'; text-anchor: start" x="388.065" y="68.74875" transform="rotate(-0 388.065 68.74875)">-estado : string</text>
+   </g>
+   <g id="text_29">
+    <text style="font-weight: 700; font-size: 8px; font-family: 'Liberation Sans'; text-anchor: middle" x="415.94" y="303.70875" transform="rotate(-0 415.94 303.70875)">Tiquete</text>
+   </g>
+   <g id="line2d_23">
+    <path d="M 382.665 311.16 
+L 449.215 311.16 
+" clip-path="url(#p0303face56)" style="fill: none; stroke: #000000; stroke-width: 0.8; stroke-linecap: square"/>
+   </g>
+   <g id="text_30">
+    <text style="font-size: 8px; font-family: 'Liberation Sans'; text-anchor: start" x="388.065" y="321.66875" transform="rotate(-0 388.065 321.66875)">-numero : string</text>
+   </g>
+   <g id="patch_8">
+    <path d="M 108.9775 20.11 
+L 124.9525 20.11 
+L 124.9525 30.29 
+L 108.9775 30.29 
+z
+" clip-path="url(#p0303face56)" style="fill: #ffffff"/>
+   </g>
+   <g id="patch_9">
+    <path d="M 108.9775 156.91 
+L 124.9525 156.91 
+L 124.9525 167.09 
+L 108.9775 167.09 
+z
+" clip-path="url(#p0303face56)" style="fill: #ffffff"/>
+   </g>
+   <g id="patch_10">
+    <path d="M 108.9775 272.91 
+L 124.9525 272.91 
+L 124.9525 283.09 
+L 108.9775 283.09 
+z
+" clip-path="url(#p0303face56)" style="fill: #ffffff"/>
+   </g>
+   <g id="patch_11">
+    <path d="M 329.3775 38.11 
+L 360.3525 38.11 
+L 360.3525 48.29 
+L 329.3775 48.29 
+z
+" clip-path="url(#p0303face56)" style="fill: #ffffff"/>
+   </g>
+   <g id="patch_12">
+    <path d="M 312.5625 51.568 
+L 320.2875 51.568 
+L 320.2875 61.472 
+L 312.5625 61.472 
+z
+" clip-path="url(#p0303face56)" style="fill: #ffffff"/>
+   </g>
+   <g id="patch_13">
+    <path d="M 365.9425 39.328 
+L 380.6675 39.328 
+L 380.6675 49.232 
+L 365.9425 49.232 
+z
+" clip-path="url(#p0303face56)" style="fill: #ffffff"/>
+   </g>
+   <g id="patch_14">
+    <path d="M 346.8275 181.79 
+L 376.1775 181.79 
+L 376.1775 191.97 
+L 346.8275 191.97 
+z
+" clip-path="url(#p0303face56)" style="fill: #ffffff"/>
+   </g>
+   <g id="patch_15">
+    <path d="M 332.94 297.79 
+L 356.79 297.79 
+L 356.79 307.97 
+L 332.94 307.97 
+z
+" clip-path="url(#p0303face56)" style="fill: #ffffff"/>
+   </g>
+   <g id="text_31">
+    <text style="font-size: 7.6px; font-family: 'Liberation Sans'; text-anchor: middle" x="116.965" y="27.453312" transform="rotate(-0 116.965 27.453312)">usa</text>
+   </g>
+   <g id="text_32">
+    <text style="font-size: 7.6px; font-family: 'Liberation Sans'; text-anchor: middle" x="116.965" y="164.253312" transform="rotate(-0 116.965 164.253312)">usa</text>
+   </g>
+   <g id="text_33">
+    <text style="font-size: 7.6px; font-family: 'Liberation Sans'; text-anchor: middle" x="116.965" y="280.253312" transform="rotate(-0 116.965 280.253312)">usa</text>
+   </g>
+   <g id="text_34">
+    <text style="font-size: 7.6px; font-family: 'Liberation Sans'; text-anchor: middle" x="344.865" y="45.453312" transform="rotate(-0 344.865 45.453312)">controla</text>
+   </g>
+   <g id="text_35">
+    <text style="font-size: 7.36px; font-family: 'Liberation Sans'; text-anchor: middle" x="316.425" y="58.71125" transform="rotate(-0 316.425 58.71125)">1</text>
+   </g>
+   <g id="text_36">
+    <text style="font-size: 7.36px; font-family: 'Liberation Sans'; text-anchor: middle" x="373.305" y="46.47125" transform="rotate(-0 373.305 46.47125)">1..*</text>
+   </g>
+   <g id="text_37">
+    <text style="font-size: 7.6px; font-family: 'Liberation Sans'; text-anchor: middle" x="361.5025" y="189.133312" transform="rotate(-0 361.5025 189.133312)">numera</text>
+   </g>
+   <g id="text_38">
+    <text style="font-size: 7.6px; font-family: 'Liberation Sans'; text-anchor: middle" x="344.865" y="305.133312" transform="rotate(-0 344.865 305.133312)">valida</text>
+   </g>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="p0303face56">
+   <rect x="0" y="0" width="460.8" height="367.36"/>
+  </clipPath>
+ </defs>
+</svg>
