@@ -55,7 +55,35 @@
       </label>
     </div>
     <p><button type="button" id="btn-ver-plano">Ver disponibilidad</button></p>
-    <div id="plano" role="grid" aria-label="Plano del salón por zonas"></div>
+    <div class="reserva-grid">
+      <div class="plano-envoltura">
+        <div id="plano" role="group" aria-label="Plano del salón: mesas por zona según disponibilidad"></div>
+        <div class="plan-leyenda" aria-hidden="true">
+          <span><i class="lm-libre"></i> Libre</span>
+          <span><i class="lm-sel"></i> Seleccionada</span>
+          <span><i class="lm-res"></i> Reservada</span>
+          <span><i class="lm-blo"></i> Bloqueada</span>
+        </div>
+      </div>
+      <aside class="ficha" id="ficha">
+        <div id="ficha-vacia">
+          <p class="eyebrow">Tu mesa</p>
+          <h3>Elige una mesa del plano</h3>
+          <p class="ficha-linea">Pulsa una mesa libre para ver su foto, su zona y su capacidad.</p>
+        </div>
+        <div id="ficha-contenido" hidden>
+          <img class="ficha-foto" id="ficha-foto" src="/static/img/mesas/mesa-general.png" alt="">
+          <p class="eyebrow">Tu mesa</p>
+          <h3 id="ficha-titulo">M—</h3>
+          <p class="ficha-linea" id="ficha-zona"></p>
+          <p class="ficha-linea" id="ficha-capacidad"></p>
+          <label>Comensales de la reserva
+            <select id="ficha-comensales"></select>
+          </label>
+          <button type="button" id="ficha-continuar" class="secundario">Continuar la reserva</button>
+        </div>
+      </aside>
+    </div>
     <p id="bloqueo-aviso" aria-live="polite">Ninguna mesa seleccionada todavía.</p>
     <div class="acciones">
       <button type="button" class="secundario" data-hacia="1">Atrás</button>
