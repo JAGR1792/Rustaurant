@@ -7,9 +7,10 @@ use std::sync::{Arc, Mutex};
 
 use chrono::{Duration, Utc};
 
+use crate::dao::{DaoError, GenericDao, UsuarioDao};
 use crate::dominio::{
-    Administrador, BaseUsuario, BloqueoMesa, Cliente, DetallePago, Empleado, EstadoReserva,
-    ItemMenu, Mesa, ModalidadPago, Ocasion, PlanServicioExtra, Reserva, Rol, TipoCliente,
+    Administrador, BaseUsuario, BloqueoMesa, Cliente, ComprobantePago, DetallePago, Empleado,
+    EstadoReserva, ItemMenu, Mesa, ModalidadPago, Ocasion, PlanServicioExtra, Reserva, TipoCliente,
     UsuarioSesion,
 };
 
@@ -21,6 +22,7 @@ pub struct Datos {
     pub bloqueos: Vec<BloqueoMesa>,
     pub items: Vec<ItemMenu>,
     pub planes: Vec<PlanServicioExtra>,
+    pub comprobantes: Vec<ComprobantePago>,
     /// token de sesión -> id de usuario
     pub sesiones: HashMap<String, i64>,
 }
@@ -81,14 +83,15 @@ pub fn sembrar() -> Estado {
             activo: true,
             debe_cambiar_pw: false,
         };
-        d.usuarios.push(UsuarioSesion::Administrador(Administrador(Empleado {
-            base: admin,
-            fecha_contratacion: None,
-        })));
+        d.usuarios
+            .push(UsuarioSesion::Administrador(Administrador(Empleado {
+                base: admin,
+                fecha_contratacion: None,
+            })));
         d.usuarios.push(UsuarioSesion::Empleado(Empleado {
             base: empleado,
             fecha_contratacion: None,
-        })));
+        }));
         d.usuarios.push(UsuarioSesion::Cliente(Cliente {
             base: cliente,
             tipo: TipoCliente::General,
@@ -190,8 +193,71 @@ pub fn buscar_por_correo(d: &Datos, correo: &str) -> Option<UsuarioSesion> {
         .cloned()
 }
 
+// ------------------------------------------------------------------ DAO en memoria
+
+/// Implementación de `UsuarioDao` sobre el almacén demo: la Factory Method
+/// (`registrar_con`) funciona igual que contra sqlx, solo que aquí sobre
+/// `Datos`. En producción se reemplaza por el DAO sqlx sin tocar el control.
+pub struct DaoMemoria {
+    pub estado: Estado,
+}
+
+impl GenericDao<UsuarioSesion, i64> for DaoMemoria {
+    async fn obtener(&self, id: i64) -> Result<Option<UsuarioSesion>, DaoError> {
+        let d = self.estado.lock().unwrap();
+        Ok(d.usuarios.iter().find(|u| u.id() == id).cloned())
+    }
+
+    async fn listar(&self) -> Result<Vec<UsuarioSesion>, DaoError> {
+        let d = self.estado.lock().unwrap();
+        Ok(d.usuarios.clone())
+    }
+
+    async fn guardar(&self, entidad: &UsuarioSesion) -> Result<i64, DaoError> {
+        let mut d = self.estado.lock().unwrap();
+        let id = d.usuarios.iter().map(|u| u.id()).max().unwrap_or(0) + 1;
+        let mut copia = entidad.clone();
+        copia.base_mut().id = id;
+        d.usuarios.push(copia);
+        Ok(id)
+    }
+
+    async fn eliminar(&self, id: i64) -> Result<(), DaoError> {
+        let mut d = self.estado.lock().unwrap();
+        d.usuarios.retain(|u| u.id() != id);
+        Ok(())
+    }
+}
+
+impl UsuarioDao for DaoMemoria {
+    async fn buscar_por_correo(&self, correo: &str) -> Result<Option<UsuarioSesion>, DaoError> {
+        let d = self.estado.lock().unwrap();
+        Ok(buscar_por_correo(&d, correo))
+    }
+
+    async fn existe_correo_o_documento(
+        &self,
+        correo: &str,
+        tipo_doc: &str,
+        doc: &str,
+    ) -> Result<bool, DaoError> {
+        let d = self.estado.lock().unwrap();
+        Ok(d.usuarios.iter().any(|u| {
+            u.correo().eq_ignore_ascii_case(correo)
+                || (!doc.is_empty()
+                    && u.base().tipo_documento == tipo_doc
+                    && u.base().documento == doc)
+        }))
+    }
+}
+
 /// Estado de una mesa en una franja: libre, reservada o bloqueada.
-pub fn estado_de_mesa(d: &Datos, mesa_id: i64, inicio: chrono::DateTime<Utc>, fin: chrono::DateTime<Utc>) -> &'static str {
+pub fn estado_de_mesa(
+    d: &Datos,
+    mesa_id: i64,
+    inicio: chrono::DateTime<Utc>,
+    fin: chrono::DateTime<Utc>,
+) -> &'static str {
     if d.bloqueos
         .iter()
         .any(|b| b.mesa_id == mesa_id && b.se_solapa(inicio, fin) && !b.esta_expirado(Utc::now()))
@@ -200,13 +266,12 @@ pub fn estado_de_mesa(d: &Datos, mesa_id: i64, inicio: chrono::DateTime<Utc>, fi
     }
     let cruzada = d.reservas.iter().any(|r| {
         r.mesa_ids.contains(&mesa_id)
-            && matches!(r.estado, EstadoReserva::Vigente | EstadoReserva::ClienteEnMesa)
+            && matches!(
+                r.estado,
+                EstadoReserva::Vigente | EstadoReserva::ClienteEnMesa
+            )
             && r.inicio < fin
             && inicio < r.inicio + Duration::minutes(r.duracion_minutos as i64)
     });
-    if cruzada {
-        "reservada"
-    } else {
-        "libre"
-    }
+    if cruzada { "reservada" } else { "libre" }
 }
