@@ -117,6 +117,7 @@
     const c = COLORES[estado] || COLORES.libre;
     const g = el("g", {
       class: "mesa-svg",
+      "data-id": m.id,
       "data-estado": estado,
       "data-clickable": clickable ? "true" : "false",
       "aria-label": `Mesa ${m.id}, zona ${m.zona}, ${m.capacidad} puestos, ${ESTADO_TEXTO[estado] || estado}`,
@@ -169,6 +170,10 @@
       ultimaMesa = m.id;
     }
     pintarPlano();
+    // El re-pintado recrea el SVG: devolvemos el foco a la misma mesa
+    // para no perder el hilo al navegar con teclado.
+    const nuevo = document.querySelector(`.mesa-svg[data-id="${m.id}"]`);
+    if (nuevo && typeof nuevo.focus === "function") nuevo.focus({ preventScroll: true });
   }
 
   function capacidadSeleccionada() {
