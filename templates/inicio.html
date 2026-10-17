@@ -1,6 +1,10 @@
 {% extends "base.html" %}
-{# Portada: propuesta de valor, zonas del salon y cuentas de demostracion. #}
+{# Portada: propuesta de valor, la carta (efecto chroma), zonas del
+   salon y cuentas de demostracion. #}
 {% block titulo %}Brindis — reservas por ocasión{% endblock %}
+{% block head %}
+<link rel="stylesheet" href="/static/css/chroma.css">
+{% endblock %}
 {% block contenido %}
 <section class="hero">
   <h1>Celebra sin preocuparte por la mesa</h1>
@@ -8,6 +12,34 @@
   extra en un asistente de 4 pasos. El plano muestra la disponibilidad real
   de cada mesa.</p>
   <p><a class="boton" href="/reservar">Reservar ahora</a></p>
+</section>
+<section id="carta">
+  <h2>La carta</h2>
+  <div class="chroma-grid has-frame" data-chroma-grid data-damping="0.45"
+       data-fade-out="0.6" data-softness="0.6">
+    <span class="chroma-frame-rim" aria-hidden="true"></span>
+    <div class="chroma-grid-inner">
+      {% for p in carta %}
+      <a class="chroma-card" href="{{ p.url }}" data-chroma-area
+         style="--chroma-accent: {{ p.accent }}">
+        <span class="chroma-wash" aria-hidden="true"></span>
+        <span class="chroma-media" data-chroma-area>
+          <img class="chroma-mono" src="{{ p.imagen }}" alt="" loading="lazy"
+               width="800" height="800" draggable="false">
+          <img class="chroma-color" src="{{ p.imagen }}" alt="" loading="lazy"
+               width="800" height="800" draggable="false" aria-hidden="true">
+          <span class="chroma-media-rim" aria-hidden="true"></span>
+        </span>
+        <span class="chroma-info">
+          <span class="chroma-title">{{ p.titulo }}</span>
+          <span class="chroma-subtitle">{{ p.subtitulo }}</span>
+        </span>
+        <span class="chroma-card-rim" aria-hidden="true"></span>
+        <span class="chroma-card-glow" aria-hidden="true"></span>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
 </section>
 <section>
   <h2>Zonas del salón</h2>
@@ -29,4 +61,7 @@
     <li>Admin: <code>admin@brindis.co</code> / <code>Admin123!</code></li>
   </ul>
 </section>
+{% endblock %}
+{% block scripts %}
+<script src="/static/js/chroma.js" defer></script>
 {% endblock %}

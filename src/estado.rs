@@ -122,24 +122,43 @@ pub fn sembrar() -> Estado {
             }
         }
 
-        // Carta y planes.
+        // Carta y planes. Las imagenes de `static/img/carta` siguen el mismo
+        // id (ver `vistas::carta`); el generador esta en esa carpeta.
         d.items.push(ItemMenu {
             id: 1,
-            nombre: "Entrada de prueba".into(),
+            nombre: "Ceviche de camarón".into(),
             tipo: "ENTRADA".into(),
             precio_vigente: 15_000,
         });
         d.items.push(ItemMenu {
             id: 2,
-            nombre: "Plato fuerte de prueba".into(),
+            nombre: "Picanha a la brasa".into(),
             tipo: "PLATO_FUERTE".into(),
             precio_vigente: 30_000,
         });
         d.items.push(ItemMenu {
             id: 3,
-            nombre: "Postre de prueba".into(),
+            nombre: "Tres leches de la casa".into(),
             tipo: "POSTRE".into(),
             precio_vigente: 12_000,
+        });
+        d.items.push(ItemMenu {
+            id: 4,
+            nombre: "Limonada de coco".into(),
+            tipo: "BEBIDA".into(),
+            precio_vigente: 8_000,
+        });
+        d.items.push(ItemMenu {
+            id: 5,
+            nombre: "Salmón en costra de hierbas".into(),
+            tipo: "PLATO_FUERTE".into(),
+            precio_vigente: 38_000,
+        });
+        d.items.push(ItemMenu {
+            id: 6,
+            nombre: "Cóctel de la casa".into(),
+            tipo: "BEBIDA".into(),
+            precio_vigente: 22_000,
         });
         d.planes.push(PlanServicioExtra {
             id: 1,
