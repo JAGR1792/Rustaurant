@@ -22,9 +22,9 @@
   ];
 
   const FOTO_ZONA = {
-    Terraza: "/static/img/mesas/mesa-terraza.png",
-    General: "/static/img/mesas/mesa-general.png",
-    VIP: "/static/img/mesas/mesa-vip.png",
+    Terraza: "/static/img/fotos/mesa-terraza.jpg",
+    General: "/static/img/fotos/mesa-general.jpg",
+    VIP: "/static/img/fotos/mesa-vip.jpg",
   };
 
   const ESTADO_TEXTO = { libre: "libre", reservada: "reservada", bloqueada: "bloqueada", seleccionada: "seleccionada" };

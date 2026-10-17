@@ -337,26 +337,27 @@ fn tipo_legible(tipo: &str) -> &'static str {
     }
 }
 
-/// Carta de la portada: platos del menú con su imagen y acento de color.
-/// El id del item mapea al PNG generado en `static/img/carta` (el mismo
-/// id que usa `generar_carta.py`); si aparece un id nuevo hay respaldo.
+/// Carta de la portada: platos del menú con su foto y acento de color.
+/// Las fotos reales viven en `static/img/fotos` (Wikimedia Commons; ver
+/// `descargar_fotos.py` y `creditos.md`); si aparece un id nuevo cae al
+/// PNG genérico de `static/img/carta`.
 fn carta(d: &Datos) -> Vec<ItemCartaVista> {
     d.items
         .iter()
         .map(|i| {
-            let (archivo, accent) = match i.id {
-                1 => ("01-ceviche-camaron.png", "#7cc4ff"),
-                2 => ("02-picanha-brasa.png", "#ff5a36"),
-                3 => ("03-tres-leches.png", "#ffb27a"),
-                4 => ("04-limonada-coco.png", "#ffd23f"),
-                5 => ("05-salmon-hierbas.png", "#a98bff"),
-                6 => ("06-coctel-casa.png", "#ff7eb6"),
-                _ => ("00-generico.png", "#a88a59"),
+            let (imagen, accent) = match i.id {
+                1 => ("/static/img/fotos/carta-01-ceviche.jpg", "#7cc4ff"),
+                2 => ("/static/img/fotos/carta-02-picana.jpg", "#ff5a36"),
+                3 => ("/static/img/fotos/carta-03-tres-leches.jpg", "#ffb27a"),
+                4 => ("/static/img/fotos/carta-04-limonada-coco.jpg", "#ffd23f"),
+                5 => ("/static/img/fotos/carta-05-salmon.jpg", "#a98bff"),
+                6 => ("/static/img/fotos/carta-06-coctel.jpg", "#ff7eb6"),
+                _ => ("/static/img/carta/00-generico.png", "#a88a59"),
             };
             ItemCartaVista {
                 titulo: i.nombre.clone(),
                 subtitulo: format!("{} · {}", tipo_legible(&i.tipo), cop(i.precio_vigente)),
-                imagen: format!("/static/img/carta/{archivo}"),
+                imagen: imagen.into(),
                 accent: accent.into(),
                 url: "/reservar".into(),
             }
@@ -1033,13 +1034,13 @@ mod tests {
         assert_eq!(platos.len(), d.items.len());
         for p in &platos {
             assert!(!p.titulo.is_empty());
-            assert!(p.imagen.starts_with("/static/img/carta/"));
+            assert!(p.imagen.starts_with("/static/img/"));
             assert!(p.accent.starts_with('#'));
             assert!(!p.subtitulo.is_empty(), "sin subtitulo: {}", p.titulo);
             assert_eq!(p.url, "/reservar");
         }
         assert_eq!(platos[0].titulo, "Ceviche de camarón");
-        assert!(platos[0].imagen.ends_with("01-ceviche-camaron.png"));
+        assert!(platos[0].imagen.ends_with("carta-01-ceviche.jpg"));
         assert!(platos[0].subtitulo.contains("Entrada"));
         assert!(
             platos[0].subtitulo.contains("15.000"),
