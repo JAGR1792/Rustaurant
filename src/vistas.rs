@@ -12,7 +12,7 @@ use axum::{
     response::{IntoResponse, Redirect, Response},
 };
 use axum_extra::extract::cookie::{Cookie, CookieJar, SameSite};
-use chrono::{DateTime, Duration, FixedOffset, NaiveDate, NaiveDateTime, NaiveTime, Utc};
+use chrono::{DateTime, Duration, NaiveDate, NaiveTime, Utc};
 use serde::{Deserialize, Serialize};
 
 use crate::builder::{ReservaBuilder, validar_modalidad};
@@ -23,6 +23,7 @@ use crate::dominio::{
 };
 use crate::estado::{self, Datos, Estado};
 use crate::factory::{ClienteFactory, DatosRegistro, registrar_con};
+use crate::formato::{cop, fecha_hora_fmt, fecha_iso_local, local_a_utc, utc_a_local};
 use crate::proxy::{AccesoError, ReservaService, ReservaServiceProxy};
 use crate::servicios::ReservaServiceMemoria;
 
@@ -47,43 +48,6 @@ impl<T: Template> IntoResponse for Html<T> {
             }
         }
     }
-}
-
-/// Fase 1 asume la hora de Colombia (UTC-5, sin horario de verano).
-const UTC_A_LOCAL: i64 = 5; // UTC = local + 5 horas
-
-fn local_a_utc(n: NaiveDateTime) -> DateTime<Utc> {
-    DateTime::from_naive_utc_and_offset(n + Duration::hours(UTC_A_LOCAL), Utc)
-}
-
-fn utc_a_local(dt: DateTime<Utc>) -> NaiveDateTime {
-    dt.naive_utc() - Duration::hours(UTC_A_LOCAL)
-}
-
-fn fecha_hora_fmt(dt: DateTime<Utc>) -> String {
-    utc_a_local(dt).format("%Y-%m-%d %H:%M").to_string()
-}
-
-/// ISO 8601 con el desfase local (UTC-5) para que el navegador calcule la
-/// cuenta regresiva con la hora correcta (p. ej. 2026-10-19T19:30:00-05:00).
-fn fecha_iso_local(dt: DateTime<Utc>) -> String {
-    let offset = FixedOffset::west_opt((UTC_A_LOCAL * 3600) as i32).expect("desfase UTC-5 válido");
-    dt.with_timezone(&offset)
-        .format("%Y-%m-%dT%H:%M:%S%:z")
-        .to_string()
-}
-
-/// Pesos colombianos con separador de miles: 440000 -> "440.000".
-fn cop(n: i64) -> String {
-    let s = n.abs().to_string();
-    let mut out = String::new();
-    for (i, c) in s.chars().enumerate() {
-        if i > 0 && (s.len() - i).is_multiple_of(3) {
-            out.push('.');
-        }
-        out.push(c);
-    }
-    if n < 0 { format!("-{out}") } else { out }
 }
 
 /// La reserva futura más cercana (solo vigentes): alimenta la cuenta
@@ -221,6 +185,14 @@ struct AgendaFila {
     estado_clase: String,
 }
 
+/// Fila del buzón de demostración que ve el personal en la agenda.
+struct CorreoVista {
+    para: String,
+    asunto: String,
+    cuerpo: String,
+    cuando: String,
+}
+
 #[derive(Template)]
 #[template(path = "inicio.html")]
 struct Inicio {
@@ -288,6 +260,7 @@ struct Agenda {
     dia_sig: String,
     filas: Vec<AgendaFila>,
     vacio: bool,
+    correos: Vec<CorreoVista>,
 }
 
 #[derive(Template)]
@@ -927,6 +900,7 @@ pub async fn agenda(
     // El Proxy (Figura 9) verifica el rol antes de entregar la agenda (RF15).
     let mut denegado = false;
     let mut filas: Vec<AgendaFila> = vec![];
+    let mut correos: Vec<CorreoVista> = vec![];
     match servicio(&e).agenda(&u).await {
         Err(_) => denegado = true,
         Ok(reservas) => {
@@ -967,6 +941,19 @@ pub async fn agenda(
                     }
                 })
                 .collect();
+            // Buzón de demostración: los últimos correos "enviados" (ADR 0008).
+            correos = d
+                .correos
+                .iter()
+                .rev()
+                .take(6)
+                .map(|m| CorreoVista {
+                    para: m.para.clone(),
+                    asunto: m.asunto.clone(),
+                    cuerpo: m.cuerpo.clone(),
+                    cuando: fecha_hora_fmt(m.enviado_en),
+                })
+                .collect();
         }
     }
     let vacio = filas.is_empty();
@@ -979,6 +966,7 @@ pub async fn agenda(
         dia_sig: (dia + Duration::days(1)).format("%Y-%m-%d").to_string(),
         filas,
         vacio,
+        correos,
     })
     .into_response()
 }
@@ -1047,7 +1035,6 @@ pub async fn disponibilidad(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use chrono::TimeZone;
 
     fn reserva_prueba(id: i64, inicio: DateTime<Utc>, estado: EstadoReserva) -> Reserva {
         Reserva {
@@ -1120,12 +1107,6 @@ mod tests {
         let p = proxima_reserva(&reservas, ahora).expect("hay una vigente futura");
         assert_eq!(p.id, 5, "debe elegir la vigente más cercana");
         assert!(proxima_reserva(&[], ahora).is_none());
-    }
-
-    #[test]
-    fn fecha_iso_local_lleva_el_desfase_de_colombia() {
-        let dt = Utc.with_ymd_and_hms(2026, 10, 20, 0, 30, 0).unwrap();
-        assert_eq!(fecha_iso_local(dt), "2026-10-19T19:30:00-05:00");
     }
 
     #[test]

@@ -390,6 +390,20 @@ section[id^="paso-"] { margin-bottom: 2rem; }
 #resumen-pago { font-weight: 600; color: var(--vino); margin-bottom: .3rem; }
 #total-estimado { color: var(--carbon-suave); font-size: .9rem; margin: 0; }
 
+/* Buzón de demostración en la agenda (ADR 0008) */
+.correos { margin-top: 2.2rem; }
+.correo {
+  border: 1px solid var(--linea); border-radius: 12px; background: var(--marfil-claro);
+  padding: .55rem .85rem; margin: .5rem 0; max-width: 78ch;
+}
+.correo summary { cursor: pointer; display: flex; flex-wrap: wrap; gap: .25rem .6rem; align-items: baseline; }
+.correo-para { color: var(--vino); font-weight: 600; }
+.correo summary time { margin-left: auto; color: var(--carbon-suave); font-size: .8rem; }
+.correo-cuerpo {
+  margin: .7rem 0 .2rem; white-space: pre-wrap; font-family: var(--sans);
+  font-size: .9rem; color: var(--carbon-suave);
+}
+
 @media (max-width: 760px) {
   .hero { grid-template-columns: 1fr; }
 }

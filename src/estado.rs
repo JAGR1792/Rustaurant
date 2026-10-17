@@ -7,6 +7,7 @@ use std::sync::{Arc, Mutex};
 
 use chrono::{Duration, Utc};
 
+use crate::correo::Mensaje;
 use crate::dao::{DaoError, GenericDao, UsuarioDao};
 use crate::dominio::{
     Administrador, BaseUsuario, BloqueoMesa, Cliente, ComprobantePago, DetallePago, Empleado,
@@ -23,6 +24,8 @@ pub struct Datos {
     pub items: Vec<ItemMenu>,
     pub planes: Vec<PlanServicioExtra>,
     pub comprobantes: Vec<ComprobantePago>,
+    /// Buzón de demostración: los correos que el sistema "envía" (ADR 0008).
+    pub correos: Vec<Mensaje>,
     /// token de sesión -> id de usuario
     pub sesiones: HashMap<String, i64>,
 }

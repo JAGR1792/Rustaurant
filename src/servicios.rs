@@ -105,6 +105,9 @@ impl ReservaService for ReservaServiceMemoria {
                 monto_total: abonado,
             });
         }
+        // Notificación por correo al cliente y a los administradores
+        // (buzón de demostración; ADR 0008).
+        crate::correo::notificar_reserva(&mut d, &reserva);
         let id = reserva.id;
         d.reservas.push(reserva);
         Ok(id)
@@ -251,6 +254,29 @@ mod tests {
             d.reservas.iter().find(|x| x.id == id).unwrap().estado,
             EstadoReserva::Cancelada
         );
+    }
+
+    #[tokio::test]
+    async fn confirmar_notifica_al_cliente_y_al_admin() {
+        let e = sembrar();
+        let s = ReservaServiceMemoria::new(e.clone());
+        let r = reserva_prueba(1, Utc::now() + Duration::days(5), 3);
+        s.confirmar(&usuario(&e, 3), r).await.unwrap();
+        let d = e.lock().unwrap();
+        let al_cliente = d
+            .correos
+            .iter()
+            .find(|m| m.para == "cliente@brindis.co")
+            .expect("correo al cliente");
+        assert!(al_cliente.asunto.contains("TEST0001"));
+        assert!(al_cliente.cuerpo.contains("24 horas"));
+        let al_admin = d
+            .correos
+            .iter()
+            .find(|m| m.para == "admin@brindis.co")
+            .expect("correo al admin");
+        assert!(al_admin.asunto.contains("TEST0001"));
+        assert!(al_admin.cuerpo.contains("M1"));
     }
 
     #[tokio::test]
