@@ -14,6 +14,9 @@ sirve desde disco; los secretos van en `.env`, que no se commitea.
 
 - `Dockerfile` multietapa: compila en `rust:1.99-slim` (con `gcc` para
   `ring`) y publica en `debian:trixie-slim` solo el binario y `static/`.
+  El truco de caché (compilar un main vacío y luego copiar `src/`) va
+  seguido de `touch` sobre los `.rs`: `COPY` conserva los mtime del
+  contexto y sin eso Cargo reutiliza el binario vacío.
 - `main.rs` lee `HOST` y `PORT` del entorno (local por defecto sigue
   siendo `127.0.0.1:3000`); dentro del contenedor se usa `HOST=0.0.0.0`
   y el `PORT` que inyecta Render, con health check en `/`.
