@@ -2,10 +2,46 @@
 {# Historial del cliente (o de todo el personal). El boton de cancelar hace
    POST a /reservas/{id}/cancelar; el reembolso RN08/RN09 lo calcula el servicio. #}
 {% block titulo %}Mis reservas — Brindis{% endblock %}
+{% block head %}
+<link rel="stylesheet" href="/static/css/counter.css">
+{% endblock %}
 {% block contenido %}
 <h1>Mis reservas</h1>
 {% if let Some(a) = aviso %}
 <p class="exito" role="status">{{ a }}</p>
+{% endif %}
+{% if let Some(c) = cuenta %}
+<section class="cuenta-panel" data-cuenta data-objetivo="{{ c.iso }}"
+         aria-label="Cuenta regresiva para la reserva {{ c.codigo }}">
+  <p class="cuenta-panel__titulo">Tu próxima mesa — <strong>{{ c.codigo }}</strong> · {{ c.detalle }}</p>
+  <div class="cuenta-reloj" aria-hidden="true">
+    <span class="cuenta-reloj__campo">
+      <span class="contador" data-contador data-valor="0" data-min-digitos="2"
+            data-direccion="down" data-cuenta-unidad="dias"></span>
+      <span class="cuenta-reloj__rotulo">días</span>
+    </span>
+    <span class="cuenta-reloj__sep">:</span>
+    <span class="cuenta-reloj__campo">
+      <span class="contador" data-contador data-valor="0" data-min-digitos="2"
+            data-direccion="down" data-cuenta-unidad="horas"></span>
+      <span class="cuenta-reloj__rotulo">horas</span>
+    </span>
+    <span class="cuenta-reloj__sep">:</span>
+    <span class="cuenta-reloj__campo">
+      <span class="contador" data-contador data-valor="0" data-min-digitos="2"
+            data-direccion="down" data-cuenta-unidad="min"></span>
+      <span class="cuenta-reloj__rotulo">min</span>
+    </span>
+    <span class="cuenta-reloj__sep">:</span>
+    <span class="cuenta-reloj__campo">
+      <span class="contador" data-contador data-valor="0" data-min-digitos="2"
+            data-direccion="down" data-cuenta-unidad="seg"></span>
+      <span class="cuenta-reloj__rotulo">seg</span>
+    </span>
+  </div>
+  <p class="cuenta-panel__pie">Tiempo para tu reserva</p>
+  <p class="cuenta-panel__ahora" role="status">¡Tu mesa te espera!</p>
+</section>
 {% endif %}
 {% if vacio %}
 <p>Todavía no hay reservas. <a href="/reservar">Crea la primera</a>.</p>
@@ -42,4 +78,7 @@
   </table>
 </div>
 {% endif %}
+{% endblock %}
+{% block scripts %}
+<script src="/static/js/counter.js" defer></script>
 {% endblock %}

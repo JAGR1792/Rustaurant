@@ -12,14 +12,14 @@ use axum::{
     response::{IntoResponse, Redirect, Response},
 };
 use axum_extra::extract::cookie::{Cookie, CookieJar, SameSite};
-use chrono::{DateTime, Duration, NaiveDate, NaiveDateTime, NaiveTime, Utc};
+use chrono::{DateTime, Duration, FixedOffset, NaiveDate, NaiveDateTime, NaiveTime, Utc};
 use serde::{Deserialize, Serialize};
 
 use crate::builder::{ReservaBuilder, validar_modalidad};
 use crate::dao::DaoError;
 use crate::dominio::{
-    DetallePago, DetallePedido, EstadoReserva, ModalidadPago, Ocasion, ReservaServicioExtra,
-    TipoCliente, UsuarioSesion,
+    DetallePago, DetallePedido, EstadoReserva, ModalidadPago, Ocasion, Reserva,
+    ReservaServicioExtra, TipoCliente, UsuarioSesion,
 };
 use crate::estado::{self, Datos, Estado};
 use crate::factory::{ClienteFactory, DatosRegistro, registrar_con};
@@ -64,6 +64,15 @@ fn fecha_hora_fmt(dt: DateTime<Utc>) -> String {
     utc_a_local(dt).format("%Y-%m-%d %H:%M").to_string()
 }
 
+/// ISO 8601 con el desfase local (UTC-5) para que el navegador calcule la
+/// cuenta regresiva con la hora correcta (p. ej. 2026-10-19T19:30:00-05:00).
+fn fecha_iso_local(dt: DateTime<Utc>) -> String {
+    let offset = FixedOffset::west_opt((UTC_A_LOCAL * 3600) as i32).expect("desfase UTC-5 válido");
+    dt.with_timezone(&offset)
+        .format("%Y-%m-%dT%H:%M:%S%:z")
+        .to_string()
+}
+
 /// Pesos colombianos con separador de miles: 440000 -> "440.000".
 fn cop(n: i64) -> String {
     let s = n.abs().to_string();
@@ -75,6 +84,15 @@ fn cop(n: i64) -> String {
         out.push(c);
     }
     if n < 0 { format!("-{out}") } else { out }
+}
+
+/// La reserva futura más cercana (solo vigentes): alimenta la cuenta
+/// regresiva que aparece tras reservar.
+fn proxima_reserva(reservas: &[Reserva], ahora: DateTime<Utc>) -> Option<&Reserva> {
+    reservas
+        .iter()
+        .filter(|r| r.estado == EstadoReserva::Vigente && r.inicio > ahora)
+        .min_by_key(|r| r.inicio)
 }
 
 fn sesion_actual(jar: &CookieJar, e: &Estado) -> Option<UsuarioSesion> {
@@ -178,6 +196,14 @@ struct ReservaFila {
     puede_cancelar: bool,
 }
 
+/// Panel de cuenta regresiva para la próxima reserva del cliente
+/// (la dibuja `counter.js` a partir de `iso`).
+struct CuentaRegresiva {
+    codigo: String,
+    detalle: String,
+    iso: String,
+}
+
 struct AgendaFila {
     hora: String,
     codigo: String,
@@ -245,6 +271,7 @@ struct MisReservas {
     aviso: Option<String>,
     filas: Vec<ReservaFila>,
     vacio: bool,
+    cuenta: Option<CuentaRegresiva>,
 }
 
 #[derive(Template)]
@@ -739,7 +766,7 @@ pub async fn mis_reservas(
         }
         .to_string()
     });
-    let (filas, vacio) = {
+    let (filas, vacio, cuenta) = {
         let d = e.lock().unwrap();
         let mut reservas: Vec<_> = d
             .reservas
@@ -787,7 +814,26 @@ pub async fn mis_reservas(
             })
             .collect();
         let vacio = filas.is_empty();
-        (filas, vacio)
+        // Cuenta regresiva solo para clientes: es "su" próxima mesa.
+        let cuenta = if matches!(u, UsuarioSesion::Cliente(_)) {
+            proxima_reserva(&reservas, Utc::now()).map(|r| CuentaRegresiva {
+                codigo: r.codigo.clone(),
+                detalle: format!(
+                    "{} · {} comensales · {}",
+                    r.mesa_ids
+                        .iter()
+                        .map(|m| format!("M{m}"))
+                        .collect::<Vec<_>>()
+                        .join(", "),
+                    r.num_comensales,
+                    r.ocasion.nombre()
+                ),
+                iso: fecha_iso_local(r.inicio),
+            })
+        } else {
+            None
+        };
+        (filas, vacio, cuenta)
     };
     Html(MisReservas {
         usuario: u.nombre().into(),
@@ -795,6 +841,7 @@ pub async fn mis_reservas(
         aviso,
         filas,
         vacio,
+        cuenta,
     })
     .into_response()
 }
@@ -950,6 +997,33 @@ pub async fn disponibilidad(
 #[cfg(test)]
 mod tests {
     use super::*;
+    use chrono::TimeZone;
+
+    fn reserva_prueba(id: i64, inicio: DateTime<Utc>, estado: EstadoReserva) -> Reserva {
+        Reserva {
+            id,
+            codigo: format!("TEST{id:04}"),
+            id_cliente: 3,
+            id_creador: None,
+            tipo_restaurante_completo: false,
+            mesa_ids: vec![1],
+            inicio,
+            duracion_minutos: 120,
+            num_comensales: 2,
+            ocasion: Ocasion::Casual,
+            pedido: vec![],
+            servicios_extra: vec![],
+            restricciones: String::new(),
+            observaciones: String::new(),
+            pago: DetallePago {
+                modalidad: ModalidadPago::Adelanto,
+                porcentaje: 30,
+                medio: "TARJETA".into(),
+                monto_total: 0,
+            },
+            estado,
+        }
+    }
 
     #[test]
     fn carta_mapea_todos_los_platos_del_seed() {
@@ -979,5 +1053,34 @@ mod tests {
         let e = estado::nuevo();
         let d = e.lock().unwrap();
         assert!(carta(&d).is_empty());
+    }
+
+    #[test]
+    fn proxima_reserva_ignora_pasadas_canceladas_y_completadas() {
+        let ahora = Utc::now();
+        let reservas = vec![
+            reserva_prueba(1, ahora + Duration::days(5), EstadoReserva::Vigente),
+            reserva_prueba(2, ahora + Duration::days(2), EstadoReserva::Cancelada),
+            reserva_prueba(3, ahora - Duration::hours(3), EstadoReserva::Vigente),
+            reserva_prueba(4, ahora + Duration::days(8), EstadoReserva::Completada),
+            reserva_prueba(5, ahora + Duration::days(3), EstadoReserva::Vigente),
+        ];
+        let p = proxima_reserva(&reservas, ahora).expect("hay una vigente futura");
+        assert_eq!(p.id, 5, "debe elegir la vigente más cercana");
+        assert!(proxima_reserva(&[], ahora).is_none());
+    }
+
+    #[test]
+    fn fecha_iso_local_lleva_el_desfase_de_colombia() {
+        let dt = Utc.with_ymd_and_hms(2026, 10, 20, 0, 30, 0).unwrap();
+        assert_eq!(fecha_iso_local(dt), "2026-10-19T19:30:00-05:00");
+    }
+
+    #[test]
+    fn el_seed_deja_una_reserva_futura_para_la_cuenta() {
+        let e = estado::sembrar();
+        let d = e.lock().unwrap();
+        let p = proxima_reserva(&d.reservas, Utc::now());
+        assert_eq!(p.map(|r| r.codigo.as_str()), Some("DEMO0001"));
     }
 }
