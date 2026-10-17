@@ -1,5 +1,6 @@
-// plano.js — asistente de reserva en 4 pasos: plano SVG del salón por zonas
-// y ficha lateral de la mesa elegida. Consulta
+// plano.js — asistente de reserva en 4 pasos: plano SVG del salón por zonas,
+// ficha lateral de la mesa elegida, pedido guiado por porciones (steppers,
+// «toda la mesa» y cobertura) y revisión viva del paso 4. Consulta
 // GET /api/disponibilidad?fecha=&hora=&zona= y arma el POST /reserva
 // llenando los campos ocultos `mesas` y `extras`. Sin librerias.
 (function () {
@@ -18,7 +19,7 @@
   const ZONAS = [
     { nombre: "Terraza", etiqueta: "TERRAZA", etiquetaX: 445, etiquetaY: 52, ancla: "middle", slots: [[320, 112], [570, 112]] },
     { nombre: "General", etiqueta: "SALÓN PRINCIPAL", etiquetaX: 450, etiquetaY: 274, ancla: "middle", slots: [[250, 352], [430, 352], [610, 352], [790, 352]] },
-    { nombre: "VIP", etiqueta: "ZONA ÍNTIMA · VIP", etiquetaX: 54, etiquetaY: 508, ancla: "start", slots: [[150, 540], [300, 540]] },
+    { nombre: "VIP", etiqueta: "ZONA ÍNTIMA · VIP", etiquetaX: 54, etiquetaY: 464, ancla: "start", slots: [[150, 536], [300, 536]] },
   ];
 
   const FOTO_ZONA = {
@@ -85,29 +86,55 @@
     svg.appendChild(l);
   }
 
+  function ventanal(svg, x0, y0, ancho) {
+    svg.appendChild(el("rect", { x: x0, y: y0, width: ancho, height: 13, rx: 6.5, fill: "#f6eedd", stroke: "#c9b795", "stroke-width": 1.8 }));
+    for (let x = x0 + ancho / 4; x < x0 + ancho - 8; x += ancho / 4) {
+      svg.appendChild(el("line", { x1: x, y1: y0 + 1.5, x2: x, y2: y0 + 11.5, stroke: "#dccdaa", "stroke-width": 1.4 }));
+    }
+  }
+
+  function planta(svg, x, y) {
+    svg.appendChild(el("rect", { x: x - 7, y: y + 3, width: 14, height: 10, rx: 3, fill: "#d9c9a8", stroke: "#b9a37a", "stroke-width": 1.4 }));
+    for (const [dx, dy, r] of [[-6, -7, 8], [6, -7, 8], [0, -13, 9]]) {
+      svg.appendChild(el("circle", { cx: x + dx, cy: y + dy, r, fill: "#93ab89", stroke: "#7e9874", "stroke-width": 1 }));
+    }
+  }
+
   function dibujarSalon(svg) {
-    svg.appendChild(el("rect", { x: 16, y: 16, width: 868, height: 588, rx: 18, fill: "#fbf7f0", stroke: "#e0d5c1", "stroke-width": 2 }));
-    // Ventanales del muro superior (dan a la terraza).
-    for (const x0 of [150, 400]) {
-      svg.appendChild(el("rect", { x: x0, y: 9, width: 230, height: 15, rx: 7, fill: "#f2e9d7", stroke: "#e0d5c1" }));
-    }
-    svg.appendChild(texto("VENTANALES", 836, 22, "plano-nota", "end"));
+    // Piso y muro perimetral (trazo doble suave, estilo plano de salón).
+    svg.appendChild(el("rect", { x: 20, y: 20, width: 860, height: 580, rx: 22, fill: "#fbf7f0", stroke: "#c9b795", "stroke-width": 3.5 }));
+    svg.appendChild(el("rect", { x: 29, y: 29, width: 842, height: 562, rx: 15, fill: "none", stroke: "#e9ddc7", "stroke-width": 1.5 }));
+    // Lavados de zona: terraza, rincón VIP y barra.
+    svg.appendChild(el("rect", { x: 34, y: 34, width: 832, height: 178, rx: 14, fill: "#f8f1e2" }));
+    svg.appendChild(el("rect", { x: 34, y: 440, width: 372, height: 152, rx: 12, fill: "#f4ecdc" }));
+    svg.appendChild(el("rect", { x: 628, y: 484, width: 244, height: 112, rx: 14, fill: "#f6edda" }));
+    // Ventanales del muro norte.
+    ventanal(svg, 150, 13, 230);
+    ventanal(svg, 400, 13, 230);
+    svg.appendChild(texto("VENTANALES", 836, 24, "plano-nota", "end"));
+    // Plantas de interior junto a los ventanales.
+    planta(svg, 108, 58);
+    planta(svg, 356, 58);
+    planta(svg, 654, 58);
     // Pasillo central punteado.
-    muro(svg, 36, 216, 368, 216, true);
-    muro(svg, 532, 216, 864, 216, true);
-    svg.appendChild(texto("PASILLO", 450, 221, "plano-texto", "middle"));
-    // Rincón VIP separado por media pared.
-    muro(svg, 36, 472, 402, 472, false);
-    muro(svg, 402, 472, 402, 604, false);
-    // Barra con banquetas.
-    svg.appendChild(el("rect", { x: 640, y: 496, width: 220, height: 88, rx: 12, fill: "#efe4d1", stroke: "#e0d5c1" }));
-    svg.appendChild(texto("BAR", 750, 549, "plano-texto", "middle"));
-    for (const x of [680, 730, 780]) {
-      svg.appendChild(el("circle", { cx: x, cy: 486, r: 9, fill: "#dcccaa", stroke: "#c9b795", "stroke-width": 2 }));
+    muro(svg, 36, 214, 368, 214, true);
+    muro(svg, 532, 214, 864, 214, true);
+    svg.appendChild(texto("PASILLO", 450, 219, "plano-texto", "middle"));
+    // Rincón VIP: media pared superior y borde tenue a la derecha.
+    muro(svg, 34, 440, 406, 440, false);
+    svg.appendChild(el("line", { x1: 406, y1: 440, x2: 406, y2: 592, stroke: "#e6dac2", "stroke-width": 1.5, "stroke-dasharray": "4 6" }));
+    // Barra: frente, superficie y banquetas.
+    svg.appendChild(el("rect", { x: 640, y: 496, width: 220, height: 88, rx: 12, fill: "#efe4d1", stroke: "#c9b795", "stroke-width": 1.8 }));
+    svg.appendChild(el("line", { x1: 648, y1: 510, x2: 852, y2: 510, stroke: "#e3d5b9", "stroke-width": 1.4 }));
+    for (const x of [682, 732, 782]) {
+      svg.appendChild(el("circle", { cx: x, cy: 492, r: 8, fill: "#dcccaa", stroke: "#c9b795", "stroke-width": 1.6 }));
     }
-    // Entrada: hueco en el muro inferior con su umbral.
-    svg.appendChild(el("rect", { x: 428, y: 598, width: 124, height: 12, fill: "#fbf7f0" }));
-    svg.appendChild(texto("ENTRADA", 490, 592, "plano-nota", "middle"));
+    svg.appendChild(texto("BAR", 750, 552, "plano-texto", "middle"));
+    // Entrada: vano en el muro sur, hoja abierta y arco de barrido.
+    svg.appendChild(el("rect", { x: 436, y: 594, width: 108, height: 16, fill: "#fbf7f0" }));
+    svg.appendChild(el("line", { x1: 436, y1: 598, x2: 436, y2: 490, stroke: "#c9b795", "stroke-width": 2.5 }));
+    svg.appendChild(el("path", { d: "M 436 490 A 108 108 0 0 1 544 598", fill: "none", stroke: "#d9c9a8", "stroke-width": 1.4, "stroke-dasharray": "3 5" }));
+    svg.appendChild(texto("ENTRADA", 490, 588, "plano-nota", "middle"));
   }
 
   function dibujarMesa(m, cx, cy) {
@@ -129,6 +156,10 @@
     } else {
       g.setAttribute("aria-disabled", "true");
     }
+    // Anillo exterior cuando la mesa está elegida.
+    if (elegida) {
+      g.appendChild(el("circle", { cx, cy, r: 41, fill: "none", stroke: "#a88a59", "stroke-width": 1.5, opacity: 0.6 }));
+    }
     // Sillas alrededor de la mesa, una por puesto.
     const r = 50;
     for (let i = 0; i < m.capacidad; i++) {
@@ -142,6 +173,8 @@
         transform: `rotate(${ang + 90} ${x} ${y})`,
       }));
     }
+    // Sombra suave asentando la mesa en el piso.
+    g.appendChild(el("circle", { cx: cx + 2, cy: cy + 3.5, r: 34, fill: "rgba(38, 35, 31, 0.10)" }));
     const cuerpo = el("circle", { class: "mesa-cuerpo", cx, cy, r: 34, fill: c.cuerpo, stroke: c.borde, "stroke-width": c.grosor || 2 });
     if (c.guion) cuerpo.setAttribute("stroke-dasharray", c.guion);
     g.appendChild(cuerpo);
@@ -239,6 +272,7 @@
     if (sel && sel.options.length > 0 && seleccion.size > 0) {
       sel.value = String(Math.min(Math.max(comensales, 1), sel.options.length));
     }
+    pintarPedido();
   }
 
   // --- plano -----------------------------------------------------------------
@@ -294,30 +328,146 @@
 
   // --- paso 3 y 4 --------------------------------------------------------------
 
+  const copFmt = new Intl.NumberFormat("es-CO", {
+    style: "currency",
+    currency: "COP",
+    maximumFractionDigits: 0,
+  });
+
+  function comensales() {
+    return Math.max(Number($("comensales").value) || 1, 1);
+  }
+
+  function porcionesPedidas() {
+    let total = 0;
+    for (const i of document.querySelectorAll("input[data-precio]")) {
+      total += Number(i.value || 0);
+    }
+    return total;
+  }
+
   function estimarTotal() {
     let total = 0;
     for (const i of document.querySelectorAll("input[data-precio]")) {
       total += Number(i.dataset.precio) * Number(i.value || 0);
     }
-    const comensales = Number($("comensales").value || 0);
+    const n = comensales();
     for (const i of document.querySelectorAll("input.extra:checked")) {
       const tarifa = Number(i.dataset.tarifa);
-      total += i.dataset.porpersona === "1" ? tarifa * comensales : tarifa;
+      total += i.dataset.porpersona === "1" ? tarifa * n : tarifa;
     }
     return total;
   }
 
+  // Pedido guiado: cobertura de la mesa, botones «toda la mesa» y costos vivos.
+  function pintarPedido() {
+    if (!$("cobertura-texto")) return;
+    const n = comensales();
+    const porciones = porcionesPedidas();
+    $("cobertura-texto").textContent =
+      porciones === 0
+        ? `Mesa para ${n}: todavía sin pedido anticipado — puedes reservar y pedir en el salón.`
+        : `Pedido de ${porciones} ${porciones === 1 ? "porción" : "porciones"} · cubre ${Math.min(porciones, n)} de ${n} comensales.`;
+    const fill = $("cobertura-fill");
+    if (fill) fill.style.width = `${Math.min((porciones / n) * 100, 100)}%`;
+    for (const b of document.querySelectorAll(".todo-mesa")) {
+      b.textContent = `Toda la mesa (${n})`;
+    }
+    for (const i of document.querySelectorAll("input.extra")) {
+      const costo = i.closest(".extra-linea")?.querySelector("[data-costo]");
+      if (!costo) continue;
+      if (i.checked) {
+        const tarifa = Number(i.dataset.tarifa);
+        const monto = i.dataset.porpersona === "1" ? tarifa * n : tarifa;
+        costo.textContent = i.dataset.porpersona === "1" ? `× ${n} = ${copFmt.format(monto)}` : copFmt.format(monto);
+      } else {
+        costo.textContent = "";
+      }
+    }
+    pintarEstimado();
+  }
+
   function pintarEstimado() {
-    const el2 = $("total-estimado");
-    if (!el2) return;
-    const cop = new Intl.NumberFormat("es-CO", {
-      style: "currency",
-      currency: "COP",
-      maximumFractionDigits: 0,
-    });
-    el2.textContent =
-      `Total estimado de pedido y extras: ${cop.format(estimarTotal())}. ` +
+    const destino = $("total-estimado");
+    if (!destino) return;
+    destino.textContent =
+      `Total estimado de pedido y extras: ${copFmt.format(estimarTotal())}. ` +
       "El valor final se recalcula en el servidor.";
+  }
+
+  // Revisión del paso 4: datos, pedido desglosado y monto según modalidad.
+  function pintarResumen() {
+    const datos = $("resumen-datos");
+    const pedido = $("resumen-pedido");
+    if (!datos || !pedido) return;
+    const n = comensales();
+    const fecha = $("fecha").value;
+    let fechaTxt = fecha || "—";
+    if (fecha) {
+      const d = new Date(`${fecha}T12:00:00`);
+      if (!Number.isNaN(d.getTime())) {
+        fechaTxt = d.toLocaleDateString("es-CO", { weekday: "long", day: "numeric", month: "long" });
+      }
+    }
+    const mesa = mesaActual();
+    const mesasTxt = seleccion.size
+      ? [...seleccion].map((id) => `M${id}`).join(", ") + (mesa ? ` · ${mesa.zona}` : "")
+      : "—";
+    datos.innerHTML = "";
+    for (const [clave, valor] of [
+      ["Fecha", fechaTxt],
+      ["Hora", $("hora").value || "—"],
+      ["Comensales", String(n)],
+      ["Mesas", mesasTxt],
+    ]) {
+      const dt = document.createElement("dt");
+      dt.textContent = clave;
+      const dd = document.createElement("dd");
+      dd.textContent = valor;
+      datos.append(dt, dd);
+    }
+
+    const lineas = [];
+    for (const i of document.querySelectorAll("input[data-precio]")) {
+      const cantidad = Number(i.value || 0);
+      if (cantidad > 0) {
+        lineas.push(`${cantidad} × ${i.dataset.nombre} — ${copFmt.format(cantidad * Number(i.dataset.precio))}`);
+      }
+    }
+    for (const i of document.querySelectorAll("input.extra:checked")) {
+      const tarifa = Number(i.dataset.tarifa);
+      const monto = i.dataset.porpersona === "1" ? tarifa * n : tarifa;
+      const nombre = i.closest(".extra-linea")?.querySelector("strong")?.textContent || `Extra ${i.value}`;
+      lineas.push(`${nombre} — ${copFmt.format(monto)}`);
+    }
+    pedido.innerHTML = "";
+    if (lineas.length === 0) {
+      const p = document.createElement("p");
+      p.textContent = "Sin pedido anticipado: la mesa podrá ordenar en el salón.";
+      pedido.appendChild(p);
+    } else {
+      const ul = document.createElement("ul");
+      for (const linea of lineas) {
+        const li = document.createElement("li");
+        li.textContent = linea;
+        ul.appendChild(li);
+      }
+      pedido.appendChild(ul);
+    }
+
+    const pago = $("resumen-pago");
+    if (pago) {
+      const modalidad = document.querySelector("input[name=modalidad]:checked")?.value;
+      const total = estimarTotal();
+      if (modalidad === "completo") {
+        pago.textContent = `Pago completo en línea: ${copFmt.format(total)}.`;
+      } else if (modalidad === "restaurante") {
+        pago.textContent = `Pago en el restaurante: ${copFmt.format(total)} al finalizar.`;
+      } else {
+        // Misma cuenta que el dominio: total * porcentaje / 100 (entero).
+        pago.textContent = `Adelanto del 30 %: ${copFmt.format(Math.floor((total * 30) / 100))} (total ${copFmt.format(total)}).`;
+      }
+    }
   }
 
   function iniciar() {
@@ -341,8 +491,9 @@
             return;
           }
           sincronizarOcultos();
-          pintarEstimado();
+          pintarPedido();
         }
+        if (destino === 4) pintarResumen();
         if (destino === 2 && !b.closest("#paso-1")) cargarPlano();
         mostrarPaso(destino);
       });
@@ -368,14 +519,27 @@
         btn.click();
       });
     }
-    for (const i of document.querySelectorAll("input.extra")) {
-      i.addEventListener("change", pintarEstimado);
+    for (const plato of document.querySelectorAll(".plato")) {
+      const input = plato.querySelector("input[data-precio]");
+      if (!input) continue;
+      const fijar = (v) => {
+        input.value = String(Math.max(0, Math.min(20, v)));
+        pintarPedido();
+      };
+      plato.querySelector(".paso-menos")?.addEventListener("click", () => fijar(Number(input.value || 0) - 1));
+      plato.querySelector(".paso-mas")?.addEventListener("click", () => fijar(Number(input.value || 0) + 1));
+      input.addEventListener("input", pintarPedido);
+      plato.querySelector(".todo-mesa")?.addEventListener("click", () => fijar(comensales()));
     }
-    for (const i of document.querySelectorAll("input[data-precio]")) {
-      i.addEventListener("input", pintarEstimado);
+    for (const i of document.querySelectorAll("input.extra")) {
+      i.addEventListener("change", pintarPedido);
+    }
+    for (const r of document.querySelectorAll("input[name=modalidad]")) {
+      r.addEventListener("change", pintarResumen);
     }
     $("form-reserva").addEventListener("submit", sincronizarOcultos);
     pintarPlano();
+    pintarPedido();
     mostrarPaso(1);
   }
 

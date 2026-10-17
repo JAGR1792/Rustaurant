@@ -161,6 +161,7 @@ struct ItemVista {
     nombre: String,
     precio: i64,
     precio_fmt: String,
+    imagen: String,
 }
 
 /// Tarjeta de "La carta" en la portada (efecto chroma del frontend).
@@ -337,27 +338,39 @@ fn tipo_legible(tipo: &str) -> &'static str {
     }
 }
 
+/// Foto real de un plato por id (Wikimedia Commons; ver
+/// `static/img/fotos/descargar_fotos.py` y `creditos.md`). Un id nuevo
+/// cae al PNG genérico de `static/img/carta`.
+fn foto_item(id: i64) -> &'static str {
+    match id {
+        1 => "/static/img/fotos/carta-01-ceviche.jpg",
+        2 => "/static/img/fotos/carta-02-picana.jpg",
+        3 => "/static/img/fotos/carta-03-tres-leches.jpg",
+        4 => "/static/img/fotos/carta-04-limonada-coco.jpg",
+        5 => "/static/img/fotos/carta-05-salmon.jpg",
+        6 => "/static/img/fotos/carta-06-coctel.jpg",
+        _ => "/static/img/carta/00-generico.png",
+    }
+}
+
 /// Carta de la portada: platos del menú con su foto y acento de color.
-/// Las fotos reales viven en `static/img/fotos` (Wikimedia Commons; ver
-/// `descargar_fotos.py` y `creditos.md`); si aparece un id nuevo cae al
-/// PNG genérico de `static/img/carta`.
 fn carta(d: &Datos) -> Vec<ItemCartaVista> {
     d.items
         .iter()
         .map(|i| {
-            let (imagen, accent) = match i.id {
-                1 => ("/static/img/fotos/carta-01-ceviche.jpg", "#7cc4ff"),
-                2 => ("/static/img/fotos/carta-02-picana.jpg", "#ff5a36"),
-                3 => ("/static/img/fotos/carta-03-tres-leches.jpg", "#ffb27a"),
-                4 => ("/static/img/fotos/carta-04-limonada-coco.jpg", "#ffd23f"),
-                5 => ("/static/img/fotos/carta-05-salmon.jpg", "#a98bff"),
-                6 => ("/static/img/fotos/carta-06-coctel.jpg", "#ff7eb6"),
-                _ => ("/static/img/carta/00-generico.png", "#a88a59"),
+            let accent = match i.id {
+                1 => "#7cc4ff",
+                2 => "#ff5a36",
+                3 => "#ffb27a",
+                4 => "#ffd23f",
+                5 => "#a98bff",
+                6 => "#ff7eb6",
+                _ => "#a88a59",
             };
             ItemCartaVista {
                 titulo: i.nombre.clone(),
                 subtitulo: format!("{} · {}", tipo_legible(&i.tipo), cop(i.precio_vigente)),
-                imagen: imagen.into(),
+                imagen: foto_item(i.id).into(),
                 accent: accent.into(),
                 url: "/reservar".into(),
             }
@@ -409,6 +422,7 @@ fn render_reservar(
                     nombre: i.nombre.clone(),
                     precio: i.precio_vigente,
                     precio_fmt: cop(i.precio_vigente),
+                    imagen: foto_item(i.id).into(),
                 })
                 .collect::<Vec<_>>(),
             d.planes

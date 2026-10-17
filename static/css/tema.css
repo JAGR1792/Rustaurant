@@ -320,6 +320,68 @@ section[id^="paso-"] { margin-bottom: 2rem; }
 .pie-nav a:hover { color: var(--marfil); text-decoration: underline; text-decoration-color: var(--dorado); }
 .pie-copy { color: rgba(245, 239, 229, .5); font-size: .78rem; margin: .8rem 0 0; }
 
+/* Paso 3: pedido guiado por porciones */
+.pedido-ayuda { color: var(--carbon-suave); font-size: .92rem; max-width: 62ch; }
+.cobertura { margin: 0 0 1.1rem; }
+.cobertura-barra { height: 8px; border-radius: 999px; background: var(--linea); overflow: hidden; }
+.cobertura-barra i {
+  display: block; height: 100%; width: 0;
+  background: linear-gradient(90deg, var(--dorado-claro), var(--vino));
+  transition: width .25s ease;
+}
+#cobertura-texto { margin: .45rem 0 0; font-size: .9rem; color: var(--carbon-suave); }
+.pedido-lista { display: grid; gap: .65rem; }
+.plato {
+  display: grid; grid-template-columns: 64px minmax(0, 1fr) auto;
+  grid-template-rows: auto auto; align-items: center; gap: .15rem .9rem;
+  padding: .55rem .65rem; border: 1px solid var(--linea); border-radius: 14px;
+  background: #fffdf8;
+}
+.plato-foto { grid-row: 1 / 3; grid-column: 1; width: 64px; height: 64px; border-radius: 10px; object-fit: cover; border: 1px solid var(--linea); }
+.plato-info { grid-row: 1; grid-column: 2; display: flex; flex-wrap: wrap; align-items: baseline; gap: .2rem .6rem; }
+.plato-info strong { font-family: var(--serif); font-size: 1.12rem; font-weight: 600; }
+.plato-precio { color: var(--carbon-suave); font-size: .88rem; }
+.paso-ctl { grid-row: 1 / 3; grid-column: 3; display: flex; align-items: center; gap: .45rem; }
+.paso-ctl button {
+  width: 2rem; height: 2rem; padding: 0; border-radius: 50%; cursor: pointer;
+  border: 1px solid var(--dorado-claro); background: var(--marfil-claro);
+  color: var(--vino); font-size: 1.05rem; line-height: 1;
+}
+.paso-ctl button:hover { border-color: var(--dorado); background: var(--marfil); }
+.paso-ctl input { width: 3.1rem; text-align: center; font-weight: 600; }
+.todo-mesa {
+  grid-row: 2; grid-column: 2; justify-self: start;
+  border: 1px dashed var(--dorado-claro); background: transparent; cursor: pointer;
+  color: var(--carbon-suave); font-size: .8rem; border-radius: 999px; padding: .18rem .7rem;
+}
+.todo-mesa:hover { border-color: var(--dorado); color: var(--vino); }
+.extras-lista { display: grid; gap: .5rem; }
+.extra-linea {
+  display: flex; align-items: center; gap: .7rem; margin: 0;
+  padding: .5rem .7rem; border: 1px solid var(--linea); border-radius: 12px; background: #fffdf8;
+}
+.extra-linea input { accent-color: var(--vino); }
+.extra-info { display: flex; flex-direction: column; line-height: 1.35; }
+.extra-info span { color: var(--carbon-suave); font-size: .85rem; }
+.extra-costo { margin-left: auto; color: var(--vino); font-weight: 600; font-size: .9rem; }
+
+/* Paso 4: revisión viva de la reserva */
+.resumen {
+  border: 1px solid var(--linea); border-radius: 16px; margin: 1.25rem 0;
+  background: var(--marfil-claro); padding: 1.15rem 1.25rem .95rem;
+}
+.resumen h3 { font-family: var(--serif); font-size: 1.3rem; font-weight: 600; margin-bottom: .65rem; }
+.resumen-datos { display: grid; grid-template-columns: auto 1fr; gap: .25rem 1rem; margin: 0 0 .8rem; }
+.resumen-datos dt {
+  color: var(--carbon-suave); font-size: .8rem; letter-spacing: .08em;
+  text-transform: uppercase; padding-top: .18rem;
+}
+.resumen-datos dd { margin: 0; font-weight: 600; }
+#resumen-pedido ul { margin: .2rem 0 .6rem; padding-left: 1.15rem; }
+#resumen-pedido li { margin: .1rem 0; }
+#resumen-pago { font-weight: 600; color: var(--vino); margin-bottom: .3rem; }
+#total-estimado { color: var(--carbon-suave); font-size: .9rem; margin: 0; }
+
 @media (max-width: 760px) {
   .hero { grid-template-columns: 1fr; }
 }
@@ -327,5 +389,11 @@ section[id^="paso-"] { margin-bottom: 2rem; }
   .menu { display: flex; flex-wrap: wrap; gap: .5rem .9rem; }
   .progreso { gap: .35rem .8rem; }
   .dia-nav { flex-wrap: wrap; }
+}
+@media (max-width: 560px) {
+  .plato { grid-template-columns: 56px 1fr; grid-template-rows: auto auto auto; }
+  .plato-foto { width: 56px; height: 56px; grid-row: 1 / 3; }
+  .paso-ctl { grid-row: 3; grid-column: 1 / 3; justify-content: flex-start; }
+  .todo-mesa { grid-row: 2; grid-column: 2; }
 }
 @media (prefers-reduced-motion: reduce) { * { animation: none; transition: none; } }

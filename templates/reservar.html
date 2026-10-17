@@ -93,23 +93,48 @@
 
   <section id="paso-3" hidden>
     <h2 tabindex="-1">3. Pedido anticipado y servicios extra</h2>
+    <p class="pedido-ayuda">Pedido opcional con precios congelados. Suma porciones con los botones o pide
+      «toda la mesa» cuando todos quieran lo mismo; también pueden pedir en el salón.</p>
+    <div class="cobertura">
+      <div class="cobertura-barra" aria-hidden="true"><i id="cobertura-fill"></i></div>
+      <p id="cobertura-texto" aria-live="polite"></p>
+    </div>
     <fieldset>
-      <legend>Pedido anticipado (opcional, precios congelados)</legend>
-      {% for it in items %}
-      <label class="linea">
-        <span>{{ it.nombre }} · $ {{ it.precio_fmt }}</span>
-        <input type="number" name="item_{{ it.id }}" min="0" max="20" value="0" data-precio="{{ it.precio }}">
-      </label>
-      {% endfor %}
+      <legend>El pedido</legend>
+      <div class="pedido-lista">
+        {% for it in items %}
+        <div class="plato">
+          <img class="plato-foto" src="{{ it.imagen }}" alt="" width="88" height="88" loading="lazy">
+          <div class="plato-info">
+            <strong>{{ it.nombre }}</strong>
+            <span class="plato-precio">$ {{ it.precio_fmt }}</span>
+          </div>
+          <div class="paso-ctl">
+            <button type="button" class="paso-menos" aria-label="Quitar una porción de {{ it.nombre }}">−</button>
+            <input type="number" name="item_{{ it.id }}" min="0" max="20" value="0"
+                   inputmode="numeric" data-precio="{{ it.precio }}" data-nombre="{{ it.nombre }}"
+                   aria-label="Porciones de {{ it.nombre }}">
+            <button type="button" class="paso-mas" aria-label="Agregar una porción de {{ it.nombre }}">+</button>
+          </div>
+          <button type="button" class="todo-mesa">Toda la mesa</button>
+        </div>
+        {% endfor %}
+      </div>
     </fieldset>
     <fieldset>
       <legend>Servicios extra</legend>
-      {% for p in planes %}
-      <label class="linea">
-        <input type="checkbox" class="extra" value="{{ p.id }}" data-tarifa="{{ p.tarifa }}" data-porpersona="{% if p.por_persona %}1{% else %}0{% endif %}">
-        <span>{{ p.nombre }} — $ {{ p.tarifa_fmt }}{% if p.por_persona %} por persona{% endif %}</span>
-      </label>
-      {% endfor %}
+      <div class="extras-lista">
+        {% for p in planes %}
+        <label class="extra-linea">
+          <input type="checkbox" class="extra" value="{{ p.id }}" data-tarifa="{{ p.tarifa }}" data-porpersona="{% if p.por_persona %}1{% else %}0{% endif %}">
+          <span class="extra-info">
+            <strong>{{ p.nombre }}</strong>
+            <span>$ {{ p.tarifa_fmt }}{% if p.por_persona %} por persona{% endif %}</span>
+          </span>
+          <span class="extra-costo" data-costo aria-hidden="true"></span>
+        </label>
+        {% endfor %}
+      </div>
     </fieldset>
     <div class="acciones">
       <button type="button" class="secundario" data-hacia="2">Atrás</button>
@@ -128,7 +153,13 @@
       <label class="linea"><input type="radio" name="modalidad" value="completo"> <span>Pago completo</span></label>
       <label class="linea"><input type="radio" name="modalidad" value="restaurante"> <span>Pagar en el restaurante{% if !es_vip %} (solo clientes VIP){% endif %}</span></label>
     </fieldset>
-    <p id="total-estimado" aria-live="polite"></p>
+    <div class="resumen" id="resumen-reserva">
+      <h3>Revisión de tu reserva</h3>
+      <dl class="resumen-datos" id="resumen-datos" aria-live="polite"></dl>
+      <div id="resumen-pedido" aria-live="polite"></div>
+      <p id="resumen-pago" aria-live="polite"></p>
+      <p id="total-estimado" aria-live="polite"></p>
+    </div>
     <div class="acciones">
       <button type="button" class="secundario" data-hacia="3">Atrás</button>
       <button type="submit">Confirmar reserva</button>
