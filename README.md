@@ -13,8 +13,9 @@ tectonic documentacion/brindis_rust.tex
 
 La app sirve en `http://127.0.0.1:3000` con la fase 1 funcional:
 login/registro, asistente de reserva de 4 pasos con plano SVG del salón
-por zonas y ficha de mesa ilustrada, mis reservas con cancelación
-(reembolso RN08/RN09), cuenta regresiva de la próxima reserva (contador
+por zonas, ficha de mesa con foto real y pedido guiado por porciones
+(ADR 0006), mis reservas con cancelación confirmada y reembolso
+(RN08/RN09), cuenta regresiva de la próxima reserva (contador
 de cifras rodantes, ver ADR 0003) y agenda del personal protegida por el
 Proxy. La portada incluye la carta de platos con un efecto de spotlight
 que sigue al cursor y revela la foto a color (port vanilla del ChromaGrid
@@ -23,9 +24,10 @@ de React Bits, ver ADR 0002).
 La interfaz sigue la dirección visual "Le Jardin" (ver ADR 0004): paleta
 marfil/borgoña/carbón con dorado apagado, tipografías self-hosted
 (Cormorant Garamond + Inter, `static/fuentes/`, licencia OFL) y
-componentes en CSS vanilla. Las ilustraciones del salón y de las mesas
-son deterministas (`generar_salon.py`, `generar_mesas.py`) y se pueden
-regenerar sin dependencias externas.
+componentes en CSS vanilla. Las fotos (carta, salón y mesas) vienen de
+Wikimedia Commons con licencia verificada: `static/img/fotos/descargar_fotos.py`
+las regenera y `creditos.md` lista autor, licencia y enlace (ADR 0005).
+Los PNG deterministas de `generar_*.py` quedan como respaldo offline.
 
 El PDF del documento se genera en `documentacion/brindis_rust.pdf`.
 
@@ -56,10 +58,11 @@ src/                  # Axum + dominio + 4 patrones + DAO
   vistas.rs           # controladores Axum + structs Askama
 templates/            # base + inicio/login/registro/reservar/mis-reservas/agenda/error
 static/css/           # tema.css + fuentes.css + chroma.css + counter.css
-static/js/            # plano.js (plano SVG + ficha) + ui.js (toasts)
+static/js/            # plano.js (plano SVG, ficha y pedido guiado) + ui.js (toasts y confirmacion)
                       # + chroma.js (carta) + counter.js (cuenta regresiva)
 static/fuentes/       # Cormorant Garamond + Inter (woff2) + descargar_fuentes.py
-static/img/carta/     # PNGs de platos + generar_carta.py (regenerables)
+static/img/fotos/     # fotos reales de Commons + descargar_fotos.py + creditos.md
+static/img/carta/     # PNGs de platos + generar_carta.py (respaldo offline)
 static/img/salon/     # salon-hero/salon-acceso.png + generar_salon.py
 static/img/mesas/     # mesa-general/terraza/vip.png + generar_mesas.py
 diagramas/brindis/    # Fig6-11 PNG/SVG + .drawio (Fig1, Fig4)
