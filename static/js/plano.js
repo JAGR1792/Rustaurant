@@ -23,9 +23,18 @@
   ];
 
   const FOTO_ZONA = {
-    Terraza: "/static/img/fotos/mesa-terraza.jpg",
-    General: "/static/img/fotos/mesa-general.jpg",
-    VIP: "/static/img/fotos/mesa-vip.jpg",
+    Terraza: {
+      jpg: "/static/img/fotos/mesa-terraza.jpg",
+      webp: "/static/img/fotos/mesa-terraza.webp",
+    },
+    General: {
+      jpg: "/static/img/fotos/mesa-general.jpg",
+      webp: "/static/img/fotos/mesa-general.webp",
+    },
+    VIP: {
+      jpg: "/static/img/fotos/mesa-vip.jpg",
+      webp: "/static/img/fotos/mesa-vip.webp",
+    },
   };
 
   const ESTADO_TEXTO = { libre: "libre", reservada: "reservada", bloqueada: "bloqueada", seleccionada: "seleccionada" };
@@ -236,9 +245,12 @@
     }
     vacia.hidden = true;
     contenido.hidden = false;
-    const foto = $("ficha-foto");
-    foto.src = FOTO_ZONA[m.zona] || FOTO_ZONA.General;
-    foto.alt = `Mesa ${m.id} preparada en la zona ${m.zona}`;
+    const foto = FOTO_ZONA[m.zona] || FOTO_ZONA.General;
+    const img = $("ficha-foto");
+    img.src = foto.jpg;
+    const source = $("ficha-webp");
+    if (source) source.srcset = foto.webp;
+    img.alt = `Mesa ${m.id} preparada en la zona ${m.zona}`;
     $("ficha-titulo").textContent = `M${m.id}`;
     $("ficha-zona").textContent = `Zona ${m.zona}`;
     $("ficha-capacidad").textContent = `Capacidad de la mesa: ${m.capacidad} puestos.`;
