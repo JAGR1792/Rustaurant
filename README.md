@@ -51,6 +51,8 @@ los DAO de `src/dao.rs` son la ruta de conexión a SQL Server.
 ## Estructura
 
 ```text
+Dockerfile            # imagen multietapa (build Rust -> runtime Debian)
+render.yaml           # servicio web en Render (ADR 0010)
 src/                  # Axum + dominio + 4 patrones + DAO
   dominio.rs          # entidades (Figura 4)
   factory.rs          # Factory Method (Figura 7)
@@ -88,3 +90,10 @@ Copiar `.env.example` a `.env` (nunca se commitea). Para que los avisos
 salgan de verdad por Gmail, definir `SMTP_USUARIO` y `SMTP_CLAVE` (con
 verificación en dos pasos, la "contraseña de aplicación"); sin ellas la
 app mantiene el buzón de demostración (ADR 0009).
+
+## Despliegue
+
+`Dockerfile` + `render.yaml` publican la demo en Render (ADR 0010):
+web service con runtime Docker, health check en `/` y plan free. En el
+panel se configuran `SMTP_USUARIO` y `SMTP_CLAVE` (secreto); sin clave
+la demo sigue con el buzón interno.
