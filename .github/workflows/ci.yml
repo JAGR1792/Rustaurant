@@ -40,3 +40,21 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
       - name: Ejecutar tests
         run: cargo test --workspace --all-features
+
+  docs:
+    name: Diagramas y documento
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Instalar matplotlib
+        run: pip install matplotlib
+      - name: Validar diagramas (0 incidencias)
+        run: python diagramas/brindis/fig_brindis.py
+      - name: Instalar Tectonic
+        uses: wtfjoke/setup-tectonic@v2
+      - name: Compilar documento
+        run: tectonic documentacion/brindis_rust.tex
+        working-directory: documentacion
