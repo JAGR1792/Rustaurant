@@ -14,7 +14,7 @@ jobs:
     name: Formato (rustfmt)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: dtolnay/rust-toolchain@stable
         with:
           components: rustfmt
@@ -25,7 +25,7 @@ jobs:
     name: Linter (clippy)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: dtolnay/rust-toolchain@stable
         with:
           components: clippy
@@ -36,7 +36,7 @@ jobs:
     name: Tests
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: dtolnay/rust-toolchain@stable
       - name: Ejecutar tests
         run: cargo test --workspace --all-features
@@ -45,8 +45,8 @@ jobs:
     name: Diagramas y documento
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: '3.12'
       - name: Instalar matplotlib
@@ -54,7 +54,6 @@ jobs:
       - name: Validar diagramas (0 incidencias)
         run: python diagramas/brindis/fig_brindis.py
       - name: Instalar Tectonic
-        uses: wtfjoke/setup-tectonic@v2
+        uses: wtfjoke/setup-tectonic@v4
       - name: Compilar documento
         run: tectonic documentacion/brindis_rust.tex
-        working-directory: documentacion
