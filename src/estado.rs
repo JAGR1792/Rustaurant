@@ -122,8 +122,9 @@ pub fn sembrar() -> Estado {
             }
         }
 
-        // Carta y planes. Las imagenes de `static/img/carta` siguen el mismo
-        // id (ver `vistas::carta`); el generador esta en esa carpeta.
+        // Carta y planes. Las fotos reales de `static/img/fotos` siguen el
+        // mismo id (ver `vistas::carta`); los PNG de respaldo se generan con
+        // `static/img/carta/generar_carta.py`.
         d.items.push(ItemMenu {
             id: 1,
             nombre: "Ceviche de camarón".into(),

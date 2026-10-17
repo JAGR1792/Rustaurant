@@ -1,19 +1,30 @@
 {% extends "base.html" %}
-{# Portada: propuesta de valor, la carta (efecto chroma), zonas del
-   salon y cuentas de demostracion. #}
+{# Portada editorial ("Le Jardin"): hero con la ilustración del salón, la
+   carta (efecto chroma), zonas del salón y cuentas de demostración. #}
 {% block titulo %}Brindis — reservas por ocasión{% endblock %}
 {% block head %}
 <link rel="stylesheet" href="/static/css/chroma.css">
 {% endblock %}
 {% block contenido %}
 <section class="hero">
-  <h1>Celebra sin preocuparte por la mesa</h1>
-  <p>Brindis reserva por ocasión: elige zona, pedido anticipado y servicios
-  extra en un asistente de 4 pasos. El plano muestra la disponibilidad real
-  de cada mesa.</p>
-  <p><a class="boton" href="/reservar">Reservar ahora</a></p>
+  <div class="hero-texto">
+    <p class="eyebrow">Restaurante Brindis · Bogotá</p>
+    <h1>Celebra sin preocuparte por la mesa</h1>
+    <p>Reserva por ocasión: elige tu mesa sobre el plano del salón, ajusta el
+    pedido anticipado y los servicios extra en un asistente de 4 pasos. La
+    disponibilidad la confirma el servidor, mesa por mesa.</p>
+    <p class="hero-acciones">
+      <a class="boton" href="/reservar">Reservar ahora</a>
+      <a class="boton secundario" href="#carta">Ver la carta</a>
+    </p>
+  </div>
+  <figure class="hero-figura">
+    <img src="/static/img/fotos/salon-hero.jpg" alt="Interior cálido de un restaurante parisino: mesas vestidas entre columnas de madera y lámparas con pantalla roja" width="1920" height="1080">
+  </figure>
 </section>
-<section id="carta">
+
+<section id="carta" class="seccion">
+  <p class="eyebrow">Nuestra cocina</p>
   <h2>La carta</h2>
   <div class="chroma-grid has-frame" data-chroma-grid data-damping="0.45"
        data-fade-out="0.6" data-softness="0.6">
@@ -41,25 +52,29 @@
     </div>
   </div>
 </section>
-<section>
-  <h2>Zonas del salón</h2>
+
+<section class="seccion">
+  <p class="eyebrow">El salón</p>
+  <h2>Tres zonas, tres formas de celebrar</h2>
   <div class="tarjetas">
     {% for z in zonas %}
-    <article class="tarjeta">
-      <strong>Zona {{ z.nombre }}</strong>
+    <article class="tarjeta tarjeta-zona">
+      <strong>{{ z.nombre }}</strong>
       <span>{{ z.mesas }} mesas · {{ z.puestos }} puestos</span>
     </article>
     {% endfor %}
   </div>
 </section>
-<section>
+
+<section class="seccion">
+  <p class="eyebrow">Para probar</p>
   <h2>Cuentas de demostración</h2>
-  <ul>
-    <li>Cliente: <code>cliente@brindis.co</code> / <code>Cliente123!</code></li>
-    <li>VIP: <code>vip@brindis.co</code> / <code>Vip123!</code></li>
-    <li>Empleado: <code>empleado@brindis.co</code> / <code>Empleado123!</code></li>
-    <li>Admin: <code>admin@brindis.co</code> / <code>Admin123!</code></li>
-  </ul>
+  <div class="demo-grid">
+    <article class="demo"><strong>Cliente</strong><code>cliente@brindis.co</code><code>Cliente123!</code></article>
+    <article class="demo"><strong>VIP</strong><code>vip@brindis.co</code><code>Vip123!</code></article>
+    <article class="demo"><strong>Empleado</strong><code>empleado@brindis.co</code><code>Empleado123!</code></article>
+    <article class="demo"><strong>Admin</strong><code>admin@brindis.co</code><code>Admin123!</code></article>
+  </div>
 </section>
 {% endblock %}
 {% block scripts %}

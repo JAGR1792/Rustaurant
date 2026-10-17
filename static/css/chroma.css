@@ -20,20 +20,20 @@
   --chroma-ratio: 3 / 2;
   --chroma-radius: 22px;
   --chroma-ink: var(--texto);
-  --chroma-muted: rgba(43, 35, 32, 0.55);
-  --chroma-tile: linear-gradient(180deg, #ffffff 0%, #f6f3ee 100%);
-  --chroma-tile-edge: rgba(43, 35, 32, 0.08);
+  --chroma-muted: rgba(38, 35, 31, 0.6);
+  --chroma-tile: linear-gradient(180deg, #fffdf9 0%, #f6efe3 100%);
+  --chroma-tile-edge: rgba(38, 35, 31, 0.08);
   --chroma-tile-highlight: rgba(255, 255, 255, 1);
-  --chroma-tile-shadow: 0 4px 10px -5px rgba(43, 35, 32, 0.25);
-  --chroma-media-edge: rgba(43, 35, 32, 0.06);
-  --chroma-well: rgba(43, 35, 32, 0.05);
+  --chroma-tile-shadow: 0 4px 10px -5px rgba(38, 35, 31, 0.25);
+  --chroma-media-edge: rgba(38, 35, 31, 0.07);
+  --chroma-well: rgba(38, 35, 31, 0.06);
   --chroma-hover: brightness(0.97);
   --chroma-press: brightness(0.92);
-  --chroma-frame: rgba(250, 247, 242, 0.82);
-  --chroma-frame-edge: rgba(43, 35, 32, 0.08);
+  --chroma-frame: rgba(251, 247, 240, 0.85);
+  --chroma-frame-edge: rgba(38, 35, 31, 0.08);
   --chroma-frame-highlight: rgba(255, 255, 255, 0.95);
-  --chroma-frame-shadow: 0 22px 44px -22px rgba(43, 35, 32, 0.28),
-    0 6px 16px -10px rgba(43, 35, 32, 0.14);
+  --chroma-frame-shadow: 0 22px 44px -22px rgba(38, 35, 31, 0.3),
+    0 6px 16px -10px rgba(38, 35, 31, 0.15);
   /* Fallback del gradiente de caida para softness = 0.6 (el JS lo recalcula). */
   --chroma-stops: rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 1) 8.3%, rgba(0, 0, 0, 1) 16.7%,
     rgba(0, 0, 0, 1) 25%, rgba(0, 0, 0, 1) 33.3%, rgba(0, 0, 0, 1) 41.7%,
