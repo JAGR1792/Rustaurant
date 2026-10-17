@@ -72,44 +72,51 @@ impl ReservaService for ReservaServiceMemoria {
         sesion: &UsuarioSesion,
         mut reserva: Reserva,
     ) -> Result<i64, AccesoError> {
-        let mut d = self.estado.lock().unwrap();
-        // RN01: ninguna mesa puede cruzarse con reserva vigente o bloqueo.
-        let fin = reserva.inicio + Duration::minutes(reserva.duracion_minutos as i64);
-        for mesa in &reserva.mesa_ids {
-            if estado::estado_de_mesa(&d, *mesa, reserva.inicio, fin) != "libre" {
-                return Err(AccesoError::Negocio(format!(
-                    "la mesa {mesa} acaba de ocuparse; elige otra"
-                )));
+        // El lock se libera antes del await de la entrega: el guard no es
+        // `Send` y la red no debe retener el estado (ADR 0009).
+        let (id, mensajes) = {
+            let mut d = self.estado.lock().unwrap();
+            // RN01: ninguna mesa puede cruzarse con reserva vigente o bloqueo.
+            let fin = reserva.inicio + Duration::minutes(reserva.duracion_minutos as i64);
+            for mesa in &reserva.mesa_ids {
+                if estado::estado_de_mesa(&d, *mesa, reserva.inicio, fin) != "libre" {
+                    return Err(AccesoError::Negocio(format!(
+                        "la mesa {mesa} acaba de ocuparse; elige otra"
+                    )));
+                }
             }
-        }
-        // RN07 + Figura 10: el servidor recalcula el total, nunca el cliente.
-        reserva.pago.monto_total = costo_reserva(&d, &reserva);
-        reserva.id = siguiente_id(d.reservas.iter().map(|r| r.id));
-        // RN14: comprobante del abono si hubo pago anticipado.
-        let abonado = pagado(&reserva);
-        if abonado > 0 {
-            let id_comprobante = siguiente_id(d.comprobantes.iter().map(|c| c.id));
-            d.comprobantes.push(ComprobantePago {
-                id: id_comprobante,
-                reserva_id: reserva.id,
-                id_empleado: if sesion.es_personal() {
-                    Some(sesion.id())
-                } else {
-                    None
-                },
-                concepto: "ABONO".into(),
-                tipo_movimiento: "INGRESO".into(),
-                medio_pago: reserva.pago.medio.clone(),
-                monto_subtotal: reserva.pago.monto_total,
-                monto_retencion: 0,
-                monto_total: abonado,
-            });
-        }
-        // Notificación por correo al cliente y a los administradores
-        // (buzón de demostración; ADR 0008).
-        crate::correo::notificar_reserva(&mut d, &reserva);
-        let id = reserva.id;
-        d.reservas.push(reserva);
+            // RN07 + Figura 10: el servidor recalcula el total, nunca el cliente.
+            reserva.pago.monto_total = costo_reserva(&d, &reserva);
+            reserva.id = siguiente_id(d.reservas.iter().map(|r| r.id));
+            // RN14: comprobante del abono si hubo pago anticipado.
+            let abonado = pagado(&reserva);
+            if abonado > 0 {
+                let id_comprobante = siguiente_id(d.comprobantes.iter().map(|c| c.id));
+                d.comprobantes.push(ComprobantePago {
+                    id: id_comprobante,
+                    reserva_id: reserva.id,
+                    id_empleado: if sesion.es_personal() {
+                        Some(sesion.id())
+                    } else {
+                        None
+                    },
+                    concepto: "ABONO".into(),
+                    tipo_movimiento: "INGRESO".into(),
+                    medio_pago: reserva.pago.medio.clone(),
+                    monto_subtotal: reserva.pago.monto_total,
+                    monto_retencion: 0,
+                    monto_total: abonado,
+                });
+            }
+            // Notificación por correo al cliente y a los administradores:
+            // siempre al buzón de demostración (ADR 0008).
+            let mensajes = crate::correo::notificar_reserva(&mut d, &reserva);
+            let id = reserva.id;
+            d.reservas.push(reserva);
+            (id, mensajes)
+        };
+        // Entrega real por SMTP, si está configurado, ya sin el lock (ADR 0009).
+        crate::correo::entregar(&self.estado, &mensajes).await;
         Ok(id)
     }
 
@@ -273,10 +280,14 @@ mod tests {
         let al_admin = d
             .correos
             .iter()
-            .find(|m| m.para == "admin@brindis.co")
+            .find(|m| m.para == "brindis.rust@gmail.com")
             .expect("correo al admin");
         assert!(al_admin.asunto.contains("TEST0001"));
         assert!(al_admin.cuerpo.contains("M1"));
+        assert!(
+            !al_admin.entregado,
+            "sin SMTP en pruebas no hay entrega real"
+        );
     }
 
     #[tokio::test]

@@ -15,7 +15,8 @@ La app sirve en `http://127.0.0.1:3000` con la fase 1 funcional:
 login/registro, asistente de reserva de 4 pasos con plano SVG del salón
 por zonas, ficha de mesa con foto real y pedido guiado por porciones
 (ADR 0006), notificación por correo al cliente y a la administración al
-confirmar (buzón de demostración visible en la agenda, ADR 0008), mis
+confirmar (buzón de demostración visible en la agenda, ADR 0008, con
+entrega real por SMTP si el entorno trae credenciales, ADR 0009), mis
 reservas con cancelación confirmada y reembolso (RN08/RN09), cuenta
 regresiva de la próxima reserva (contador de cifras rodantes, ver ADR
 0003) y agenda del personal protegida por el Proxy. La portada incluye
@@ -42,7 +43,7 @@ El PDF del documento se genera en `documentacion/brindis_rust.pdf`.
 | Cliente | `cliente@brindis.co` | `Cliente123!` |
 | VIP | `vip@brindis.co` | `Vip123!` |
 | Empleado | `empleado@brindis.co` | `Empleado123!` |
-| Admin | `admin@brindis.co` | `Admin123!` |
+| Admin | `brindis.rust@gmail.com` | `Admin123!` |
 
 La fase 1 guarda todo en memoria (`src/estado.rs` + seed de demo);
 los DAO de `src/dao.rs` son la ruta de conexión a SQL Server.
@@ -59,7 +60,7 @@ src/                  # Axum + dominio + 4 patrones + DAO
   dao.rs              # GenericDAO + pool (Figura 6)
   estado.rs           # almacen demo en memoria + seed
   servicios.rs        # sujeto real del Proxy sobre el almacen
-  correo.rs           # avisos al cliente/admin (buzon demo, ADR 0008)
+  correo.rs           # avisos al cliente/admin (buzon demo + SMTP, ADR 0008/0009)
   formato.rs          # fechas UTC-5 y pesos para vistas y correos
   vistas.rs           # controladores Axum + structs Askama
 templates/            # base + inicio/login/registro/reservar/mis-reservas/agenda/error
@@ -83,4 +84,7 @@ a PNG 300 ppp con el mismo nombre para que el `.tex` los tome.
 
 ## Variables
 
-Copiar `.env.example` a `.env` (nunca se commitea).
+Copiar `.env.example` a `.env` (nunca se commitea). Para que los avisos
+salgan de verdad por Gmail, definir `SMTP_USUARIO` y `SMTP_CLAVE` (con
+verificación en dos pasos, la "contraseña de aplicación"); sin ellas la
+app mantiene el buzón de demostración (ADR 0009).

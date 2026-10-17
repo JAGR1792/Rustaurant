@@ -398,6 +398,11 @@ section[id^="paso-"] { margin-bottom: 2rem; }
 }
 .correo summary { cursor: pointer; display: flex; flex-wrap: wrap; gap: .25rem .6rem; align-items: baseline; }
 .correo-para { color: var(--vino); font-weight: 600; }
+.correo-tag {
+  border: 1px solid var(--linea); border-radius: 999px; padding: 0 .45rem;
+  font-size: .72rem; color: var(--carbon-suave); background: var(--marfil);
+}
+.correo-tag.ok { color: var(--vino); border-color: var(--vino); }
 .correo summary time { margin-left: auto; color: var(--carbon-suave); font-size: .8rem; }
 .correo-cuerpo {
   margin: .7rem 0 .2rem; white-space: pre-wrap; font-family: var(--sans);

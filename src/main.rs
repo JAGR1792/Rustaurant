@@ -28,6 +28,12 @@ async fn main() {
         )
         .init();
 
+    // Configuración local (.env, nunca se commitea): credenciales SMTP, etc.
+    // En formato inválido o ausente se sigue con las variables del sistema.
+    if let Err(e) = dotenvy::dotenv() {
+        tracing::debug!(error = %e, "sin .env utilizable; se usan las variables del sistema");
+    }
+
     let estado = estado::sembrar();
 
     let app = Router::new()

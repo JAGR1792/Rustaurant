@@ -191,6 +191,8 @@ struct CorreoVista {
     asunto: String,
     cuerpo: String,
     cuando: String,
+    /// `true` si el SMTP confirmó la entrega real (ADR 0009).
+    entregado: bool,
 }
 
 #[derive(Template)]
@@ -952,6 +954,7 @@ pub async fn agenda(
                     asunto: m.asunto.clone(),
                     cuerpo: m.cuerpo.clone(),
                     cuando: fecha_hora_fmt(m.enviado_en),
+                    entregado: m.entregado,
                 })
                 .collect();
         }

@@ -44,7 +44,8 @@ pub fn sembrar() -> Estado {
         // Usuarios demo: hash de bcrypt de las contraseñas de prueba.
         let admin = BaseUsuario {
             id: 1,
-            correo: "admin@brindis.co".into(),
+            // Cuenta real del sistema: aquí llegan los avisos (ADR 0009).
+            correo: "brindis.rust@gmail.com".into(),
             hash_pw: bcrypt::hash("Admin123!", bcrypt::DEFAULT_COST).unwrap(),
             tipo_documento: "CC".into(),
             documento: "1".into(),
@@ -107,7 +108,6 @@ pub fn sembrar() -> Estado {
             strikes: 0,
             fecha_ultima_actividad: None,
         }));
-
         // Mesas: 8 en 3 zonas.
         let zonas = [("VIP", 2), ("General", 4), ("Terraza", 2)];
         let mut id = 1;
