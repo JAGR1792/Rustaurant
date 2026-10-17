@@ -4,7 +4,7 @@
 {% block contenido %}
 <section class="acceso">
   <figure class="acceso-panel">
-    <img src="/static/img/fotos/salon-acceso.jpg" alt="Mesa preparada junto a un ventanal, con jarrón de flores y luz natural" width="1280" height="1920">
+    <img src="/static/img/fotos/salon-acceso.jpg" alt="Mesa preparada junto a un ventanal, con jarrón de flores y luz natural" width="1280" height="1920" fetchpriority="high">
     <figcaption>Crea tu cuenta y reserva en menos de un minuto.</figcaption>
   </figure>
   <div class="acceso-form">
@@ -15,7 +15,7 @@
     {% endif %}
     <form method="post" action="/registro">
       <label>Nombre <input type="text" name="nombre" required autocomplete="name" autofocus></label>
-      <label>Correo <input type="email" name="correo" required autocomplete="email"></label>
+      <label>Correo <input type="email" name="correo" required autocomplete="email" spellcheck="false"></label>
       <label>Contraseña <input type="password" name="password" required autocomplete="new-password" minlength="8"></label>
       <button type="submit">Registrarme</button>
     </form>

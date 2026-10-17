@@ -4,7 +4,7 @@
 {% block contenido %}
 <section class="acceso">
   <figure class="acceso-panel">
-    <img src="/static/img/fotos/salon-acceso.jpg" alt="Mesa preparada junto a un ventanal, con jarrón de flores y luz natural" width="1280" height="1920">
+    <img src="/static/img/fotos/salon-acceso.jpg" alt="Mesa preparada junto a un ventanal, con jarrón de flores y luz natural" width="1280" height="1920" fetchpriority="high">
     <figcaption>La mesa ya está puesta; solo falta tu ocasión.</figcaption>
   </figure>
   <div class="acceso-form">
@@ -18,7 +18,7 @@
     {% endif %}
     <form method="post" action="/login">
       <label>Correo
-        <input type="email" name="correo" required autocomplete="email" value="{{ correo }}" autofocus>
+        <input type="email" name="correo" required autocomplete="email" spellcheck="false" value="{{ correo }}" autofocus>
       </label>
       <label>Contraseña
         <input type="password" name="password" required autocomplete="current-password">

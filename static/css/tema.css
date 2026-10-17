@@ -3,6 +3,7 @@
    dorados apagados; serif editorial (Cormorant Garamond) para titulos e
    Inter para interfaz (fuentes self-hosted en static/fuentes/). */
 :root {
+  color-scheme: light;
   /* Paleta */
   --marfil: #f5efe5;
   --marfil-claro: #fbf7f0;
@@ -40,6 +41,7 @@ body {
 }
 
 h1, h2, h3 { line-height: 1.15; margin: 0 0 .6em; color: var(--carbon); }
+h1, h2 { text-wrap: balance; }
 h1 { font-family: var(--serif); font-weight: 500; font-size: clamp(2.1rem, 4.6vw, 3.1rem); letter-spacing: .01em; }
 h2 { font-family: var(--serif); font-weight: 500; font-size: clamp(1.55rem, 2.8vw, 2.1rem); }
 h3 { font-family: var(--sans); font-weight: 600; font-size: 1.05rem; }
@@ -152,6 +154,7 @@ main { max-width: 1140px; margin: 0 auto; padding: clamp(1.5rem, 4vw, 2.75rem) c
   background: var(--vino); color: #fdf9f1;
   padding: .68rem 1.5rem; border: 1px solid var(--vino); border-radius: 9px;
   text-decoration: none; cursor: pointer;
+  touch-action: manipulation;
   transition: background .18s ease, transform .18s ease, box-shadow .18s ease;
 }
 .boton:hover, button:hover { background: var(--vino-oscuro); border-color: var(--vino-oscuro); transform: translateY(-1px); box-shadow: 0 10px 22px -14px rgba(38, 35, 31, .55); color: #fff; }
@@ -226,7 +229,7 @@ section[id^="paso-"] { margin-bottom: 2rem; }
 #plano svg { display: block; width: 100%; height: auto; }
 .plano-texto { font-family: var(--sans); font-size: 11px; letter-spacing: .3em; fill: #a3947c; text-transform: uppercase; }
 .plano-nota { font-family: var(--sans); font-size: 9px; letter-spacing: .2em; fill: #b5a88f; text-transform: uppercase; }
-.mesa-svg { cursor: pointer; }
+.mesa-svg { cursor: pointer; touch-action: manipulation; }
 .mesa-svg .mesa-cuerpo { transition: fill .16s ease, stroke .16s ease; }
 .mesa-svg[data-estado="libre"]:hover .mesa-cuerpo { fill: #dfcba4; }
 .mesa-svg:focus-visible { outline: none; }
@@ -262,7 +265,7 @@ section[id^="paso-"] { margin-bottom: 2rem; }
 /* Tablas editoriales */
 .tabla-scroll { overflow-x: auto; border: 1px solid var(--linea); border-radius: 14px; background: var(--marfil-claro); }
 .tabla { width: 100%; border-collapse: collapse; }
-.tabla th, .tabla td { text-align: left; padding: .7rem .8rem; }
+.tabla th, .tabla td { text-align: left; padding: .7rem .8rem; font-variant-numeric: tabular-nums; }
 .tabla thead th {
   background: transparent; color: var(--carbon-suave);
   font-family: var(--sans); font-size: .7rem; font-weight: 600; letter-spacing: .14em; text-transform: uppercase;
@@ -304,7 +307,10 @@ section[id^="paso-"] { margin-bottom: 2rem; }
 #modal {
   border-radius: 16px; border: 1px solid var(--linea); background: var(--marfil-claro);
   max-width: 520px; padding: 1.5rem; box-shadow: 0 30px 60px -30px rgba(38, 35, 31, .6);
+  overscroll-behavior: contain;
 }
+#modal h2 { font-size: 1.45rem; }
+#modal .acciones { justify-content: flex-end; margin-top: 1.2rem; }
 #modal::backdrop { background: rgba(38, 35, 31, .45); }
 
 /* Pie editorial */

@@ -7,7 +7,7 @@
 {% if let Some(e) = error %}
 <p class="error" role="alert">{{ e }}</p>
 {% endif %}
-<form id="form-reserva" method="post" action="/reservar">
+<form id="form-reserva" method="post" action="/reservar" autocomplete="off">
   <input type="hidden" id="mesas" name="mesas" value="">
   <input type="hidden" id="extras" name="extras" value="">
   <ol class="progreso" aria-label="Progreso de la reserva">
@@ -72,7 +72,7 @@
           <p class="ficha-linea">Pulsa una mesa libre para ver su foto, su zona y su capacidad.</p>
         </div>
         <div id="ficha-contenido" hidden>
-          <img class="ficha-foto" id="ficha-foto" src="/static/img/fotos/mesa-general.jpg" alt="">
+          <img class="ficha-foto" id="ficha-foto" src="/static/img/fotos/mesa-general.jpg" alt="" width="800" height="600">
           <p class="eyebrow">Tu mesa</p>
           <h3 id="ficha-titulo">M—</h3>
           <p class="ficha-linea" id="ficha-zona"></p>
@@ -104,7 +104,7 @@
       <div class="pedido-lista">
         {% for it in items %}
         <div class="plato">
-          <img class="plato-foto" src="{{ it.imagen }}" alt="" width="88" height="88" loading="lazy">
+          <img class="plato-foto" src="{{ it.imagen }}" alt="" width="88" height="88" loading="lazy" decoding="async">
           <div class="plato-info">
             <strong>{{ it.nombre }}</strong>
             <span class="plato-precio">$ {{ it.precio_fmt }}</span>
@@ -145,7 +145,7 @@
   <section id="paso-4" hidden>
     <h2 tabindex="-1">4. Pago y confirmación</h2>
     <label>Restricciones alimentarias (alergias)
-      <input type="text" name="restricciones" maxlength="200" placeholder="Ej.: maní, lactosa (opcional)">
+      <input type="text" name="restricciones" maxlength="200" placeholder="Ej.: maní, lactosa… (opcional)">
     </label>
     <fieldset>
       <legend>Modalidad de pago</legend>

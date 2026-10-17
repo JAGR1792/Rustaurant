@@ -6,8 +6,11 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f5efe5">
   <title>{% block titulo %}Brindis{% endblock %}</title>
   <meta name="description" content="Brindis: reservas por ocasion con plano interactivo.">
+  <link rel="preload" href="/static/fuentes/inter-400-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/static/fuentes/cormorant-garamond-500-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/static/css/fuentes.css">
   <link rel="stylesheet" href="/static/css/tema.css">
   {% block head %}{% endblock %}
@@ -15,7 +18,7 @@
 <body>
   <a class="saltar" href="#contenido">Saltar al contenido</a>
   <header class="barra">
-    <a class="logo" href="/" aria-label="Brindis, inicio">Brindis</a>
+    <a class="logo" href="/" aria-label="Brindis, inicio" translate="no">Brindis</a>
     <nav class="menu" aria-label="Principal">
       <a href="/reservar">Reservar</a>
       <a href="/mis-reservas">Mis reservas</a>
@@ -33,7 +36,7 @@
   </main>
   <footer class="pie">
     <div class="pie-interior">
-      <p class="pie-marca">Brindis</p>
+      <p class="pie-marca" translate="no">Brindis</p>
       <p class="pie-lema">Reservas por ocasión · salón, terraza y zona íntima.</p>
       <nav class="pie-nav" aria-label="Enlaces del pie">
         <a href="/reservar">Reservar</a>

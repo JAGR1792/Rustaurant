@@ -71,7 +71,8 @@
         <td><span class="badge {{ r.estado_clase }}">{{ r.estado }}</span></td>
         <td>
           {% if r.puede_cancelar %}
-          <form method="post" action="/reservas/{{ r.id }}/cancelar">
+          <form method="post" action="/reservas/{{ r.id }}/cancelar"
+                data-confirmar="¿Cancelar la reserva {{ r.codigo }}? El reembolso se calcula según las reglas de cancelación.">
             <button type="submit" class="secundario">Cancelar</button>
           </form>
           {% endif %}

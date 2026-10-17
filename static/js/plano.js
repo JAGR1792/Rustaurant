@@ -322,7 +322,7 @@
       if (!seleccion.has(ultimaMesa)) ultimaMesa = null;
       pintarPlano();
     } catch {
-      aviso("No se pudo cargar el plano de mesas.");
+      aviso("No se pudo cargar el plano. Revisa la fecha y la hora e inténtalo de nuevo.");
     }
   }
 
