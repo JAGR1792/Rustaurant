@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: brindis
+    # `main` solo recibe entregas; la demo sigue la rama de integración.
+    branch: dev
+    runtime: docker
+    plan: free
+    healthCheckPath: /
+    autoDeploy: true
+    envVars:
+      - key: HOST
+        value: 0.0.0.0
+      - key: SMTP_SERVIDOR
+        value: smtp.gmail.com
+      - key: SMTP_PUERTO
+        value: "587"
+      - key: SMTP_USUARIO
+        value: brindis.rust@gmail.com
+      # La clave de aplicacion se define una sola vez en el panel.
+      - key: SMTP_CLAVE
+        sync: false

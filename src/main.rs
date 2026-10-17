@@ -28,6 +28,12 @@ async fn main() {
         )
         .init();
 
+    // Configuración local (.env, nunca se commitea): credenciales SMTP, etc.
+    // En formato inválido o ausente se sigue con las variables del sistema.
+    if let Err(e) = dotenvy::dotenv() {
+        tracing::debug!(error = %e, "sin .env utilizable; se usan las variables del sistema");
+    }
+
     let estado = estado::sembrar();
 
     let app = Router::new()
@@ -50,9 +56,12 @@ async fn main() {
         .layer(TraceLayer::new_for_http())
         .with_state(estado);
 
-    let listener = tokio::net::TcpListener::bind("127.0.0.1:3000")
-        .await
-        .unwrap();
-    tracing::info!("Brindis en http://127.0.0.1:3000");
+    // Dirección de escucha: local por defecto; en contenedor (Render) se
+    // define HOST=0.0.0.0 y el PORT lo inyecta la plataforma (ADR 0010).
+    let host = std::env::var("HOST").unwrap_or_else(|_| "127.0.0.1".into());
+    let puerto = std::env::var("PORT").unwrap_or_else(|_| "3000".into());
+    let direccion = format!("{host}:{puerto}");
+    let listener = tokio::net::TcpListener::bind(&direccion).await.unwrap();
+    tracing::info!("Brindis en http://{direccion}");
     axum::serve(listener, app).await.unwrap();
 }

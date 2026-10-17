@@ -1,0 +1,14 @@
+target/
+.git/
+.gitignore
+.agents/
+.vscode/
+.idea/
+documentacion/
+diagramas/
+__pycache__/
+*.pyc
+*.log
+.env
+.env.example
+temp/

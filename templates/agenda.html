@@ -44,14 +44,15 @@
   {% endif %}
   <section class="correos" aria-label="Correos enviados">
     <h2>Correos enviados</h2>
-    <p class="pedido-ayuda">Buzón de demostración (ADR 0008): al confirmar cada reserva el sistema
-      avisa al cliente y a la administración; en producción la entrega es por SMTP.</p>
+    <p class="pedido-ayuda">Avisos de reserva (ADR 0008): al confirmar se redacta el correo del
+      cliente y el de la administración. Con credenciales SMTP en el entorno (ADR 0009) la
+      entrega a buzones reales sale de verdad; las cuentas demo quedan solo aquí.</p>
     {% if correos.is_empty() %}
     <p>Todavía no se han enviado correos.</p>
     {% else %}
     {% for c in correos %}
     <details class="correo">
-      <summary><span class="correo-para">{{ c.para }}</span> · {{ c.asunto }} <time>{{ c.cuando }}</time></summary>
+      <summary><span class="correo-para">{{ c.para }}</span> · {{ c.asunto }} {% if c.entregado %}<span class="correo-tag ok">enviado</span>{% else %}<span class="correo-tag">buzón demo</span>{% endif %} <time>{{ c.cuando }}</time></summary>
       <pre class="correo-cuerpo">{{ c.cuerpo }}</pre>
     </details>
     {% endfor %}
