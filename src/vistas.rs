@@ -21,7 +21,7 @@ use crate::dominio::{
     DetallePago, DetallePedido, EstadoReserva, ModalidadPago, Ocasion, ReservaServicioExtra,
     TipoCliente, UsuarioSesion,
 };
-use crate::estado::{self, Estado};
+use crate::estado::{self, Datos, Estado};
 use crate::factory::{ClienteFactory, DatosRegistro, registrar_con};
 use crate::proxy::{AccesoError, ReservaService, ReservaServiceProxy};
 use crate::servicios::ReservaServiceMemoria;
@@ -145,6 +145,17 @@ struct ItemVista {
     precio_fmt: String,
 }
 
+/// Tarjeta de "La carta" en la portada (efecto chroma del frontend).
+/// Imagen y acento son presentación, por eso el mapeo vive aquí y no
+/// en el dominio.
+struct ItemCartaVista {
+    titulo: String,
+    subtitulo: String,
+    imagen: String,
+    accent: String,
+    url: String,
+}
+
 struct PlanVista {
     id: i64,
     nombre: String,
@@ -187,6 +198,7 @@ struct Inicio {
     usuario: String,
     es_personal: bool,
     zonas: Vec<ZonaVista>,
+    carta: Vec<ItemCartaVista>,
 }
 
 #[derive(Template)]
@@ -287,6 +299,44 @@ fn zonas_disponibles(seleccionada: &str) -> Vec<ZonaOpcion> {
         .collect()
 }
 
+/// Nombre legible de la categoría de un plato para la carta.
+fn tipo_legible(tipo: &str) -> &'static str {
+    match tipo {
+        "ENTRADA" => "Entrada",
+        "PLATO_FUERTE" => "Plato fuerte",
+        "POSTRE" => "Postre",
+        "BEBIDA" => "Bebida",
+        _ => "De la casa",
+    }
+}
+
+/// Carta de la portada: platos del menú con su imagen y acento de color.
+/// El id del item mapea al PNG generado en `static/img/carta` (el mismo
+/// id que usa `generar_carta.py`); si aparece un id nuevo hay respaldo.
+fn carta(d: &Datos) -> Vec<ItemCartaVista> {
+    d.items
+        .iter()
+        .map(|i| {
+            let (archivo, accent) = match i.id {
+                1 => ("01-ceviche-camaron.png", "#7cc4ff"),
+                2 => ("02-picanha-brasa.png", "#ff5a36"),
+                3 => ("03-tres-leches.png", "#ffb27a"),
+                4 => ("04-limonada-coco.png", "#ffd23f"),
+                5 => ("05-salmon-hierbas.png", "#a98bff"),
+                6 => ("06-coctel-casa.png", "#ff7eb6"),
+                _ => ("00-generico.png", "#c9a227"),
+            };
+            ItemCartaVista {
+                titulo: i.nombre.clone(),
+                subtitulo: format!("{} · {}", tipo_legible(&i.tipo), cop(i.precio_vigente)),
+                imagen: format!("/static/img/carta/{archivo}"),
+                accent: accent.into(),
+                url: "/reservar".into(),
+            }
+        })
+        .collect()
+}
+
 /// Campos del asistente que se conservan al re-renderizar con error.
 #[derive(Clone, Default)]
 struct CamposReserva {
@@ -368,9 +418,9 @@ fn render_reservar(
 
 pub async fn inicio(State(e): State<Estado>, jar: CookieJar) -> Response {
     let (usuario, es_personal) = barra(&jar, &e);
-    let zonas = {
+    let (zonas, carta_vista) = {
         let d = e.lock().unwrap();
-        ["VIP", "General", "Terraza"]
+        let zonas = ["VIP", "General", "Terraza"]
             .iter()
             .filter_map(|z| {
                 let mesas: Vec<_> = d.mesas.iter().filter(|m| m.zona == *z).collect();
@@ -383,12 +433,14 @@ pub async fn inicio(State(e): State<Estado>, jar: CookieJar) -> Response {
                     puestos: mesas.iter().map(|m| m.capacidad as u32).sum(),
                 })
             })
-            .collect()
+            .collect();
+        (zonas, carta(&d))
     };
     Html(Inicio {
         usuario,
         es_personal,
         zonas,
+        carta: carta_vista,
     })
     .into_response()
 }
@@ -893,4 +945,39 @@ pub async fn disponibilidad(
         })
         .collect();
     Json(mesas).into_response()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn carta_mapea_todos_los_platos_del_seed() {
+        let e = estado::sembrar();
+        let d = e.lock().unwrap();
+        let platos = carta(&d);
+        assert_eq!(platos.len(), d.items.len());
+        for p in &platos {
+            assert!(!p.titulo.is_empty());
+            assert!(p.imagen.starts_with("/static/img/carta/"));
+            assert!(p.accent.starts_with('#'));
+            assert!(!p.subtitulo.is_empty(), "sin subtitulo: {}", p.titulo);
+            assert_eq!(p.url, "/reservar");
+        }
+        assert_eq!(platos[0].titulo, "Ceviche de camarón");
+        assert!(platos[0].imagen.ends_with("01-ceviche-camaron.png"));
+        assert!(platos[0].subtitulo.contains("Entrada"));
+        assert!(
+            platos[0].subtitulo.contains("15.000"),
+            "con precio: {}",
+            platos[0].subtitulo
+        );
+    }
+
+    #[test]
+    fn carta_sin_items_es_vacia() {
+        let e = estado::nuevo();
+        let d = e.lock().unwrap();
+        assert!(carta(&d).is_empty());
+    }
 }
