@@ -14,8 +14,10 @@ pub enum AccesoError {
 }
 
 // Interfaz común (sujeto real + proxy).
+#[allow(async_fn_in_trait)]
 pub trait ReservaService: Send + Sync {
-    async fn confirmar(&self, sesion: &UsuarioSesion, reserva: Reserva) -> Result<i64, AccesoError>;
+    async fn confirmar(&self, sesion: &UsuarioSesion, reserva: Reserva)
+    -> Result<i64, AccesoError>;
     async fn cancelar(&self, sesion: &UsuarioSesion, reserva_id: i64) -> Result<(), AccesoError>;
     async fn agenda(&self, sesion: &UsuarioSesion) -> Result<Vec<Reserva>, AccesoError>;
 }
@@ -24,7 +26,11 @@ pub trait ReservaService: Send + Sync {
 pub struct ReservaServiceImpl;
 
 impl ReservaService for ReservaServiceImpl {
-    async fn confirmar(&self, _sesion: &UsuarioSesion, _reserva: Reserva) -> Result<i64, AccesoError> {
+    async fn confirmar(
+        &self,
+        _sesion: &UsuarioSesion,
+        _reserva: Reserva,
+    ) -> Result<i64, AccesoError> {
         // Aquí: builder.build() + decoradores + reserva_dao.guardar en transacción sqlx.
         Ok(1)
     }
@@ -58,14 +64,18 @@ impl<R: ReservaService> ReservaServiceProxy<R> {
 }
 
 impl<R: ReservaService + Send + Sync> ReservaService for ReservaServiceProxy<R> {
-    async fn confirmar(&self, sesion: &UsuarioSesion, reserva: Reserva) -> Result<i64, AccesoError> {
+    async fn confirmar(
+        &self,
+        sesion: &UsuarioSesion,
+        reserva: Reserva,
+    ) -> Result<i64, AccesoError> {
         // Cliente solo a su nombre; personal puede crear a nombre de otro (RF12).
-        if let UsuarioSesion::Cliente(c) = sesion {
-            if reserva.id_cliente != c.base.id {
-                return Err(AccesoError::Denegado(
-                    "un cliente solo reserva a su nombre".into(),
-                ));
-            }
+        if let UsuarioSesion::Cliente(c) = sesion
+            && reserva.id_cliente != c.base.id
+        {
+            return Err(AccesoError::Denegado(
+                "un cliente solo reserva a su nombre".into(),
+            ));
         }
         self.real.confirmar(sesion, reserva).await
     }

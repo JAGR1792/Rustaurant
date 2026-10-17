@@ -38,7 +38,12 @@ impl ComponenteReserva for DecoracionDecorator {
         self.envuelto.costo() + self.tarifa
     }
     fn descripcion(&self) -> String {
-        format!("{} + Decoración {} ({})", self.envuelto.descripcion(), self.motivo, self.tarifa)
+        format!(
+            "{} + Decoración {} ({})",
+            self.envuelto.descripcion(),
+            self.motivo,
+            self.tarifa
+        )
     }
     fn indicaciones(&self) -> Vec<String> {
         let mut v = self.envuelto.indicaciones();
@@ -64,7 +69,11 @@ impl ComponenteReserva for BarraCoctelesDecorator {
         self.envuelto.costo() + extra
     }
     fn descripcion(&self) -> String {
-        format!("{} + Barra ({})", self.envuelto.descripcion(), self.costo() - self.envuelto.costo())
+        format!(
+            "{} + Barra ({})",
+            self.envuelto.descripcion(),
+            self.costo() - self.envuelto.costo()
+        )
     }
     fn indicaciones(&self) -> Vec<String> {
         let mut v = self.envuelto.indicaciones();
@@ -80,7 +89,10 @@ mod tests {
     #[test]
     fn cp09_total_440mil() {
         // CP09: pedido 180.000 + decoración 80.000 + barra 45.000 x 4 = 440.000
-        let base = ReservaBase { pedido_total: 180_000, num_comensales: 4 };
+        let base = ReservaBase {
+            pedido_total: 180_000,
+            num_comensales: 4,
+        };
         let con_deco = DecoracionDecorator {
             envuelto: Box::new(base),
             tarifa: 80_000,

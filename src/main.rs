@@ -8,7 +8,7 @@ pub mod dominio;
 pub mod factory;
 pub mod proxy;
 
-use axum::{routing::get, Router};
+use axum::{Router, routing::get};
 
 async fn salud() -> &'static str {
     "Brindis Rustaurant OK"
@@ -22,7 +22,9 @@ async fn main() {
         // .route("/login", post(auth::login))
         // .route("/reservas", post(reserva::confirmar))
         ;
-    let listener = tokio::net::TcpListener::bind("127.0.0.1:3000").await.unwrap();
+    let listener = tokio::net::TcpListener::bind("127.0.0.1:3000")
+        .await
+        .unwrap();
     println!("Brindis en http://127.0.0.1:3000");
     axum::serve(listener, app).await.unwrap();
 }

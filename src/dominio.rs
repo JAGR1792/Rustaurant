@@ -266,8 +266,8 @@ pub struct HorarioAtencion {
 pub struct Mesa {
     pub id: i64,
     pub numero_mesa: u32,
-    pub zona_id: i64, // 1 Zona -> 0..* Mesas
-    pub zona: String, // desnormalizado para el plano
+    pub zona_id: i64,  // 1 Zona -> 0..* Mesas
+    pub zona: String,  // desnormalizado para el plano
     pub capacidad: u8, // CHECK 1..20
     pub disponible_fisicamente: bool,
 }
@@ -363,8 +363,8 @@ pub struct ComprobantePago {
     pub id: i64,
     pub reserva_id: i64,
     pub id_empleado: Option<i64>, // None = autogestión del cliente
-    pub concepto: String, // ABONO, LIQUIDACION, REEMBOLSO_TOTAL, REEMBOLSO_PARCIAL
-    pub tipo_movimiento: String, // INGRESO / EGRESO
+    pub concepto: String,         // ABONO, LIQUIDACION, REEMBOLSO_TOTAL, REEMBOLSO_PARCIAL
+    pub tipo_movimiento: String,  // INGRESO / EGRESO
     pub medio_pago: String,
     pub monto_subtotal: i64,
     pub monto_retencion: i64, // 10% RN08/RN09 cuando aplica
@@ -375,8 +375,8 @@ pub struct ComprobantePago {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Reserva {
     pub id: i64,
-    pub codigo: String, // 8 alfanuméricos, único (RN15)
-    pub id_cliente: i64, // 1 Cliente -> 1..* Reservas
+    pub codigo: String,          // 8 alfanuméricos, único (RN15)
+    pub id_cliente: i64,         // 1 Cliente -> 1..* Reservas
     pub id_creador: Option<i64>, // 0..1 Empleado crea 1..* Reservas (RN12)
     pub tipo_restaurante_completo: bool,
     pub mesa_ids: Vec<i64>, // vía ReservaMesa; 1..* Mesas <-> 0..* Reservas
@@ -386,13 +386,15 @@ pub struct Reserva {
     pub ocasion: Ocasion,
     pub pedido: Vec<DetallePedido>, // 1 Reserva -> 0..* detalles (RN07)
     pub servicios_extra: Vec<ReservaServicioExtra>, // 0..* <-> 0..*
-    pub restricciones: String, // alergias (RF09)
+    pub restricciones: String,      // alergias (RF09)
     pub observaciones: String,
     pub pago: DetallePago,
     pub estado: EstadoReserva,
 }
 
 impl Reserva {
+    /// Solo el Builder la llama (11 piezas = toda la reserva CU04).
+    #[allow(clippy::too_many_arguments)]
     pub(crate) fn new(
         id_cliente: i64,
         id_creador: Option<i64>,
@@ -447,10 +449,7 @@ impl Reserva {
 
 fn generar_codigo() -> String {
     use uuid::Uuid;
-    Uuid::new_v4()
-        .simple()
-        .to_string()[..8]
-        .to_uppercase()
+    Uuid::new_v4().simple().to_string()[..8].to_uppercase()
 }
 
 #[cfg(test)]

@@ -92,10 +92,18 @@ impl ReservaBuilder {
 
     /// Todas las validaciones aquí: si algo falla, la Reserva jamás existe.
     pub fn build(self) -> Result<Reserva, ReservaError> {
-        let id_cliente = self.id_cliente.ok_or(ReservaError::FaltaDato("cliente".into()))?;
-        let inicio = self.inicio.ok_or(ReservaError::FaltaDato("fecha/hora".into()))?;
-        let n = self.num_comensales.ok_or(ReservaError::FaltaDato("comensales".into()))?;
-        let ocasion = self.ocasion.ok_or(ReservaError::FaltaDato("ocasión".into()))?;
+        let id_cliente = self
+            .id_cliente
+            .ok_or(ReservaError::FaltaDato("cliente".into()))?;
+        let inicio = self
+            .inicio
+            .ok_or(ReservaError::FaltaDato("fecha/hora".into()))?;
+        let n = self
+            .num_comensales
+            .ok_or(ReservaError::FaltaDato("comensales".into()))?;
+        let ocasion = self
+            .ocasion
+            .ok_or(ReservaError::FaltaDato("ocasión".into()))?;
         let pago = self.pago.ok_or(ReservaError::FaltaDato("pago".into()))?;
 
         // RN05: 1h anticipación, máx 60 días (simplificado; horario de atención en servicio).

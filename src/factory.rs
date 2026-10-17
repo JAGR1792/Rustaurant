@@ -3,7 +3,9 @@
 //! (default impl) + método fábrica `crear_usuario()` que cada subclase decide.
 
 use crate::dao::{DaoError, UsuarioDao};
-use crate::dominio::{Administrador, BaseUsuario, Cliente, Empleado, Rol, TipoCliente, UsuarioSesion};
+use crate::dominio::{
+    Administrador, BaseUsuario, Cliente, Empleado, Rol, TipoCliente, UsuarioSesion,
+};
 
 #[derive(Debug, Clone)]
 pub struct DatosRegistro {
@@ -29,29 +31,29 @@ pub async fn registrar_con<D: UsuarioDao + Sync>(
     dao: &D,
     datos: DatosRegistro,
 ) -> Result<UsuarioSesion, DaoError> {
-        if dao
-            .existe_correo_o_documento(&datos.correo, &datos.tipo_documento, &datos.documento)
-            .await?
-        {
-            return Err(DaoError::Duplicado("correo o documento ya existe".into()));
-        }
-        let hash = bcrypt::hash(&datos.password_plano, bcrypt::DEFAULT_COST)
-            .map_err(|e| DaoError::Db(e.to_string()))?;
-        let base = BaseUsuario {
-            id: 0,
-            correo: datos.correo.clone(),
-            hash_pw: hash,
-            tipo_documento: datos.tipo_documento.clone(),
-            documento: datos.documento.clone(),
-            nombre: String::new(),
-            telefono: String::new(),
-            activo: true,
-            debe_cambiar_pw: datos.creado_por_personal, // RN12
-        };
-        let sesion = fabrica.crear_usuario(base, &datos);
-        // dao.guardar(...) omitido en esqueleto; la impl real persiste aquí.
-        Ok(sesion)
+    if dao
+        .existe_correo_o_documento(&datos.correo, &datos.tipo_documento, &datos.documento)
+        .await?
+    {
+        return Err(DaoError::Duplicado("correo o documento ya existe".into()));
     }
+    let hash = bcrypt::hash(&datos.password_plano, bcrypt::DEFAULT_COST)
+        .map_err(|e| DaoError::Db(e.to_string()))?;
+    let base = BaseUsuario {
+        id: 0,
+        correo: datos.correo.clone(),
+        hash_pw: hash,
+        tipo_documento: datos.tipo_documento.clone(),
+        documento: datos.documento.clone(),
+        nombre: String::new(),
+        telefono: String::new(),
+        activo: true,
+        debe_cambiar_pw: datos.creado_por_personal, // RN12
+    };
+    let sesion = fabrica.crear_usuario(base, &datos);
+    // dao.guardar(...) omitido en esqueleto; la impl real persiste aquí.
+    Ok(sesion)
+}
 
 // ---------------- fábricas concretas ----------------
 
@@ -78,7 +80,10 @@ impl UsuarioFactory for EmpleadoFactory {
         Rol::Empleado
     }
     fn crear_usuario(&self, base: BaseUsuario, _datos: &DatosRegistro) -> UsuarioSesion {
-        UsuarioSesion::Empleado(Empleado { base, fecha_contratacion: None })
+        UsuarioSesion::Empleado(Empleado {
+            base,
+            fecha_contratacion: None,
+        })
     }
 }
 
@@ -87,7 +92,10 @@ impl UsuarioFactory for AdministradorFactory {
         Rol::Administrador
     }
     fn crear_usuario(&self, base: BaseUsuario, _datos: &DatosRegistro) -> UsuarioSesion {
-        UsuarioSesion::Administrador(Administrador(Empleado { base, fecha_contratacion: None }))
+        UsuarioSesion::Administrador(Administrador(Empleado {
+            base,
+            fecha_contratacion: None,
+        }))
     }
 }
 
