@@ -14,12 +14,14 @@ tectonic documentacion/brindis_rust.tex
 La app sirve en `http://127.0.0.1:3000` con la fase 1 funcional:
 login/registro, asistente de reserva de 4 pasos con plano SVG del salón
 por zonas, ficha de mesa con foto real y pedido guiado por porciones
-(ADR 0006), mis reservas con cancelación confirmada y reembolso
-(RN08/RN09), cuenta regresiva de la próxima reserva (contador
-de cifras rodantes, ver ADR 0003) y agenda del personal protegida por el
-Proxy. La portada incluye la carta de platos con un efecto de spotlight
-que sigue al cursor y revela la foto a color (port vanilla del ChromaGrid
-de React Bits, ver ADR 0002).
+(ADR 0006), notificación por correo al cliente y a la administración al
+confirmar (buzón de demostración visible en la agenda, ADR 0008), mis
+reservas con cancelación confirmada y reembolso (RN08/RN09), cuenta
+regresiva de la próxima reserva (contador de cifras rodantes, ver ADR
+0003) y agenda del personal protegida por el Proxy. La portada incluye
+la carta de platos con un efecto de spotlight que sigue al cursor y
+revela la foto a color (port vanilla del ChromaGrid de React Bits, ver
+ADR 0002).
 
 La interfaz sigue la dirección visual "Le Jardin" (ver ADR 0004): paleta
 marfil/borgoña/carbón con dorado apagado, tipografías self-hosted
@@ -57,6 +59,8 @@ src/                  # Axum + dominio + 4 patrones + DAO
   dao.rs              # GenericDAO + pool (Figura 6)
   estado.rs           # almacen demo en memoria + seed
   servicios.rs        # sujeto real del Proxy sobre el almacen
+  correo.rs           # avisos al cliente/admin (buzon demo, ADR 0008)
+  formato.rs          # fechas UTC-5 y pesos para vistas y correos
   vistas.rs           # controladores Axum + structs Askama
 templates/            # base + inicio/login/registro/reservar/mis-reservas/agenda/error
 static/css/           # tema.css + fuentes.css + chroma.css + counter.css

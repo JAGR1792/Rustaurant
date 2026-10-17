@@ -3,11 +3,13 @@
 //! Modelo: dominio + patrones (factory/builder/proxy/decorator) + DAO/estado.
 
 pub mod builder;
+pub mod correo;
 pub mod dao;
 pub mod decorator;
 pub mod dominio;
 pub mod estado;
 pub mod factory;
+pub mod formato;
 pub mod proxy;
 pub mod servicios;
 pub mod vistas;
