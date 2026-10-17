@@ -13,6 +13,8 @@ pub struct DatosRegistro {
     pub password_plano: String,
     pub tipo_documento: String,
     pub documento: String,
+    pub nombre: String,
+    pub telefono: String,
     pub creado_por_personal: bool,
 }
 
@@ -45,13 +47,15 @@ pub async fn registrar_con<D: UsuarioDao + Sync>(
         hash_pw: hash,
         tipo_documento: datos.tipo_documento.clone(),
         documento: datos.documento.clone(),
-        nombre: String::new(),
-        telefono: String::new(),
+        nombre: datos.nombre.clone(),
+        telefono: datos.telefono.clone(),
         activo: true,
         debe_cambiar_pw: datos.creado_por_personal, // RN12
     };
-    let sesion = fabrica.crear_usuario(base, &datos);
-    // dao.guardar(...) omitido en esqueleto; la impl real persiste aquí.
+    let mut sesion = fabrica.crear_usuario(base, &datos);
+    // El DAO asigna el id real (en sqlx sería el IDENTITY de la tabla).
+    let id = dao.guardar(&sesion).await?;
+    sesion.base_mut().id = id;
     Ok(sesion)
 }
 
@@ -70,7 +74,7 @@ impl UsuarioFactory for ClienteFactory {
             base,
             tipo: TipoCliente::General,
             strikes: 0,
-            fecha_ultima_actividad: None,
+            fecha_ultima_actividad: Some(chrono::Utc::now()), // RN13
         })
     }
 }
