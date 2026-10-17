@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block titulo %}Reservar — Brindis{% endblock %}
+{% block contenido %}
+<h1>Reserva en 4 pasos</h1>
+<ol class="progreso" aria-label="Progreso de la reserva">
+  <li data-paso="1" aria-current="step">Ocasión</li>
+  <li data-paso="2">Mesas</li>
+  <li data-paso="3">Pedido y extras</li>
+  <li data-paso="4">Pago</li>
+</ol>
+<section id="paso-1">
+  <h2>1. ¿Qué celebras?</h2>
+  <!-- tarjetas: cumpleanos, aniversario, propuesta, romantica, negocios, casual -->
+</section>
+<section id="paso-2" hidden>
+  <h2>2. Elige tus mesas</h2>
+  <div id="plano" role="grid" aria-label="Plano del salón por zonas"></div>
+  <p id="bloqueo-aviso" aria-live="polite"></p>
+</section>
+<section id="paso-3" hidden>
+  <h2>3. Pedido anticipado y servicios extra</h2>
+</section>
+<section id="paso-4" hidden>
+  <h2>4. Pago</h2>
+</section>
+{% endblock %}
+{% block scripts %}<script src="/static/js/plano.js" defer></script>{% endblock %}

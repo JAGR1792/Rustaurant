@@ -5,6 +5,7 @@ edition = "2024"
 
 [dependencies]
 axum = "0.8.9"
+axum-extra = { version = "0.10", features = ["cookie"] }
 tokio = { version = "1.53.1", features = ["full"] }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
@@ -12,3 +13,4 @@ chrono = { version = "0.4", features = ["serde"] }
 uuid = { version = "1.6", features = ["v4"] }
 bcrypt = "0.17"
 thiserror = "2.0"
+askama = "0.13"

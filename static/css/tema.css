@@ -1,0 +1,30 @@
+/* Tema original Brindis (CSS vanilla, sin librerias).
+   Tokens tomados como idea de UNAL (tailwind.config) y Camilo (tema.css),
+   reescritos: marca vino, estados de mesa, responsive y reduced-motion. */
+:root {
+  --vino: #6d1a2d;
+  --dorado: #c9a227;
+  --libre: #2e9e5b;
+  --reservada: #c0392b;
+  --bloqueada: #8a8f98;
+  --seleccionada: var(--dorado);
+  --fondo: #faf7f2;
+  --texto: #2b2320;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--fondo); color: var(--texto);
+  font-family: system-ui, sans-serif; }
+.saltar { position: absolute; left: -999px; }
+.saltar:focus { left: 0; background: #fff; padding: .5rem; }
+.barra { display: flex; justify-content: space-between; align-items: center;
+  background: var(--vino); color: #fff; padding: .6rem 1rem; }
+.barra a { color: #fff; }
+.progreso { display: flex; gap: 1rem; list-style: none; padding: 0; }
+.progreso [aria-current="step"] { font-weight: 700; text-decoration: underline; }
+#plano { display: grid; gap: .5rem; }
+.mesa[data-estado="libre"] { background: var(--libre); }
+.mesa[data-estado="reservada"] { background: var(--reservada); }
+.mesa[data-estado="bloqueada"] { background: var(--bloqueada); }
+.mesa[data-estado="seleccionada"] { background: var(--seleccionada); }
+@media (max-width: 700px) { .menu { display: flex; flex-wrap: wrap; gap: .5rem; } }
+@media (prefers-reduced-motion: reduce) { * { animation: none; transition: none; } }

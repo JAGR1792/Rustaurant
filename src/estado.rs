@@ -1,0 +1,212 @@
+//! Estado en memoria del servidor (demo sin SQL Server) + seed.
+//! La capa de datos real son los traits de `dao.rs`; aquí hay un almacén
+//! demostrativo para ejecutar la app y verificar la funcionalidad.
+
+use std::collections::HashMap;
+use std::sync::{Arc, Mutex};
+
+use chrono::{Duration, Utc};
+
+use crate::dominio::{
+    Administrador, BaseUsuario, BloqueoMesa, Cliente, DetallePago, Empleado, EstadoReserva,
+    ItemMenu, Mesa, ModalidadPago, Ocasion, PlanServicioExtra, Reserva, Rol, TipoCliente,
+    UsuarioSesion,
+};
+
+#[derive(Default)]
+pub struct Datos {
+    pub usuarios: Vec<UsuarioSesion>,
+    pub mesas: Vec<Mesa>,
+    pub reservas: Vec<Reserva>,
+    pub bloqueos: Vec<BloqueoMesa>,
+    pub items: Vec<ItemMenu>,
+    pub planes: Vec<PlanServicioExtra>,
+    /// token de sesión -> id de usuario
+    pub sesiones: HashMap<String, i64>,
+}
+
+pub type Estado = Arc<Mutex<Datos>>;
+
+pub fn nuevo() -> Estado {
+    let d = Datos::default();
+    Arc::new(Mutex::new(d))
+}
+
+pub fn sembrar() -> Estado {
+    let e = nuevo();
+    {
+        let mut d = e.lock().unwrap();
+        // Usuarios demo: hash de bcrypt de las contraseñas de prueba.
+        let admin = BaseUsuario {
+            id: 1,
+            correo: "admin@brindis.co".into(),
+            hash_pw: bcrypt::hash("Admin123!", bcrypt::DEFAULT_COST).unwrap(),
+            tipo_documento: "CC".into(),
+            documento: "1".into(),
+            nombre: "Admin".into(),
+            telefono: "3000000001".into(),
+            activo: true,
+            debe_cambiar_pw: false,
+        };
+        let empleado = BaseUsuario {
+            id: 2,
+            correo: "empleado@brindis.co".into(),
+            hash_pw: bcrypt::hash("Empleado123!", bcrypt::DEFAULT_COST).unwrap(),
+            tipo_documento: "CC".into(),
+            documento: "2".into(),
+            nombre: "Empleado".into(),
+            telefono: "3000000002".into(),
+            activo: true,
+            debe_cambiar_pw: false,
+        };
+        let cliente = BaseUsuario {
+            id: 3,
+            correo: "cliente@brindis.co".into(),
+            hash_pw: bcrypt::hash("Cliente123!", bcrypt::DEFAULT_COST).unwrap(),
+            tipo_documento: "CC".into(),
+            documento: "3".into(),
+            nombre: "Cliente".into(),
+            telefono: "3000000003".into(),
+            activo: true,
+            debe_cambiar_pw: false,
+        };
+        let vip = BaseUsuario {
+            id: 4,
+            correo: "vip@brindis.co".into(),
+            hash_pw: bcrypt::hash("Vip123!", bcrypt::DEFAULT_COST).unwrap(),
+            tipo_documento: "CC".into(),
+            documento: "4".into(),
+            nombre: "VIP".into(),
+            telefono: "3000000004".into(),
+            activo: true,
+            debe_cambiar_pw: false,
+        };
+        d.usuarios.push(UsuarioSesion::Administrador(Administrador(Empleado {
+            base: admin,
+            fecha_contratacion: None,
+        })));
+        d.usuarios.push(UsuarioSesion::Empleado(Empleado {
+            base: empleado,
+            fecha_contratacion: None,
+        })));
+        d.usuarios.push(UsuarioSesion::Cliente(Cliente {
+            base: cliente,
+            tipo: TipoCliente::General,
+            strikes: 0,
+            fecha_ultima_actividad: None,
+        }));
+        d.usuarios.push(UsuarioSesion::Cliente(Cliente {
+            base: vip,
+            tipo: TipoCliente::Vip,
+            strikes: 0,
+            fecha_ultima_actividad: None,
+        }));
+
+        // Mesas: 8 en 3 zonas.
+        let zonas = [("VIP", 2), ("General", 4), ("Terraza", 2)];
+        let mut id = 1;
+        for (z, n) in zonas {
+            for k in 0..n {
+                d.mesas.push(Mesa {
+                    id,
+                    numero_mesa: id as u32,
+                    zona_id: 0,
+                    zona: z.into(),
+                    capacidad: if k % 2 == 0 { 4 } else { 2 },
+                    disponible_fisicamente: true,
+                });
+                id += 1;
+            }
+        }
+
+        // Carta y planes.
+        d.items.push(ItemMenu {
+            id: 1,
+            nombre: "Entrada de prueba".into(),
+            tipo: "ENTRADA".into(),
+            precio_vigente: 15_000,
+        });
+        d.items.push(ItemMenu {
+            id: 2,
+            nombre: "Plato fuerte de prueba".into(),
+            tipo: "PLATO_FUERTE".into(),
+            precio_vigente: 30_000,
+        });
+        d.items.push(ItemMenu {
+            id: 3,
+            nombre: "Postre de prueba".into(),
+            tipo: "POSTRE".into(),
+            precio_vigente: 12_000,
+        });
+        d.planes.push(PlanServicioExtra {
+            id: 1,
+            nombre: "Decoración de ocasión".into(),
+            tarifa: 80_000,
+            descripcion: "Montaje 20 min antes".into(),
+            por_persona: false,
+        });
+        d.planes.push(PlanServicioExtra {
+            id: 2,
+            nombre: "Barra de cócteles".into(),
+            tarifa: 45_000,
+            descripcion: "Por persona".into(),
+            por_persona: true,
+        });
+
+        // Una reserva vigente de ejemplo para el cliente general.
+        let inicio = Utc::now() + Duration::days(2);
+        d.reservas.push(Reserva {
+            id: 1,
+            codigo: "DEMO0001".into(),
+            id_cliente: 3,
+            id_creador: None,
+            tipo_restaurante_completo: false,
+            mesa_ids: vec![5],
+            inicio,
+            duracion_minutos: 120,
+            num_comensales: 4,
+            ocasion: Ocasion::Casual,
+            pedido: vec![],
+            servicios_extra: vec![],
+            restricciones: "Sin alergias".into(),
+            observaciones: String::new(),
+            pago: DetallePago {
+                modalidad: ModalidadPago::Adelanto,
+                porcentaje: 30,
+                medio: "TARJETA".into(),
+                monto_total: 0,
+            },
+            estado: EstadoReserva::Vigente,
+        });
+    }
+    e
+}
+
+/// Busca por correo exacto.
+pub fn buscar_por_correo(d: &Datos, correo: &str) -> Option<UsuarioSesion> {
+    d.usuarios
+        .iter()
+        .find(|u| u.correo().eq_ignore_ascii_case(correo))
+        .cloned()
+}
+
+/// Estado de una mesa en una franja: libre, reservada o bloqueada.
+pub fn estado_de_mesa(d: &Datos, mesa_id: i64, inicio: chrono::DateTime<Utc>, fin: chrono::DateTime<Utc>) -> &'static str {
+    if d.bloqueos
+        .iter()
+        .any(|b| b.mesa_id == mesa_id && b.se_solapa(inicio, fin) && !b.esta_expirado(Utc::now()))
+    {
+        return "bloqueada";
+    }
+    let cruzada = d.reservas.iter().any(|r| {
+        r.mesa_ids.contains(&mesa_id)
+            && matches!(r.estado, EstadoReserva::Vigente | EstadoReserva::ClienteEnMesa)
+            && r.inicio < fin
+            && inicio < r.inicio + Duration::minutes(r.duracion_minutos as i64)
+    });
+    if cruzada {
+        "reservada"
+    } else {
+        "libre"
+    }
+}
