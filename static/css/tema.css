@@ -180,8 +180,13 @@ legend { font-family: var(--serif); font-size: 1.15rem; font-weight: 600; color:
 .acciones { display: flex; gap: .8rem; margin-top: 1.5rem; flex-wrap: wrap; align-items: center; }
 
 /* Avisos */
-.error { background: #f7e9e5; border-left: 3px solid var(--reservada); padding: .65rem .9rem; border-radius: 8px; }
-.exito { background: #e9f0e9; border-left: 3px solid var(--libre); padding: .65rem .9rem; border-radius: 8px; }
+.error { background: rgba(169, 79, 66, .12); border-left: 3px solid var(--reservada); padding: .65rem .9rem; border-radius: 8px; }
+.exito { background: rgba(78, 125, 87, .12); border-left: 3px solid var(--libre); padding: .65rem .9rem; border-radius: 8px; }
+.vacio-reservas {
+  background: var(--marfil-claro); border: 1px dashed var(--linea); border-radius: 16px;
+  padding: 1.6rem 1.4rem; text-align: center; display: grid; gap: .4rem; justify-items: center;
+}
+.vacio-reservas p { margin: 0; color: var(--carbon-suave); }
 
 /* Asistente: progreso de pasos */
 .progreso { display: flex; gap: .4rem 1.4rem; list-style: none; padding: 0; flex-wrap: wrap; margin: 1.5rem 0 2rem; counter-reset: paso; }

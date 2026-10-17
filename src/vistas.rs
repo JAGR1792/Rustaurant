@@ -351,7 +351,7 @@ fn carta(d: &Datos) -> Vec<ItemCartaVista> {
                 4 => ("04-limonada-coco.png", "#ffd23f"),
                 5 => ("05-salmon-hierbas.png", "#a98bff"),
                 6 => ("06-coctel-casa.png", "#ff7eb6"),
-                _ => ("00-generico.png", "#c9a227"),
+                _ => ("00-generico.png", "#a88a59"),
             };
             ItemCartaVista {
                 titulo: i.nombre.clone(),

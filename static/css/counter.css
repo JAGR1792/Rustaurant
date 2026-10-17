@@ -125,12 +125,12 @@
 .cuenta-panel {
   margin: 18px 0 26px;
   padding: 20px 22px 16px;
-  border: 1px solid rgba(109, 26, 45, 0.14);
+  border: 1px solid rgba(112, 44, 59, 0.16);
   border-radius: 18px;
   background:
-    radial-gradient(120% 90% at 50% -20%, rgba(201, 162, 39, 0.14), transparent 60%),
-    linear-gradient(180deg, #ffffff 0%, #fbf6ef 100%);
-  box-shadow: 0 16px 34px -24px rgba(43, 35, 32, 0.45);
+    radial-gradient(120% 90% at 50% -20%, rgba(168, 138, 89, 0.18), transparent 60%),
+    linear-gradient(180deg, #fffdf9 0%, #f8f2e7 100%);
+  box-shadow: 0 16px 34px -24px rgba(38, 35, 31, 0.5);
   text-align: center;
 }
 
@@ -140,8 +140,11 @@
 }
 
 .cuenta-panel__titulo strong {
+  font-family: var(--serif);
+  font-size: 1.15rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
   color: var(--vino);
-  letter-spacing: 0.02em;
 }
 
 .cuenta-reloj {
@@ -170,7 +173,7 @@
   font-size: 11px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: rgba(43, 35, 32, 0.55);
+  color: rgba(38, 35, 31, 0.55);
 }
 
 .cuenta-reloj__sep {
@@ -184,7 +187,7 @@
 .cuenta-panel__pie {
   margin: 8px 0 0;
   font-size: 13px;
-  color: rgba(43, 35, 32, 0.55);
+  color: rgba(38, 35, 31, 0.55);
 }
 
 .cuenta-panel__ahora {

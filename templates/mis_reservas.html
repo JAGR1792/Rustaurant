@@ -6,6 +6,7 @@
 <link rel="stylesheet" href="/static/css/counter.css">
 {% endblock %}
 {% block contenido %}
+<p class="eyebrow">Tu historial</p>
 <h1>Mis reservas</h1>
 {% if let Some(a) = aviso %}
 <p class="exito" role="status">{{ a }}</p>
@@ -44,7 +45,10 @@
 </section>
 {% endif %}
 {% if vacio %}
-<p>Todavía no hay reservas. <a href="/reservar">Crea la primera</a>.</p>
+<div class="vacio-reservas">
+  <p>Todavía no hay reservas en tu historial.</p>
+  <p><a class="boton" href="/reservar">Crear la primera reserva</a></p>
+</div>
 {% else %}
 <div class="tabla-scroll">
   <table class="tabla">
