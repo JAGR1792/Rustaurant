@@ -44,6 +44,43 @@ pub enum Ocasion {
 }
 
 impl Ocasion {
+    /// Clave estable para formularios HTML (`value` del radio).
+    pub fn clave(&self) -> &'static str {
+        match self {
+            Ocasion::Cumpleanos => "cumpleanos",
+            Ocasion::Aniversario => "aniversario",
+            Ocasion::Propuesta => "propuesta",
+            Ocasion::Romantica => "romantica",
+            Ocasion::Negocios => "negocios",
+            Ocasion::Casual => "casual",
+        }
+    }
+
+    /// Nombre legible para la interfaz.
+    pub fn nombre(&self) -> &'static str {
+        match self {
+            Ocasion::Cumpleanos => "Cumpleaños",
+            Ocasion::Aniversario => "Aniversario",
+            Ocasion::Propuesta => "Propuesta",
+            Ocasion::Romantica => "Romántica",
+            Ocasion::Negocios => "Negocios",
+            Ocasion::Casual => "Casual",
+        }
+    }
+
+    /// Reverso de `clave()` para los formularios.
+    pub fn desde_clave(clave: &str) -> Option<Ocasion> {
+        match clave {
+            "cumpleanos" => Some(Ocasion::Cumpleanos),
+            "aniversario" => Some(Ocasion::Aniversario),
+            "propuesta" => Some(Ocasion::Propuesta),
+            "romantica" => Some(Ocasion::Romantica),
+            "negocios" => Some(Ocasion::Negocios),
+            "casual" => Some(Ocasion::Casual),
+            _ => None,
+        }
+    }
+
     /// Tabla 10 del documento: cada valor conoce su zona y decoración.
     pub fn zona_sugerida(&self) -> &'static str {
         match self {
@@ -74,6 +111,30 @@ impl Ocasion {
             Ocasion::Romantica => "Mesa apartada y servicio discreto.",
             Ocasion::Negocios => "Servicio ágil y sin interrupciones.",
             Ocasion::Casual => "Servicio estándar.",
+        }
+    }
+}
+
+impl EstadoReserva {
+    /// Texto para las tablas de la interfaz.
+    pub fn etiqueta(&self) -> &'static str {
+        match self {
+            EstadoReserva::Vigente => "Vigente",
+            EstadoReserva::ClienteEnMesa => "Cliente en mesa",
+            EstadoReserva::Completada => "Completada",
+            EstadoReserva::Cancelada => "Cancelada",
+            EstadoReserva::Inasistida => "Inasistida",
+        }
+    }
+
+    /// Sufijo CSS del badge (clase `.badge.<sufijo>`).
+    pub fn clase(&self) -> &'static str {
+        match self {
+            EstadoReserva::Vigente => "vigente",
+            EstadoReserva::ClienteEnMesa => "en-mesa",
+            EstadoReserva::Completada => "completada",
+            EstadoReserva::Cancelada => "cancelada",
+            EstadoReserva::Inasistida => "inasistida",
         }
     }
 }
@@ -242,6 +303,38 @@ impl UsuarioSesion {
             self,
             UsuarioSesion::Empleado(_) | UsuarioSesion::Administrador(_)
         )
+    }
+
+    pub fn base(&self) -> &BaseUsuario {
+        match self {
+            UsuarioSesion::Cliente(c) => c.base(),
+            UsuarioSesion::Empleado(e) => e.base(),
+            UsuarioSesion::Administrador(a) => a.base(),
+        }
+    }
+
+    pub fn base_mut(&mut self) -> &mut BaseUsuario {
+        match self {
+            UsuarioSesion::Cliente(c) => c.base_mut(),
+            UsuarioSesion::Empleado(e) => e.base_mut(),
+            UsuarioSesion::Administrador(a) => a.base_mut(),
+        }
+    }
+
+    pub fn id(&self) -> i64 {
+        self.base().id
+    }
+
+    pub fn nombre(&self) -> &str {
+        &self.base().nombre
+    }
+
+    /// Tipo de cliente (General si no es cliente).
+    pub fn tipo_cliente(&self) -> TipoCliente {
+        match self {
+            UsuarioSesion::Cliente(c) => c.tipo,
+            _ => TipoCliente::General,
+        }
     }
 }
 
