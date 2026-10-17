@@ -105,6 +105,33 @@ main { max-width: 1140px; margin: 0 auto; padding: clamp(1.5rem, 4vw, 2.75rem) c
 .hero-figura { margin: 0; }
 .hero-figura img { display: block; width: 100%; height: auto; border-radius: 14px; border: 1px solid var(--linea); }
 
+/* Acceso (login/registro): panel ilustrado + formulario */
+.acceso {
+  display: grid;
+  grid-template-columns: minmax(0, .92fr) minmax(0, 1.08fr);
+  gap: clamp(1.5rem, 4vw, 3.25rem);
+  align-items: center;
+  margin-top: .5rem;
+}
+.acceso-panel { position: relative; margin: 0; }
+.acceso-panel img { display: block; width: 100%; height: auto; border-radius: 16px; border: 1px solid var(--linea); }
+.acceso-panel figcaption {
+  position: absolute; left: 1rem; right: 1rem; bottom: 1rem;
+  background: rgba(38, 35, 31, .84); color: var(--marfil);
+  padding: .6rem .95rem; border-radius: 10px;
+  font-family: var(--serif); font-size: 1.05rem; letter-spacing: .01em;
+}
+.acceso-form { max-width: 460px; }
+.acceso-form h1 { margin-bottom: .2rem; }
+.acceso-form form { margin-top: 1.1rem; }
+.acceso-form button { width: 100%; margin-top: .5rem; }
+.acceso-pie { margin-top: 1.2rem; color: var(--carbon-suave); font-size: .92rem; }
+@media (max-width: 760px) {
+  .acceso { grid-template-columns: 1fr; }
+  .acceso-form { order: 1; max-width: none; }
+  .acceso-panel { order: 2; }
+}
+
 /* Secciones con ritmo editorial */
 .seccion { margin-top: 3.5rem; }
 .seccion h2 { margin-bottom: .9rem; }
