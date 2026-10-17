@@ -11,7 +11,10 @@ RUN mkdir src && echo 'fn main() {}' > src/main.rs \
     && rm -rf src
 COPY src ./src
 COPY templates ./templates
-RUN cargo build --release
+# COPY conserva los mtime del contexto: sin el touch, cargo reusaria el
+# main de mentira de la cache y la imagen saldria con un binario vacio.
+RUN find src -name '*.rs' -exec touch {} + \
+    && cargo build --release
 
 # Etapa 2: runtime minimo (las plantillas Askama van embebidas).
 FROM debian:trixie-slim
