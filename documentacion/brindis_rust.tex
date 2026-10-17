@@ -617,6 +617,8 @@ Los controladores dependen de las interfaces de servicio, que en ejecuci\'on est
 El controlador hace una sola llamada; el proxy verifica el permiso antes de delegar; y el servicio real usa el builder y los decoradores dentro de una misma transacci\'on: disponibilidad, construcci\'on, c\'alculo total, guardado y comprobante.
 \subsection{UI}
 4 pasos con progreso, vino de marca; plano verde libre, rojo reservada, gris bloqueada, dorado seleccionada; mensajes Nielsen (1993). Prototipos Figs.~13--16 (baja fidelidad).
+
+\textit{Decisi{\'o}n de stack frontend (vinculante):} plantillas HTML con bloques estilo Jinja/Askama en \texttt{templates/base.html}, \texttt{templates/login.html} y \texttt{templates/reservar.html} (asistente de 4 pasos con \texttt{\#plano}); CSS vanilla en \texttt{static/css/tema.css} con los tokens de mesa; JS vanilla en \texttt{static/js/plano.js} (pinta estados y consulta \texttt{GET /api/disponibilidad?fecha=\&hora=\&zona=} sin recargar) y \texttt{static/js/ui.js} (toasts y modal propios). No se usa htmx ni librer{\'i}as: todo es c{\'o}digo original del repo, sin copiar de otros proyectos. El servidor expone \texttt{/static} y las rutas \texttt{/}, \texttt{/login}, \texttt{/reservar}, \texttt{/mis-reservas} y \texttt{/agenda}.
 \section{Implementaci{\'o}n: backend cr{\'i}tico y patrones}
 Lo importante del backend son cinco piezas, una por patr{\'o}n m{\'a}s la transacci{\'o}n. El resto (vistas, DTO) solo transporta datos. C{\'o}digo completo en \texttt{src/}: compila con \texttt{cargo check} y el caso CP09 pasa con \texttt{cargo test}.
 \subsection{Capas y transacci{\'o}n (lo que une todo)}
