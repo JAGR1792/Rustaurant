@@ -1,6 +1,8 @@
 services:
   - type: web
     name: brindis
+    # `main` solo recibe entregas; la demo sigue la rama de integración.
+    branch: dev
     runtime: docker
     plan: free
     healthCheckPath: /
