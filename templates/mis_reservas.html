@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{# Historial del cliente (o de todo el personal). El boton de cancelar hace
+   POST a /reservas/{id}/cancelar; el reembolso RN08/RN09 lo calcula el servicio. #}
+{% block titulo %}Mis reservas — Brindis{% endblock %}
+{% block contenido %}
+<h1>Mis reservas</h1>
+{% if let Some(a) = aviso %}
+<p class="exito" role="status">{{ a }}</p>
+{% endif %}
+{% if vacio %}
+<p>Todavía no hay reservas. <a href="/reservar">Crea la primera</a>.</p>
+{% else %}
+<div class="tabla-scroll">
+  <table class="tabla">
+    <thead>
+      <tr>
+        <th>Código</th><th>Fecha</th><th>Mesas</th><th>Comensales</th>
+        <th>Ocasión</th><th>Total</th><th>Movimiento</th><th>Estado</th><th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for r in filas %}
+      <tr>
+        <td>{{ r.codigo }}</td>
+        <td>{{ r.fecha }}</td>
+        <td>{{ r.mesas }}</td>
+        <td>{{ r.comensales }}</td>
+        <td>{{ r.ocasion }}</td>
+        <td>{{ r.total }}</td>
+        <td>{{ r.movimiento }}</td>
+        <td><span class="badge {{ r.estado_clase }}">{{ r.estado }}</span></td>
+        <td>
+          {% if r.puede_cancelar %}
+          <form method="post" action="/reservas/{{ r.id }}/cancelar">
+            <button type="submit" class="secundario">Cancelar</button>
+          </form>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+{% endblock %}

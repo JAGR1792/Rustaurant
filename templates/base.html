@@ -18,8 +18,13 @@
     <nav class="menu" aria-label="Principal">
       <a href="/reservar">Reservar</a>
       <a href="/mis-reservas">Mis reservas</a>
-      <a href="/agenda">Agenda</a>
+      {% if es_personal %}<a href="/agenda">Agenda</a>{% endif %}
+      {% if usuario != "" %}
+      <span class="usuario">Hola, {{ usuario }}</span>
+      <a href="/logout">Salir</a>
+      {% else %}
       <a href="/login">Entrar</a>
+      {% endif %}
     </nav>
   </header>
   <main id="contenido">

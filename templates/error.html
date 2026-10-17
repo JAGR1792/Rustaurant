@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{# Errores de negocio o de permisos mostrados como pagina (ej: cancelar ajeno). #}
+{% block titulo %}Error — Brindis{% endblock %}
+{% block contenido %}
+<h1>Algo no salió bien</h1>
+<p class="error" role="alert">{{ mensaje }}</p>
+<p><a href="/">Volver al inicio</a> — <a href="/mis-reservas">Mis reservas</a></p>
+{% endblock %}

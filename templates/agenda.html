@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{# Agenda del dia para el personal (RF15): indicaciones por ocasion y alertas
+   de alergias resaltadas. El Proxy verifica el rol antes de entregar los datos. #}
+{% block titulo %}Agenda — Brindis{% endblock %}
+{% block contenido %}
+<h1>Agenda del día</h1>
+<nav class="dia-nav" aria-label="Cambiar día">
+  <a href="/agenda?dia={{ dia_ant }}">← Día anterior</a>
+  <strong>{{ fecha }}</strong>
+  <a href="/agenda?dia={{ dia_sig }}">Día siguiente →</a>
+</nav>
+{% if denegado %}
+<p class="error" role="alert">Solo el personal autorizado puede ver la agenda (RF15).</p>
+{% else %}
+  {% if vacio %}
+  <p>No hay reservas para este día.</p>
+  {% else %}
+  <div class="tabla-scroll">
+    <table class="tabla">
+      <thead>
+        <tr>
+          <th>Hora</th><th>Código</th><th>Cliente</th><th>Mesas</th><th>Comensales</th>
+          <th>Ocasión</th><th>Indicaciones</th><th>Restricciones</th><th>Estado</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for f in filas %}
+        <tr>
+          <td>{{ f.hora }}</td>
+          <td>{{ f.codigo }}</td>
+          <td>{{ f.cliente }}</td>
+          <td>{{ f.mesas }}</td>
+          <td>{{ f.comensales }}</td>
+          <td>{{ f.ocasion }}</td>
+          <td>{{ f.indicacion }}</td>
+          <td class="{% if f.alerta %}alerta{% endif %}">{{ f.restricciones }}</td>
+          <td><span class="badge {{ f.estado_clase }}">{{ f.estado }}</span></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+{% endif %}
+{% endblock %}
