@@ -14,7 +14,9 @@ tectonic documentacion/brindis_rust.tex
 La app sirve en `http://127.0.0.1:3000` con la fase 1 funcional:
 login/registro, asistente de reserva de 4 pasos con plano de mesas,
 mis reservas con cancelación (reembolso RN08/RN09) y agenda del
-personal protegida por el Proxy.
+personal protegida por el Proxy. La portada incluye la carta de platos
+con un efecto de spotlight que sigue al cursor y revela la foto a color
+(port vanilla del ChromaGrid de React Bits, ver ADR 0002).
 
 El PDF del documento se genera en `documentacion/brindis_rust.pdf`.
 
@@ -45,6 +47,8 @@ src/                  # Axum + dominio + 4 patrones + DAO
   vistas.rs           # controladores Axum + structs Askama
 templates/            # base + inicio/login/registro/reservar/mis-reservas/agenda/error
 static/               # tema.css + plano.js (asistente) + ui.js (toasts)
+                      # + chroma.css/js (efecto de la carta)
+static/img/carta/     # PNGs de platos + generar_carta.py (regenerables)
 diagramas/brindis/    # Fig6-11 PNG/SVG + .drawio (Fig1, Fig4)
 documentacion/        # brindis_rust.tex + usa.png + entregables/
 ```
