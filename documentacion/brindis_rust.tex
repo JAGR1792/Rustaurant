@@ -28,6 +28,7 @@
 \definecolor{umlutil}{HTML}{E6E6E6}
 \definecolor{umlcls}{HTML}{F4F4F4}
 \definecolor{umlnote}{HTML}{FFF8DC}
+\definecolor{wfgris}{HTML}{8F8F8F}
 \def\umlfs{\fontsize{7}{8.4}\selectfont}
 \def\umlfst{\fontsize{5}{6}\selectfont}
 \tikzset{
@@ -124,7 +125,15 @@
   hoja/.style={draw, rounded corners, align=left, font=\scriptsize,
              minimum height=0.6cm, text width=2.4cm, inner sep=3pt},
   wf/.style={draw, align=center, font=\scriptsize},
-  wftxt/.style={font=\scriptsize, align=left, anchor=north west, inner sep=1pt}
+  wftxt/.style={font=\scriptsize, align=left, anchor=north west, inner sep=1pt},
+  wfr/.style={draw=umlline, line width=0.55pt, rounded corners=2.5pt, fill=white},
+  wfh/.style={draw=umlline, line width=0.45pt, fill=umlutil, rounded corners=1.5pt},
+  wfb/.style={draw=wfgris!65, line width=0.35pt, rounded corners=1pt, fill=umlcls},
+  wfd/.style={draw=umlline, line width=0.45pt, fill=umlline, rounded corners=1.5pt},
+  wfo/.style={draw=umlline, line width=0.45pt, rounded corners=1.5pt, fill=white},
+  wft/.style={font=\scriptsize\bfseries, text=umlline, inner sep=0pt},
+  wfm/.style={font=\umlfst, text=umlline, inner sep=0.5pt},
+  wfg/.style={font=\umlfst, text=wfgris, inner sep=0.5pt}
 }
 
 % Actor (monigote) reutilizable: {x}{y}{nombre-nodo}{etiqueta}
@@ -347,11 +356,126 @@ An{\'a}lisis: el Cliente concentra el flujo de reserva (CU04) y sus extensiones 
 \end{tabular}
 {\small\textit{Nota.} Elaboraci{\'o}n propia.}
 \subsection{Ciclo de vida}
-VIGENTE $\rightarrow$ CLIENTE\_EN\_MESA $\rightarrow$ COMPLETADA; VIGENTE $\rightarrow$ CANCELADA/INASISTIDA; modificación sobre VIGENTE.
+VIGENTE $\rightarrow$ CLIENTE\_EN\_MESA $\rightarrow$ COMPLETADA; VIGENTE $\rightarrow$ CANCELADA/INASISTIDA; la modificaci{\'o}n se hace sobre una reserva vigente. La Figura 2 resume los estados de una reserva y los eventos que producen cada transici{\'o}n.
+\begin{figure}[H]\centering
+{\small\textbf{Figura 2}}\\{\small\textit{Diagrama de estados de la reserva}}\\[4pt]
+\begin{tikzpicture}[
+  estado/.style={draw, rounded corners=2pt, font=\scriptsize, minimum height=0.85cm, minimum width=2.2cm, align=center, fill=umlcls},
+  ev/.style={font=\scriptsize, inner sep=1.5pt, text=umlline},
+  fl/.style={umlline, line width=0.5pt, -{Straight Barb[length=5.5pt,width=7pt]}},
+]
+  % --- inicio y fin ---
+  \node[circle, fill=black, minimum size=0.28cm, inner sep=0pt] (ini) at (-1.6,0) {};
+  \node[circle, draw=umlline, fill=white, double, double distance=1.3pt, minimum size=0.34cm, inner sep=0pt] (fin) at (12.2,2.2) {};
+  \node[font=\scriptsize, anchor=south] at (ini.north) {Inicio};
+  \node[font=\scriptsize, anchor=south] at (fin.north) {Fin};
+  % --- estados ---
+  \node[estado] (vig) at (2.4,0) {VIGENTE};
+  \node[estado] (can) at (2.4,2.2) {CANCELADA};
+  \node[estado] (ina) at (7.4,0) {INASISTIDA};
+  \node[estado] (cli) at (8.0,-2.4) {CLIENTE\_EN\_MESA};
+  \node[estado] (com) at (12.2,-2.4) {COMPLETADA};
+  % --- crear reserva ---
+  \draw[fl] (ini) -- (vig.west);
+  \node[ev, anchor=south] at ($(ini.east)!.5!(vig.west)+(0,0.04)$) {crear reserva};
+  % --- cancelar (sube) ---
+  \draw[fl] (vig.north) -- (can.south);
+  \node[ev, anchor=west, align=left, text width=2.8cm] at ($(vig.north)!.5!(can.south)+(0.12,0)$) {cliente o personal cancelan la reserva};
+  % --- cancelada -> fin ---
+  \draw[fl] (can.east) -- (fin.west);
+  % --- no asiste ---
+  \draw[fl] (vig.east) -- (ina.west);
+  \node[ev, anchor=south] at ($(vig.east)!.5!(ina.west)+(0,0.12)$) {comensal no asiste};
+  % --- inasistida -> fin ---
+  \draw[fl] (ina.north east) -- (fin.south);
+  % --- asiste ---
+  \coordinate (ds) at ($(vig.south)+(0.9,0)$);
+  \draw[fl] (ds) -- (cli.west);
+  \node[ev, rotate=-30, anchor=south, font=\umlfst] at ($(ds)!.5!(cli.west)+(0,0.14)$) {comensal asiste a la hora pactada};
+  % --- liquidar ---
+  \draw[fl] (cli.east) -- (com.west);
+  \node[ev, anchor=south] at ($(cli.east)!.5!(com.west)+(0,0.06)$) {liquidar cuenta};
+  % --- completada -> fin ---
+  \draw[fl] (com.north) -- (fin.south);
+  % --- autotransicion: modificar ---
+  \draw[fl] ($(vig.south)+(-0.75,0)$) .. controls +(-0.25,-1.2) and +(0.6,-1.2) .. ($(vig.south)+(-0.15,0)$);
+  \node[ev, anchor=north, align=center] at ($(vig.south)+(-0.45,-1.5)$) {cliente o personal\\modifican la reserva};
+\end{tikzpicture}
+\\[3pt]{\small\textit{Nota.} Elaboraci{\'o}n propia. Las transiciones inv{\'a}lidas (por ejemplo, completar una reserva cancelada) se rechazan en \texttt{cambiar\_estado()} (\texttt{src/dominio.rs}).}
+\end{figure}
 
 \section{Diseño}
 \subsection{Arquitectura MVC por capas}
-La Vista presenta la informaci\'on, el Controlador atiende las peticiones y el Modelo contiene la l\'ogica y los datos. Lo cr\'itico: los controladores no acceden a la l\'ogica de reservas sin pasar por el control de acceso; la verificaci\'on de cruces, el registro de la reserva y su comprobante se ejecutan en una misma transacci\'on.
+La Vista presenta la informaci\'on, el Controlador atiende las peticiones y el Modelo contiene la l\'ogica y los datos. Para separar mejor las responsabilidades, el modelo se divide a su vez en tres capas internas: servicios y patrones, acceso a datos y entidades; la Figura 3 muestra la organizaci{\'o}n resultante. Lo cr\'itico: los controladores no acceden a la l\'ogica de reservas sin pasar por el control de acceso (proxies de servicio); la verificaci\'on de cruces, el registro de la reserva y su comprobante se ejecutan en una misma transacci\'on.
+\begin{figure}[H]\centering
+{\small\textbf{Figura 3}}\\{\small\textit{Arquitectura MVC por capas}}\\[4pt]
+\begin{tikzpicture}[
+  band/.style={draw=umlline, line width=0.5pt, rounded corners=3pt, fill=white},
+  chip/.style={draw=umlline, line width=0.4pt, fill=umlutil, rounded corners=1.5pt, font=\umlfst, inner sep=2.6pt, minimum height=0.42cm, align=center},
+  tit/.style={font=\scriptsize\bfseries, text=umlline, align=center, inner sep=0pt},
+  lb/.style={font=\umlfst, text=umlline, inner sep=1.5pt},
+  fl/.style={umlline, line width=0.5pt, -{Straight Barb[length=5.5pt,width=7pt]}},
+  flb/.style={umlline, line width=0.5pt, {Straight Barb[length=5.5pt,width=7pt]}-{Straight Barb[length=5.5pt,width=7pt]}},
+]
+  % --- Vista ---
+  \node[band, minimum width=10.6cm, minimum height=1.35cm, anchor=north west] (vista) at (0,0) {};
+  \node[tit, anchor=west] at ($(vista.west)+(0.25,0)$) {Vista};
+  \node[chip] at (3.05,-0.44) {plantillas Askama};
+  \node[chip] at (6.15,-0.44) {plano.js y ui.js};
+  \node[chip] at (9.15,-0.44) {tema.css y fuentes};
+  \node[chip] at (5.75,-0.98) {HTML + CSS + JS vanilla (sin librer{\'i}as)};
+  % --- Controlador ---
+  \node[band, minimum width=10.6cm, minimum height=0.95cm, anchor=north west] (ctrl) at (0,-2.2) {};
+  \node[tit, anchor=west] at ($(ctrl.west)+(0.25,0)$) {Controlador\\(Axum)};
+  \node[chip] at (3.15,-2.67) {AuthController};
+  \node[chip] at (6.05,-2.67) {ReservaController};
+  \node[chip] at (8.95,-2.67) {PersonalController};
+  % --- Modelo: servicios y patrones ---
+  \node[band, minimum width=10.6cm, minimum height=2.35cm, anchor=north west] (serv) at (0,-4.0) {};
+  \node[tit, anchor=west, text width=1.7cm] at ($(serv.west)+(0.25,0)$) {Modelo:\\servicios y patrones};
+  \node[chip] at (3.1,-4.5) {UsuarioServiceProxy};
+  \node[chip] at (6.2,-4.5) {ReservaServiceProxy};
+  \node[chip] at (9.15,-4.5) {UsuarioServiceImpl};
+  \node[chip] at (3.1,-5.08) {ReservaServiceImpl};
+  \node[chip] at (6.2,-5.08) {UsuarioFactory};
+  \node[chip] at (9.15,-5.08) {ReservaBuilder};
+  \node[chip] at (3.35,-5.66) {ComponenteReserva\\(decoradores)};
+  \node[chip] at (6.35,-5.66) {DisponibilidadService};
+  \node[chip] at (9.15,-5.66) {PagoService};
+  % --- Modelo: acceso a datos ---
+  \node[band, minimum width=10.6cm, minimum height=0.95cm, anchor=north west] (dao) at (0,-6.9) {};
+  \node[tit, anchor=west] at ($(dao.west)+(0.25,0)$) {Modelo:\\acceso a datos};
+  \node[chip] at (3.3,-7.37) {traits *Dao};
+  \node[chip] at (6.2,-7.37) {impls *Sqlx};
+  \node[chip] at (8.85,-7.37) {DbPool};
+  % --- Base de datos ---
+  \node[band, minimum width=10.6cm, minimum height=0.7cm, anchor=north west] (bd) at (0,-8.4) {};
+  \node[tit, anchor=west] at ($(bd.west)+(0.25,0)$) {Base de\\datos};
+  \node[chip] at (4.1,-8.75) {brindis\_db};
+  \node[lb, anchor=west] at (5.65,-8.75) {(13 tablas, 3FN)};
+  % --- Modelo: entidades (lateral) ---
+  \node[band, minimum width=3.2cm, minimum height=3.85cm, anchor=north west] (ent) at (11.2,-4.0) {};
+  \node[tit] at (12.8,-4.45) {Modelo:\\entidades};
+  \node[lb, align=center] at (12.8,-5.75) {structs del dominio\\y DTO\\(Usuario, Reserva, Mesa,\\Plan...)};
+  % --- dependencias hacia las entidades ---
+  \coordinate (e1) at (ent.west |- serv.east);
+  \coordinate (e2) at (ent.west |- dao.east);
+  \draw[fl, dashed] (serv.east) -- (e1);
+  \node[lb, anchor=south] at ($(serv.east)!.5!(e1)+(0,0.03)$) {usan};
+  \draw[fl, dashed] (dao.east) -- (e2);
+  \node[lb, anchor=south] at ($(dao.east)!.5!(e2)+(0,0.03)$) {usan};
+  % --- flujo vertical ---
+  \draw[flb] (vista.south) -- (ctrl.north);
+  \node[lb, anchor=west] at ($(vista.south)!.5!(ctrl.north)+(0.1,0.02)$) {peticiones y respuestas};
+  \draw[fl] (ctrl.south) -- (serv.north);
+  \node[lb, anchor=west] at ($(ctrl.south)!.5!(serv.north)+(0.1,0)$) {usa las interfaces de servicio};
+  \draw[fl] (serv.south) -- (dao.north);
+  \node[lb, anchor=west] at ($(serv.south)!.5!(dao.north)+(0.1,0)$) {consultas};
+  \draw[flb] (dao.south) -- (bd.north);
+  \node[lb, anchor=west] at ($(dao.south)!.5!(bd.north)+(0.1,0)$) {SQL (pool)};
+\end{tikzpicture}
+\\[3pt]{\small\textit{Nota.} Elaboraci{\'o}n propia. Las flechas punteadas indican dependencia de uso: los servicios y los DAO usan las entidades del dominio; la vista no conoce al modelo y el controlador solo conoce las interfaces de servicio (proxies).}
+\end{figure}
 \subsection{Diagrama de clases del modelo}
 Usuario es abstracta y se especializa en Cliente y Empleado; Administrador hereda de Empleado, lo que expresa que puede hacer todo lo del personal. Lo cr\'itico: la Reserva pertenece a un Cliente, puede haber sido creada por un Empleado, ocupa una o varias Mesas y se compone de su pedido anticipado y sus servicios extra. La enumeraci\'on Ocasion sostiene la reserva por ocasi\'on: cada valor conoce la zona sugerida y la decoraci\'on ofrecida.
 \begin{figure}[H]\centering
@@ -614,11 +738,401 @@ Lo cr\'itico: los servicios extra se combinan libremente y cada uno cambia el co
 \end{figure}
 Los controladores dependen de las interfaces de servicio, que en ejecuci\'on est\'an implementadas por los proxies; el servicio real dirige al builder y compone los decoradores; el servicio de usuarios elige la f\'abrica seg\'un el rol; y solo los servicios acceden a los DAO.
 \subsection{Secuencia CU04}
-El controlador hace una sola llamada; el proxy verifica el permiso antes de delegar; y el servicio real usa el builder y los decoradores dentro de una misma transacci\'on: disponibilidad, construcci\'on, c\'alculo total, guardado y comprobante.
+El controlador hace una sola llamada; el proxy verifica el permiso antes de delegar; y el servicio real usa el builder y los decoradores dentro de una misma transacci\'on: disponibilidad, construcci\'on, c\'alculo total, guardado y comprobante. La Figura 12 muestra esa colaboraci{\'o}n paso a paso.
+\begin{figure}[H]\centering
+{\small\textbf{Figura 12}}\\{\small\textit{Diagrama de secuencia al confirmar una reserva (CU04)}}\\[4pt]
+\begin{tikzpicture}[
+  part/.style={draw=umlline, line width=0.5pt, fill=umlcls, font=\umlfst, align=center, minimum width=1.5cm, minimum height=0.62cm, inner sep=1.5pt},
+  msg/.style={umlline, line width=0.5pt, -{Straight Barb[length=5.5pt,width=7pt]}},
+  ret/.style={umlline, line width=0.5pt, dashed, -{Straight Barb[length=5.5pt,width=7pt]}},
+  both/.style={umlline, line width=0.5pt, {Straight Barb[length=5.5pt,width=7pt]}-{Straight Barb[length=5.5pt,width=7pt]}},
+  lab/.style={font=\umlfst, text=umlline, inner sep=1pt},
+  labr/.style={font=\umlfst\itshape, text=umlline, inner sep=1pt},
+]
+  % --- participantes ---
+  \node[part] (cl) at (0.8,0) {Cliente};
+  \node[part] (ctl) at (2.45,0) {Reserva\\Controller};
+  \node[part] (prx) at (4.1,0) {Reserva\\ServiceProxy};
+  \node[part] (imp) at (5.75,0) {Reserva\\ServiceImpl};
+  \node[part] (dis) at (7.4,0) {Disponibilidad\\Service};
+  \node[part] (bld) at (9.05,0) {Reserva\\Builder};
+  \node[part] (cmp) at (10.7,0) {Componente\\Reserva};
+  \node[part] (dao) at (12.35,0) {ReservaDAO};
+  \node[part] (pag) at (14.0,0) {PagoService};
+  % --- l{\'i}neas de vida ---
+  \foreach \p in {cl,ctl,prx,imp,dis,bld,cmp,dao,pag} {\draw[dashed, umlline] (\p.south) -- (\p.south |- 0,-7.8);}
+  % --- barras de activaci{\'o}n ---
+  \draw[draw=umlline, fill=white, line width=0.4pt] (4.02,-1.75) rectangle (4.18,-3.05);
+  \draw[draw=umlline, fill=white, line width=0.4pt] (5.67,-2.95) rectangle (5.83,-7.0);
+  \node[lab, rotate=90, anchor=north] at (5.6,-6.55) {transacci{\'o}n};
+  % --- mensajes ---
+  \draw[msg] (0.8,-1.15) -- (2.45,-1.15) node[lab, above, midway] {POST /reservas};
+  \draw[msg] (2.45,-1.75) -- (4.1,-1.75) node[lab, above, midway] {confirmar(datos)};
+  \draw[msg] (4.16,-2.28) -- (4.62,-2.28) -- (4.62,-2.5) -- (4.16,-2.5);
+  \node[lab] at (4.75,-2.12) {verificar\_rol()};
+  \draw[msg] (4.1,-2.95) -- (5.75,-2.95) node[lab, above, midway] {confirmar(datos)};
+  \draw[both] (5.75,-3.6) -- (7.4,-3.6) node[lab, above, midway] {hay\_cruce()} node[labr, below, midway] {libre = true};
+  \draw[both] (5.75,-4.25) -- (9.05,-4.25) node[lab, above, midway] {construir(datos)} node[labr, below, midway] {reserva};
+  \draw[both] (5.75,-4.9) -- (10.7,-4.9) node[lab, above, midway] {costo()} node[labr, below, midway] {total};
+  \draw[both] (5.75,-5.55) -- (12.35,-5.55) node[lab, above, midway] {guardar()} node[labr, below, midway] {id};
+  \draw[both] (5.75,-6.2) -- (14.0,-6.2);
+  \node[lab] at (9.875,-6.08) {emitir\_comprobante()};
+  \node[labr] at (9.875,-6.34) {comprobante};
+  \draw[ret] (5.75,-6.85) -- (2.45,-6.85);
+  \node[labr] at (4.9,-6.73) {id + comprobante};
+  \draw[ret] (2.45,-7.5) -- (0.8,-7.5);
+  \node[labr] at (1.75,-7.38) {201 Created};
+\end{tikzpicture}
+\\[3pt]{\small\textit{Nota.} Elaboraci{\'o}n propia. El retorno se dibuja en punteado; las barras marcan el per{\'i}odo de ejecuci{\'o}n de cada objeto y la operaci{\'o}n completa corre dentro de una transacci{\'o}n (RNF03): si la disponibilidad falla, nada se guarda.}
+\end{figure}
 \subsection{UI}
 La interfaz sigue la direcci{\'o}n visual ``Le Jardin'' (ADR 0004): paleta marfil, borgo{\~n}a, carb{\'o}n y dorado apagado; tipograf{\'i}a editorial (Cormorant Garamond para t{\'i}tulos e Inter para la interfaz) \textit{self-hosted} en \texttt{static/fuentes/} con licencia OFL, sin CDN. El asistente mantiene 4 pasos con progreso; el paso 2 pinta un plano SVG del sal{\'o}n (muros dobles, ventanales con parteluces, lavados de zona, plantas, barra y puerta con arco) con una silla por puesto: libre en arena, seleccionada en borgo{\~n}a con anillo dorado, reservada en gris c{\'a}lido y bloqueada en gris punteado, con roles ARIA, operaci{\'o}n por teclado (Enter/Espacio) y leyenda; al lado, la ficha de mesa muestra la foto real de su zona y sincroniza el selector de comensales con el campo del paso. El paso 3 gu{\'i}a el pedido por porciones (botones de restar y sumar, ``toda la mesa'' y medidor de cobertura sobre los comensales, con costos vivos en los extras) y el paso 4 revisa la reserva en vivo (fecha, mesas, pedido desglosado y monto seg{\'u}n la modalidad). La cancelaci{\'o}n de una reserva pide confirmaci{\'o}n en un di{\'a}logo propio. Al confirmar una reserva se avisa por correo al cliente y a la administraci{\'o}n, recordando la fecha y el plazo de cancelaci{\'o}n antes del cobro; en la demo los mensajes quedan en un buz{\'o}n visible para el personal en la agenda y, con credenciales SMTP en el entorno, la entrega a buzones reales es efectiva (ADRs 0008 y 0009). El acceso y el registro usan un panel ilustrado a dos columnas, y mis reservas y la agenda comparten tabla editorial con insignias de estado. Los mensajes siguen las heur{\'i}sticas de Nielsen (1993). Prototipos Figs.~13--16 (baja fidelidad).
 
 \textit{Decisi{\'o}n de stack frontend (vinculante):} plantillas HTML con bloques estilo Jinja/Askama en \texttt{templates/} (\texttt{base}, \texttt{inicio}, \texttt{login}, \texttt{registro}, \texttt{reservar}, \texttt{mis\_reservas} y \texttt{agenda}); CSS vanilla en \texttt{static/css/} con los tokens de \texttt{tema.css} (colores de estado de mesa, tipograf{\'i}a y componentes) y las fuentes \textit{self-hosted} de \texttt{fuentes.css}; JS vanilla en \texttt{static/js/plano.js} (pinta el plano SVG, gestiona la selecci{\'o}n y la ficha de mesa, gu{\'i}a el pedido por porciones y consulta \texttt{GET /api/disponibilidad?fecha=\&hora=\&zona=} sin recargar) y \texttt{static/js/ui.js} (toasts y di{\'a}logo de confirmaci{\'o}n propios). La portada incluye la carta de platos (\texttt{\#carta} en \texttt{templates/inicio.html}) con un spotlight que sigue al cursor y revela la foto a color de cada plato: efecto adaptado a JS/CSS vanilla desde el componente ChromaGrid de React Bits (MIT), portado como c{\'o}digo propio en \texttt{static/js/chroma.js} y \texttt{static/css/chroma.css}, con las fotos reales de \texttt{static/img/fotos/}. En \texttt{/mis-reservas} el cliente ve una cuenta regresiva (d{\'i}as, horas, minutos y segundos) para su pr{\'o}xima reserva vigente: port vanilla del componente Counter de React Bits (MIT) en \texttt{static/js/counter.js} y \texttt{static/css/counter.css}, alimentado por la fecha en ISO 8601 con desfase UTC-5. Las fotos (carta, sal{\'o}n y mesas) se descargan con \texttt{static/img/fotos/descargar\_fotos.py}, que verifica la licencia por la API de Wikimedia Commons y escribe \texttt{creditos.md} (ADR 0005), y \texttt{convertir\_webp.py} deja la variante WebP que sirven los \texttt{<picture>} de la UI (respaldo JPEG, ADR 0007); los PNG deterministas de \texttt{generar\_*.py} quedan como respaldo \textit{offline}. No se usa htmx ni librer{\'i}as: todo es c{\'o}digo original del repo (las adaptaciones de la carta y del contador est{\'a}n acreditadas a React Bits), sin copiar de otros proyectos. El servidor expone \texttt{/static} y las rutas \texttt{/}, \texttt{/login}, \texttt{/registro}, \texttt{/reservar} (GET y POST), \texttt{/mis-reservas}, \texttt{/reservas/\{id\}/cancelar} y \texttt{/agenda}. En la fase 1 el flujo completo corre sobre un almac{\'e}n en memoria (\texttt{src/estado.rs}) con seed de demostraci{\'o}n; los DAO sqlx ya definidos son la ruta de conexi{\'o}n al motor.
+\begin{figure}[H]\centering
+{\small\textbf{Figura 13}}\\{\small\textit{Prototipos de inicio de sesi{\'o}n y paso 1 (ocasi{\'o}n)}}\\[4pt]
+\begin{tikzpicture}
+  % ---------- (a) inicio de sesion ----------
+  \draw[wfr] (0,0) rectangle (7,-5.2);
+  \draw[wfh] (0.1,-0.1) rectangle (6.9,-0.52);
+  \foreach \x in {0.34,0.54,0.74} \fill[umlline] (\x,-0.31) circle (0.045);
+  \draw[wfb] (0.35,-0.8) rectangle (2.95,-4.55);
+  \draw[wfb] (0.35,-0.8) -- (2.95,-4.55);
+  \draw[wfb] (0.35,-4.55) -- (2.95,-0.8);
+  \node[wfg] at (1.65,-2.68) {ilustraci{\'o}n};
+  \node[wft] at (4.98,-1.35) {Iniciar sesi{\'o}n};
+  \draw[wfo] (3.3,-1.75) rectangle (6.65,-2.35);
+  \node[wfg, anchor=west] at (3.45,-2.05) {correo electr{\'o}nico};
+  \draw[wfo] (3.3,-2.55) rectangle (6.65,-3.15);
+  \node[wfg, anchor=west] at (3.45,-2.85) {contrase{\~n}a};
+  \draw[wfd] (3.3,-3.45) rectangle (6.65,-4.0);
+  \node[wfm, text=white] at (4.98,-3.73) {Entrar};
+  \node[wfg] at (4.98,-4.38) {{\textquestiondown}No tienes cuenta? Reg{\'i}strate};
+  \node[wfg] at (3.5,-5.5) {(a) Inicio de sesi{\'o}n};
+  % ---------- (b) paso 1: ocasion ----------
+  \begin{scope}[shift={(7.8,0)}]
+  \draw[wfr] (0,0) rectangle (7,-5.2);
+  \draw[wfh] (0.1,-0.1) rectangle (6.9,-0.52);
+  \foreach \x in {0.34,0.54,0.74} \fill[umlline] (\x,-0.31) circle (0.045);
+  \draw[umlline!45, line width=0.4pt] (1.15,-0.85) -- (5.95,-0.85);
+  \foreach \x in {2.75,4.35,5.95} \draw[umlline, line width=0.6pt, fill=white] (\x,-0.85) circle (0.09);
+  \fill[umlline] (1.15,-0.85) circle (0.09);
+  \node[wfm] at (1.15,-1.15) {Ocasi{\'o}n};
+  \node[wfm] at (2.75,-1.15) {Mesas};
+  \node[wfm] at (4.35,-1.15) {Pedido};
+  \node[wfm] at (5.95,-1.15) {Pago};
+  \node[wfm, anchor=west] at (0.35,-1.6) {Ocasi{\'o}n};
+  \draw[wfo] (0.35,-1.85) rectangle (1.85,-2.6);
+  \draw[wfb] (0.5,-2.0) rectangle (1.7,-2.18);
+  \node[wfm] at (1.1,-2.42) {Cumplea{\~n}os};
+  \draw[wfo] (2.01,-1.85) rectangle (3.51,-2.6);
+  \draw[wfb] (2.16,-2.0) rectangle (3.36,-2.18);
+  \node[wfm] at (2.76,-2.42) {Aniversario};
+  \draw[wfo] (3.67,-1.85) rectangle (5.17,-2.6);
+  \draw[wfb] (3.82,-2.0) rectangle (5.02,-2.18);
+  \node[wfm] at (4.42,-2.42) {Propuesta};
+  \draw[wfo] (5.33,-1.85) rectangle (6.83,-2.6);
+  \draw[wfb] (5.48,-2.0) rectangle (6.68,-2.18);
+  \node[wfm] at (6.08,-2.42) {Casual};
+  \node[wfm, anchor=west] at (0.35,-2.95) {Tipo de reserva};
+  \draw[wfo] (0.35,-3.15) rectangle (2.05,-3.62);
+  \draw[umlline, line width=0.5pt, fill=white] (0.5,-3.38) circle (0.055);
+  \node[wfg, anchor=west] at (0.65,-3.38) {Por mesas};
+  \draw[wfo] (2.25,-3.15) rectangle (4.5,-3.62);
+  \draw[umlline, line width=0.5pt, fill=white] (2.4,-3.38) circle (0.055);
+  \node[wfg, anchor=west] at (2.55,-3.38) {Restaurante completo};
+  \draw[wfo] (0.35,-3.9) rectangle (1.95,-4.5);
+  \node[wfg, anchor=west] at (0.5,-4.08) {Fecha};
+  \node[wfm, anchor=west] at (0.5,-4.32) {12 oct};
+  \draw[wfo] (2.1,-3.9) rectangle (3.7,-4.5);
+  \node[wfg, anchor=west] at (2.25,-4.08) {Hora};
+  \node[wfm, anchor=west] at (2.25,-4.32) {7:00 p. m.};
+  \draw[wfo] (3.85,-3.9) rectangle (6.65,-4.5);
+  \node[wfg, anchor=west] at (4.0,-4.08) {Comensales};
+  \draw[wfo] (4.1,-4.28) rectangle (4.38,-4.46);
+  \node[wfm] at (4.24,-4.37) {-};
+  \node[wfm] at (4.52,-4.37) {2};
+  \draw[wfo] (4.66,-4.28) rectangle (4.94,-4.46);
+  \node[wfm] at (4.8,-4.37) {+};
+  \node[wfg, anchor=west] at (0.35,-4.82) {Zona sugerida: General};
+  \draw[wfd] (5.15,-4.62) rectangle (6.65,-5.08);
+  \node[wfm, text=white] at (5.9,-4.85) {Continuar};
+  \node[wfg] at (3.5,-5.5) {(b) Paso 1: ocasi{\'o}n, fecha y comensales};
+  \end{scope}
+\end{tikzpicture}
+\\[3pt]{\small\textit{Nota.} Elaboraci{\'o}n propia.}
+\end{figure}
+\begin{figure}[H]\centering
+{\small\textbf{Figura 14}}\\{\small\textit{Prototipos del paso 2 (plano de mesas) y paso 3 (pedido y servicios extra)}}\\[4pt]
+\begin{tikzpicture}
+  % ---------- (a) paso 2: plano ----------
+  \draw[wfr] (0,0) rectangle (7,-6.2);
+  \draw[wfh] (0.1,-0.1) rectangle (6.9,-0.52);
+  \foreach \x in {0.34,0.54,0.74} \fill[umlline] (\x,-0.31) circle (0.045);
+  \draw[umlline!45, line width=0.4pt] (1.15,-0.85) -- (5.95,-0.85);
+  \foreach \x in {1.15,4.35,5.95} \draw[umlline, line width=0.6pt, fill=white] (\x,-0.85) circle (0.09);
+  \fill[umlline] (2.75,-0.85) circle (0.09);
+  \node[wfm] at (1.15,-1.15) {Ocasi{\'o}n};
+  \node[wfm] at (2.75,-1.15) {Mesas};
+  \node[wfm] at (4.35,-1.15) {Pedido};
+  \node[wfm] at (5.95,-1.15) {Pago};
+  \node[wft, anchor=west] at (0.35,-1.45) {Elige tus mesas};
+  \draw[wfo] (0.35,-1.7) rectangle (4.45,-5.0);
+  \draw[umlline!40, line width=0.4pt] (0.45,-1.8) rectangle (4.35,-4.9);
+  \node[wfg, anchor=west] at (0.6,-2.0) {General};
+  \node[wfg, anchor=east] at (4.2,-2.0) {VIP};
+  \node[wfg, anchor=west] at (0.6,-4.72) {Terraza};
+  \foreach \x/\y in {0.65/-2.35, 1.15/-2.35, 0.65/-2.85, 1.15/-2.85, 2.4/-3.55, 2.9/-3.55}
+    \draw[wfo] (\x,\y) rectangle + (0.4,-0.4);
+  \foreach \x/\y in {2.05/-2.55, 2.55/-2.55}
+    \draw[wfd] (\x,\y) rectangle + (0.4,-0.4);
+  \foreach \x/\y in {3.55/-2.35, 3.55/-2.85, 3.3/-4.25, 3.8/-4.25}
+    \draw[wfb] (\x,\y) rectangle + (0.4,-0.4);
+  \draw[wfb, dashed] (2.65,-4.25) rectangle + (0.4,-0.4);
+  \draw[wfo] (0.45,-5.68) rectangle + (0.22,-0.22);
+  \node[wfg, anchor=west] at (0.73,-5.79) {libre};
+  \draw[wfd] (1.75,-5.68) rectangle + (0.22,-0.22);
+  \node[wfg, anchor=west] at (2.03,-5.79) {elegida};
+  \draw[wfb] (2.95,-5.68) rectangle + (0.22,-0.22);
+  \node[wfg, anchor=west] at (3.23,-5.79) {reservada};
+  \draw[wfb, dashed] (4.25,-5.68) rectangle + (0.22,-0.22);
+  \node[wfg, anchor=west] at (4.53,-5.79) {bloqueada};
+  \draw[wfb] (4.75,-1.7) rectangle (6.65,-2.7);
+  \draw[wfb] (4.75,-1.7) -- (6.65,-2.7);
+  \draw[wfb] (4.75,-2.7) -- (6.65,-1.7);
+  \node[wfg] at (5.7,-2.2) {foto};
+  \node[wfm] at (5.7,-2.92) {Mesa 6 · VIP};
+  \node[wfg] at (5.7,-3.15) {4 puestos};
+  \draw[wfo] (4.75,-3.42) rectangle (6.65,-3.97);
+  \node[wfg, anchor=west] at (4.87,-3.6) {Capacidad};
+  \node[wfm, anchor=east] at (6.53,-3.6) {4/4};
+  \draw[wfb] (4.87,-3.78) rectangle (6.53,-3.9);
+  \draw[wfo] (4.75,-4.12) rectangle (6.65,-4.67);
+  \node[wfg, anchor=west] at (4.87,-4.3) {Bloqueo};
+  \node[wfm, anchor=east] at (6.53,-4.3) {04:32};
+  \draw[wfb] (4.87,-4.48) rectangle (6.53,-4.6);
+  \draw[wfd] (4.9,-4.95) rectangle (6.5,-5.4);
+  \node[wfm, text=white] at (5.7,-5.175) {Continuar};
+  \node[wfg] at (3.5,-6.5) {(a) Paso 2: plano del sal{\'o}n y ficha de mesa};
+  % ---------- (b) paso 3: pedido ----------
+  \begin{scope}[shift={(7.8,0)}]
+  \draw[wfr] (0,0) rectangle (7,-6.2);
+  \draw[wfh] (0.1,-0.1) rectangle (6.9,-0.52);
+  \foreach \x in {0.34,0.54,0.74} \fill[umlline] (\x,-0.31) circle (0.045);
+  \draw[umlline!45, line width=0.4pt] (1.15,-0.85) -- (5.95,-0.85);
+  \foreach \x in {1.15,2.75,5.95} \draw[umlline, line width=0.6pt, fill=white] (\x,-0.85) circle (0.09);
+  \fill[umlline] (4.35,-0.85) circle (0.09);
+  \node[wfm] at (1.15,-1.15) {Ocasi{\'o}n};
+  \node[wfm] at (2.75,-1.15) {Mesas};
+  \node[wfm] at (4.35,-1.15) {Pedido};
+  \node[wfm] at (5.95,-1.15) {Pago};
+  \node[wft, anchor=west] at (0.35,-1.45) {Tu pedido y extras};
+  \node[wfm, anchor=west] at (0.35,-1.75) {Pedido anticipado};
+  \draw[wfo] (0.35,-1.95) rectangle (5.4,-2.37);
+  \draw[wfb] (0.5,-2.06) rectangle (3.6,-2.26);
+  \draw[wfo] (4.55,-2.02) rectangle (4.81,-2.28);
+  \node[wfm] at (4.68,-2.15) {-};
+  \node[wfm] at (4.94,-2.15) {0};
+  \draw[wfo] (5.07,-2.02) rectangle (5.33,-2.28);
+  \node[wfm] at (5.2,-2.15) {+};
+  \draw[wfo] (0.35,-2.5) rectangle (5.4,-2.92);
+  \draw[wfb] (0.5,-2.61) rectangle (3.6,-2.81);
+  \draw[wfo] (4.55,-2.57) rectangle (4.81,-2.83);
+  \node[wfm] at (4.68,-2.7) {-};
+  \node[wfm] at (4.94,-2.7) {0};
+  \draw[wfo] (5.07,-2.57) rectangle (5.33,-2.83);
+  \node[wfm] at (5.2,-2.7) {+};
+  \draw[wfo] (0.35,-3.05) rectangle (5.4,-3.47);
+  \draw[wfb] (0.5,-3.16) rectangle (3.6,-3.36);
+  \draw[wfo] (4.55,-3.12) rectangle (4.81,-3.38);
+  \node[wfm] at (4.68,-3.25) {-};
+  \node[wfm] at (4.94,-3.25) {0};
+  \draw[wfo] (5.07,-3.12) rectangle (5.33,-3.38);
+  \node[wfm] at (5.2,-3.25) {+};
+  \node[wfm, anchor=west] at (0.35,-3.75) {Servicios extra};
+  \draw[wfo] (0.4,-3.92) rectangle (0.62,-4.14);
+  \node[wfg, anchor=west] at (0.76,-4.03) {Decoraci{\'o}n (tarifa fija)};
+  \draw[wfo] (0.4,-4.36) rectangle (0.62,-4.58);
+  \node[wfg, anchor=west] at (0.76,-4.47) {Barra (por persona)};
+  \draw[wfo] (0.35,-4.85) rectangle (5.4,-5.6);
+  \node[wfg, anchor=west] at (0.5,-5.03) {Restricciones alimentarias};
+  \draw[wfb] (0.5,-5.2) rectangle (5.25,-5.33);
+  \draw[wfo] (5.65,-1.75) rectangle (6.85,-3.6);
+  \node[wfm, anchor=west] at (5.75,-1.95) {Resumen};
+  \draw[wfb] (5.75,-2.2) rectangle (6.75,-2.32);
+  \draw[wfb] (5.75,-2.5) rectangle (6.75,-2.62);
+  \draw[wfb] (5.75,-2.8) rectangle (6.75,-2.92);
+  \draw[umlline!40, line width=0.4pt] (5.75,-3.12) -- (6.75,-3.12);
+  \node[wfg, anchor=west] at (5.75,-3.28) {Total};
+  \node[wfm, anchor=west] at (5.75,-3.48) {\$ 440.000};
+  \draw[wfd] (5.65,-4.05) rectangle (6.85,-4.5);
+  \node[wfm, text=white] at (6.25,-4.28) {Continuar};
+  \node[wfg] at (3.5,-6.5) {(b) Paso 3: pedido, extras y resumen};
+  \end{scope}
+\end{tikzpicture}
+\\[3pt]{\small\textit{Nota.} Elaboraci{\'o}n propia. Los precios est{\'a}n en pesos colombianos y son ilustrativos.}
+\end{figure}
+\begin{figure}[H]\centering
+{\small\textbf{Figura 15}}\\{\small\textit{Prototipos del paso 4 (pago) y de las reservas del cliente}}\\[4pt]
+\begin{tikzpicture}
+  % ---------- (a) paso 4: pago ----------
+  \draw[wfr] (0,0) rectangle (7,-6.2);
+  \draw[wfh] (0.1,-0.1) rectangle (6.9,-0.52);
+  \foreach \x in {0.34,0.54,0.74} \fill[umlline] (\x,-0.31) circle (0.045);
+  \draw[umlline!45, line width=0.4pt] (1.15,-0.85) -- (5.95,-0.85);
+  \foreach \x in {1.15,2.75,4.35} \draw[umlline, line width=0.6pt, fill=white] (\x,-0.85) circle (0.09);
+  \fill[umlline] (5.95,-0.85) circle (0.09);
+  \node[wfm] at (1.15,-1.15) {Ocasi{\'o}n};
+  \node[wfm] at (2.75,-1.15) {Mesas};
+  \node[wfm] at (4.35,-1.15) {Pedido};
+  \node[wfm] at (5.95,-1.15) {Pago};
+  \node[wft, anchor=west] at (0.35,-1.45) {Confirma tu reserva};
+  \node[wfg, anchor=west] at (0.45,-1.95) {Fecha};
+  \draw[wfb] (1.6,-1.84) rectangle (4.35,-2.06);
+  \node[wfg, anchor=west] at (0.45,-2.4) {Mesas};
+  \draw[wfb] (1.6,-2.29) rectangle (4.35,-2.51);
+  \node[wfg, anchor=west] at (0.45,-2.85) {Pedido};
+  \draw[wfb] (1.6,-2.74) rectangle (4.35,-2.96);
+  \node[wfg, anchor=west] at (0.45,-3.3) {Total};
+  \draw[wfb] (1.6,-3.19) rectangle (4.35,-3.41);
+  \node[wfm, anchor=west] at (0.35,-3.7) {Modalidad de pago};
+  \draw[umlline, line width=0.5pt, fill=white] (0.5,-3.95) circle (0.055);
+  \node[wfg, anchor=west] at (0.66,-3.95) {Abono del 50 \%};
+  \draw[umlline, line width=0.5pt, fill=white] (0.5,-4.35) circle (0.055);
+  \node[wfg, anchor=west] at (0.66,-4.35) {Pago completo};
+  \draw[umlline!45, line width=0.5pt, fill=white] (0.5,-4.75) circle (0.055);
+  \node[wfg, anchor=west] at (0.66,-4.75) {En el restaurante};
+  \node[wfg, anchor=west] at (2.55,-4.75) {(requiere VIP)};
+  \node[wfm, anchor=west] at (0.35,-5.15) {Medio de pago};
+  \draw[wfo] (0.35,-5.32) rectangle (1.65,-5.7);
+  \node[wfg, anchor=west] at (0.52,-5.51) {Tarjeta};
+  \draw[wfo] (1.85,-5.32) rectangle (3.0,-5.7);
+  \node[wfg, anchor=west] at (2.02,-5.51) {PSE};
+  \node[wfg, anchor=west] at (0.35,-6.0) {Pol{\'i}tica: reembolso seg{\'u}n horas de anticipaci{\'o}n};
+  \draw[wfo] (4.85,-1.75) rectangle (6.85,-3.4);
+  \node[wfm, anchor=west] at (5.0,-1.95) {Detalle del pago};
+  \draw[wfb] (5.0,-2.2) rectangle (6.7,-2.32);
+  \draw[wfb] (5.0,-2.5) rectangle (6.7,-2.62);
+  \draw[wfb] (5.0,-2.8) rectangle (6.7,-2.92);
+  \node[wfg, anchor=west] at (4.95,-3.2) {Abono};
+  \node[wfm, anchor=east] at (6.75,-3.2) {\$ 220.000};
+  \draw[wfd] (4.85,-4.4) rectangle (6.85,-5.0);
+  \node[wfm, text=white] at (5.85,-4.7) {Confirmar reserva};
+  \node[wfg] at (3.5,-6.5) {(a) Paso 4: pago y pol{\'i}tica de cancelaci{\'o}n};
+  % ---------- (b) mis reservas ----------
+  \begin{scope}[shift={(7.8,0)}]
+  \draw[wfr] (0,0) rectangle (7,-6.2);
+  \draw[wfh] (0.1,-0.1) rectangle (6.9,-0.52);
+  \foreach \x in {0.34,0.54,0.74} \fill[umlline] (\x,-0.31) circle (0.045);
+  \node[wft, anchor=west] at (0.35,-0.95) {Mis reservas};
+  \draw[wfo] (5.0,-0.78) rectangle (6.85,-1.2);
+  \node[wfg] at (5.925,-0.99) {+ Nueva reserva};
+  \draw[wfh] (0.35,-1.45) rectangle (6.85,-1.85);
+  \node[wfg] at (1.0,-1.65) {Fecha};
+  \node[wfg] at (2.4,-1.65) {C{\'o}digo};
+  \node[wfg] at (3.7,-1.65) {Mesas};
+  \node[wfg] at (5.7,-1.65) {Estado};
+  \draw[wfb] (0.45,-1.99) rectangle (1.55,-2.21);
+  \draw[wfb] (1.85,-1.99) rectangle (2.95,-2.21);
+  \draw[wfb] (3.3,-1.99) rectangle (4.1,-2.21);
+  \draw[wfd] (5.05,-1.98) rectangle (6.35,-2.22);
+  \node[wfm, text=white] at (5.7,-2.1) {Vigente};
+  \draw[wfb] (0.45,-2.54) rectangle (1.55,-2.76);
+  \draw[wfb] (1.85,-2.54) rectangle (2.95,-2.76);
+  \draw[wfb] (3.3,-2.54) rectangle (4.1,-2.76);
+  \draw[wfh] (5.05,-2.53) rectangle (6.35,-2.77);
+  \node[wfm] at (5.7,-2.65) {Completada};
+  \draw[wfb] (0.45,-3.09) rectangle (1.55,-3.31);
+  \draw[wfb] (1.85,-3.09) rectangle (2.95,-3.31);
+  \draw[wfb] (3.3,-3.09) rectangle (4.1,-3.31);
+  \draw[wfo] (5.05,-3.08) rectangle (6.35,-3.32);
+  \node[wfm] at (5.7,-3.2) {Cancelada};
+  \draw[wfo] (0.35,-3.7) rectangle (6.85,-5.1);
+  \node[wfm, anchor=west] at (0.55,-3.95) {Cancelar reserva};
+  \node[wfg, anchor=west] at (0.55,-4.28) {Reembolso estimado};
+  \draw[wfb] (0.55,-4.48) rectangle (3.4,-4.61);
+  \node[wfm, anchor=west] at (0.55,-4.88) {\$ 118.800};
+  \draw[wfo] (5.0,-4.55) rectangle (6.6,-5.0);
+  \node[wfm] at (5.8,-4.78) {Cancelar reserva};
+  \node[wfg] at (3.5,-6.5) {(b) Reservas del cliente y ventana de cancelaci{\'o}n};
+  \end{scope}
+\end{tikzpicture}
+\\[3pt]{\small\textit{Nota.} Elaboraci{\'o}n propia.}
+\end{figure}
+\begin{figure}[H]\centering
+{\small\textbf{Figura 16}}\\{\small\textit{Prototipo de la agenda del personal}}\\[4pt]
+\begin{tikzpicture}
+  \draw[wfr] (0,0) rectangle (14,-5.0);
+  \draw[wfb] (0.15,-0.15) rectangle (2.0,-4.85);
+  \draw[wfd] (0.4,-0.4) rectangle (1.75,-0.75);
+  \node[wfm, text=white] at (1.075,-0.575) {Brindis};
+  \draw[wfd] (0.4,-1.15) rectangle (1.75,-1.49);
+  \node[wfm, text=white] at (1.075,-1.32) {Agenda};
+  \draw[wfo] (0.4,-1.6) rectangle (1.75,-1.94);
+  \node[wfm] at (1.075,-1.77) {Reservas};
+  \draw[wfo] (0.4,-2.05) rectangle (1.75,-2.39);
+  \node[wfm] at (1.075,-2.22) {Mesas};
+  \draw[wfo] (0.4,-2.5) rectangle (1.75,-2.84);
+  \node[wfm] at (1.075,-2.67) {Correos};
+  \draw[wfh] (0.4,-3.9) rectangle (1.75,-4.2);
+  \node[wfg] at (1.075,-4.05) {Usuarios};
+  \draw[wfh] (0.4,-4.3) rectangle (1.75,-4.6);
+  \node[wfg] at (1.075,-4.45) {Estad{\'i}sticas};
+  \node[wft, anchor=west] at (2.3,-0.5) {Agenda del d{\'i}a --- S{\'a}b 18 de oct};
+  \draw[wfd] (11.4,-0.32) rectangle (13.7,-0.75);
+  \node[wfm, text=white] at (12.55,-0.535) {+ Reserva de cliente};
+  \draw[wfh] (2.3,-1.0) rectangle (13.7,-1.42);
+  \node[wfg] at (2.75,-1.21) {Hora};
+  \node[wfg] at (3.8,-1.21) {C{\'o}digo};
+  \node[wfg] at (5.3,-1.21) {Cliente};
+  \node[wfg] at (6.6,-1.21) {Mesas};
+  \node[wfg] at (7.8,-1.21) {Ocasi{\'o}n};
+  \node[wfg] at (9.3,-1.21) {Estado};
+  \node[wfg] at (11.85,-1.21) {Alertas e indicaciones};
+  \node[wfg] at (2.75,-1.78) {12:00};
+  \node[wfg] at (3.8,-1.78) {BRND2026};
+  \draw[wfb] (4.5,-1.71) rectangle (5.25,-1.85);
+  \draw[wfd] (5.35,-1.68) rectangle (5.95,-1.88);
+  \node[wfm, text=white] at (5.65,-1.78) {VIP};
+  \draw[wfb] (6.35,-1.71) rectangle (6.85,-1.85);
+  \node[wfg] at (7.8,-1.78) {Cumplea{\~n}os};
+  \draw[wfd] (8.65,-1.67) rectangle (9.95,-1.89);
+  \node[wfm, text=white] at (9.3,-1.78) {Vigente};
+  \draw[wfo] (10.1,-1.67) rectangle (11.6,-1.91);
+  \node[wfg] at (10.85,-1.79) {sin gluten};
+  \node[wfg, anchor=west] at (10.15,-2.0) {decorar con velas};
+  \draw[umlline!35, line width=0.3pt] (2.3,-2.14) -- (13.7,-2.14);
+  \node[wfg] at (2.75,-2.5) {13:30};
+  \node[wfg] at (3.8,-2.5) {BRND2031};
+  \draw[wfb] (4.5,-2.43) rectangle (6.05,-2.57);
+  \draw[wfb] (6.35,-2.43) rectangle (6.85,-2.57);
+  \node[wfg] at (7.8,-2.5) {Casual};
+  \draw[wfh] (8.65,-2.39) rectangle (9.95,-2.61);
+  \node[wfm] at (9.3,-2.5) {Completada};
+  \draw[umlline!35, line width=0.3pt] (2.3,-2.86) -- (13.7,-2.86);
+  \node[wfg] at (2.75,-3.22) {19:00};
+  \node[wfg] at (3.8,-3.22) {BRND2048};
+  \draw[wfb] (4.5,-3.15) rectangle (5.25,-3.29);
+  \draw[wfd] (5.35,-3.12) rectangle (5.95,-3.32);
+  \node[wfm, text=white] at (5.65,-3.22) {VIP};
+  \draw[wfb] (6.35,-3.15) rectangle (6.85,-3.29);
+  \node[wfg] at (7.8,-3.22) {Propuesta};
+  \draw[wfd] (8.65,-3.11) rectangle (9.95,-3.33);
+  \node[wfm, text=white] at (9.3,-3.22) {Vigente};
+  \draw[wfo] (10.1,-3.11) rectangle (11.6,-3.35);
+  \node[wfg] at (10.85,-3.23) {sin lactosa};
+  \node[wfg, anchor=west] at (10.15,-3.44) {flores y velas en la mesa};
+  \draw[umlline!35, line width=0.3pt] (2.3,-3.58) -- (13.7,-3.58);
+  \node[wfg] at (2.75,-3.94) {20:30};
+  \node[wfg] at (3.8,-3.94) {BRND2051};
+  \draw[wfb] (4.5,-3.87) rectangle (6.05,-4.01);
+  \draw[wfb] (6.35,-3.87) rectangle (6.85,-4.01);
+  \node[wfg] at (7.8,-3.94) {Casual};
+  \draw[wfo] (8.65,-3.83) rectangle (9.95,-4.05);
+  \node[wfm] at (9.3,-3.94) {Cancelada};
+\end{tikzpicture}
+\\[3pt]{\small\textit{Nota.} Elaboraci{\'o}n propia. Las opciones de usuarios y estad{\'i}sticas solo aparecen para el administrador.}
+\end{figure}
 \section{Implementaci{\'o}n: backend cr{\'i}tico y patrones}
 Lo importante del backend son cinco piezas, una por patr{\'o}n m{\'a}s la transacci{\'o}n. El resto (vistas, DTO) solo transporta datos. C{\'o}digo completo en \texttt{src/}: compila con \texttt{cargo check} y el caso CP09 pasa con \texttt{cargo test}.
 \subsection{Capas y transacci{\'o}n (lo que une todo)}
@@ -653,20 +1167,20 @@ costo() = envuelto.costo() + tarifa * comensales
 \begin{longtable}{|p{1.0cm}|>{\raggedright\arraybackslash}p{5.4cm}|>{\raggedright\arraybackslash}p{5.0cm}|c|}\hline
 \textbf{ID} & \textbf{Escenario} & \textbf{Resultado esperado} & \textbf{{\textquestiondown}Cumple?}\\\hline
 \endhead
-CP01 & Inicio de sesi{\'o}n con credenciales v{\'a}lidas de cliente. & Redirige a ``Mis reservas''. & \\\hline
-CP02 & Inicio de sesi{\'o}n con contrase{\~n}a incorrecta. & Mensaje gen{\'e}rico de error. & \\\hline
-CP03 & Registro de un cliente nuevo desde la aplicaci{\'o}n. & Queda con rol cliente, tipo general y cero \textit{strikes} (\textit{Factory Method}). & \\\hline
-CP04 & Un cliente intenta abrir la agenda del personal. & Acceso denegado (\textit{Proxy}). & \\\hline
-CP05 & Un cliente intenta cancelar la reserva de otro cliente. & Acceso denegado (\textit{Proxy}). & \\\hline
-CP06 & Dos usuarios seleccionan la misma mesa en la misma franja. & El segundo la ve bloqueada y no puede tomarla (RN03). & \\\hline
-CP07 & Reservar para 6 personas con mesas que suman 4 puestos. & Se rechaza por RN02 (\textit{Builder}). & \\\hline
-CP08 & Cliente general elige pago en el restaurante. & Se rechaza por RN06 (\textit{Builder}). & \\\hline
-CP09 & Pedido de \$180.000, decoraci{\'o}n de \$80.000 y barra de \$45.000 por persona para 4 personas. & Total de \$440.000 (\textit{Decorator}). & \\\hline
-CP10 & Cliente general cancela 2 horas antes, con \$132.000 pagados. & Reembolso de \$118.800 y comprobante de reembolso parcial (RN08). & \\\hline
-CP11 & Cliente VIP cancela 30 minutos antes. & Retenci{\'o}n del 10~\% y un \textit{strike} (RN09). & \\\hline
-CP12 & El personal marca una inasistencia a un cliente VIP con dos \textit{strikes}. & El cliente pasa a general (RN10). & \\\hline
-CP13 & Un empleado registra una reserva para un cliente nuevo. & Se crea el cliente con contrase{\~n}a gen{\'e}rica y la reserva queda con el empleado como creador. & \\\hline
-CP14 & Reserva de restaurante completo en una franja libre. & Se asocian todas las mesas en servicio (RN04). & \\\hline
+CP01 & Inicio de sesi{\'o}n con credenciales v{\'a}lidas de cliente. & Redirige a ``Mis reservas''. & S{\'i} \\\hline
+CP02 & Inicio de sesi{\'o}n con contrase{\~n}a incorrecta. & Mensaje gen{\'e}rico de error. & S{\'i} \\\hline
+CP03 & Registro de un cliente nuevo desde la aplicaci{\'o}n. & Queda con rol cliente, tipo general y cero \textit{strikes} (\textit{Factory Method}). & S{\'i} \\\hline
+CP04 & Un cliente intenta abrir la agenda del personal. & Acceso denegado (\textit{Proxy}). & S{\'i} \\\hline
+CP05 & Un cliente intenta cancelar la reserva de otro cliente. & Acceso denegado (\textit{Proxy}). & S{\'i} \\\hline
+CP06 & Dos usuarios seleccionan la misma mesa en la misma franja. & El segundo la ve bloqueada y no puede tomarla (RN03). & S{\'i} \\\hline
+CP07 & Reservar para 6 personas con mesas que suman 4 puestos. & Se rechaza por RN02 (\textit{Builder}). & S{\'i} \\\hline
+CP08 & Cliente general elige pago en el restaurante. & Se rechaza por RN06 (\textit{Builder}). & S{\'i} \\\hline
+CP09 & Pedido de \$180.000, decoraci{\'o}n de \$80.000 y barra de \$45.000 por persona para 4 personas. & Total de \$440.000 (\textit{Decorator}). & S{\'i} \\\hline
+CP10 & Cliente general cancela 2 horas antes, con \$132.000 pagados. & Reembolso de \$118.800 y comprobante de reembolso parcial (RN08). & S{\'i} \\\hline
+CP11 & Cliente VIP cancela 30 minutos antes. & Retenci{\'o}n del 10~\% y un \textit{strike} (RN09). & S{\'i} \\\hline
+CP12 & El personal marca una inasistencia a un cliente VIP con dos \textit{strikes}. & El cliente pasa a general (RN10). & S{\'i} \\\hline
+CP13 & Un empleado registra una reserva para un cliente nuevo. & Se crea el cliente con contrase{\~n}a gen{\'e}rica y la reserva queda con el empleado como creador. & S{\'i} \\\hline
+CP14 & Reserva de restaurante completo en una franja libre. & Se asocian todas las mesas en servicio (RN04). & S{\'i} \\\hline
 \end{longtable}
 \section{Video explicativo}
 Link YouTube: (pegar aqu\'i). Guion: programaci\'on por capas/MVC, Factory + Builder, Proxy + Decorator y ejecuci\'on (login, 4 pasos, agenda, cancelaci\'on).

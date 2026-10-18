@@ -78,6 +78,24 @@ diagramas/brindis/    # Fig6-11 PNG/SVG + .drawio (Fig1, Fig4)
 documentacion/        # brindis_rust.tex + decisiones/ (ADRs) + usa.png + entregables/
 ```
 
+## Arquitectura MVC por capas
+
+El código se organiza por capas como en la Figura 3 del documento:
+
+| Capa | Rol | Archivos |
+|---|---|---|
+| Vista | Pinta la interfaz; no conoce al modelo. | `templates/` + `static/` |
+| Controlador | Atiende las peticiones HTTP y delega en el modelo. | `src/vistas.rs` + rutas de `src/main.rs` |
+| Modelo: servicios y patrones | Reglas de negocio detrás de las interfaces de servicio. | `src/servicios.rs` + `factory.rs`, `builder.rs`, `proxy.rs`, `decorator.rs`, `correo.rs` |
+| Modelo: acceso a datos | DAO genéricos y almacenamiento (fase 1 en memoria). | `src/dao.rs` + `src/estado.rs` |
+| Modelo: entidades | Structs del dominio y utilidades de formato. | `src/dominio.rs` + `src/formato.rs` |
+
+Regla de dependencias: la Vista solo habla con el Controlador; el
+Controlador solo conoce las interfaces de servicio (los Proxy); los
+servicios usan los DAO y las entidades; las entidades no conocen a nadie.
+Ninguna capa salta a otra que no le corresponde (Figuras 3 y 11 del
+documento).
+
 ## Diagramas
 
 Se regeneran sin solapes con `python diagramas/brindis/fig_brindis.py`
