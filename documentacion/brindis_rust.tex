@@ -347,11 +347,126 @@ An{\'a}lisis: el Cliente concentra el flujo de reserva (CU04) y sus extensiones 
 \end{tabular}
 {\small\textit{Nota.} Elaboraci{\'o}n propia.}
 \subsection{Ciclo de vida}
-VIGENTE $\rightarrow$ CLIENTE\_EN\_MESA $\rightarrow$ COMPLETADA; VIGENTE $\rightarrow$ CANCELADA/INASISTIDA; modificación sobre VIGENTE.
+VIGENTE $\rightarrow$ CLIENTE\_EN\_MESA $\rightarrow$ COMPLETADA; VIGENTE $\rightarrow$ CANCELADA/INASISTIDA; la modificaci{\'o}n se hace sobre una reserva vigente. La Figura 2 resume los estados de una reserva y los eventos que producen cada transici{\'o}n.
+\begin{figure}[H]\centering
+{\small\textbf{Figura 2}}\\{\small\textit{Diagrama de estados de la reserva}}\\[4pt]
+\begin{tikzpicture}[
+  estado/.style={draw, rounded corners=2pt, font=\scriptsize, minimum height=0.85cm, minimum width=2.2cm, align=center, fill=umlcls},
+  ev/.style={font=\scriptsize, inner sep=1.5pt, text=umlline},
+  fl/.style={umlline, line width=0.5pt, -{Straight Barb[length=5.5pt,width=7pt]}},
+]
+  % --- inicio y fin ---
+  \node[circle, fill=black, minimum size=0.28cm, inner sep=0pt] (ini) at (-1.6,0) {};
+  \node[circle, draw=umlline, fill=white, double, double distance=1.3pt, minimum size=0.34cm, inner sep=0pt] (fin) at (12.2,2.2) {};
+  \node[font=\scriptsize, anchor=south] at (ini.north) {Inicio};
+  \node[font=\scriptsize, anchor=south] at (fin.north) {Fin};
+  % --- estados ---
+  \node[estado] (vig) at (2.4,0) {VIGENTE};
+  \node[estado] (can) at (2.4,2.2) {CANCELADA};
+  \node[estado] (ina) at (7.4,0) {INASISTIDA};
+  \node[estado] (cli) at (8.0,-2.4) {CLIENTE\_EN\_MESA};
+  \node[estado] (com) at (12.2,-2.4) {COMPLETADA};
+  % --- crear reserva ---
+  \draw[fl] (ini) -- (vig.west);
+  \node[ev, anchor=south] at ($(ini.east)!.5!(vig.west)+(0,0.04)$) {crear reserva};
+  % --- cancelar (sube) ---
+  \draw[fl] (vig.north) -- (can.south);
+  \node[ev, anchor=west, align=left, text width=2.8cm] at ($(vig.north)!.5!(can.south)+(0.12,0)$) {cliente o personal cancelan la reserva};
+  % --- cancelada -> fin ---
+  \draw[fl] (can.east) -- (fin.west);
+  % --- no asiste ---
+  \draw[fl] (vig.east) -- (ina.west);
+  \node[ev, anchor=south] at ($(vig.east)!.5!(ina.west)+(0,0.12)$) {comensal no asiste};
+  % --- inasistida -> fin ---
+  \draw[fl] (ina.north east) -- (fin.south);
+  % --- asiste ---
+  \coordinate (ds) at ($(vig.south)+(0.9,0)$);
+  \draw[fl] (ds) -- (cli.west);
+  \node[ev, rotate=-30, anchor=south, font=\umlfst] at ($(ds)!.5!(cli.west)+(0,0.14)$) {comensal asiste a la hora pactada};
+  % --- liquidar ---
+  \draw[fl] (cli.east) -- (com.west);
+  \node[ev, anchor=south] at ($(cli.east)!.5!(com.west)+(0,0.06)$) {liquidar cuenta};
+  % --- completada -> fin ---
+  \draw[fl] (com.north) -- (fin.south);
+  % --- autotransicion: modificar ---
+  \draw[fl] ($(vig.south)+(-0.75,0)$) .. controls +(-0.25,-1.2) and +(0.6,-1.2) .. ($(vig.south)+(-0.15,0)$);
+  \node[ev, anchor=north, align=center] at ($(vig.south)+(-0.45,-1.5)$) {cliente o personal\\modifican la reserva};
+\end{tikzpicture}
+\\[3pt]{\small\textit{Nota.} Elaboraci{\'o}n propia. Las transiciones inv{\'a}lidas (por ejemplo, completar una reserva cancelada) se rechazan en \texttt{cambiar\_estado()} (\texttt{src/dominio.rs}).}
+\end{figure}
 
 \section{Diseño}
 \subsection{Arquitectura MVC por capas}
-La Vista presenta la informaci\'on, el Controlador atiende las peticiones y el Modelo contiene la l\'ogica y los datos. Lo cr\'itico: los controladores no acceden a la l\'ogica de reservas sin pasar por el control de acceso; la verificaci\'on de cruces, el registro de la reserva y su comprobante se ejecutan en una misma transacci\'on.
+La Vista presenta la informaci\'on, el Controlador atiende las peticiones y el Modelo contiene la l\'ogica y los datos. Para separar mejor las responsabilidades, el modelo se divide a su vez en tres capas internas: servicios y patrones, acceso a datos y entidades; la Figura 3 muestra la organizaci{\'o}n resultante. Lo cr\'itico: los controladores no acceden a la l\'ogica de reservas sin pasar por el control de acceso (proxies de servicio); la verificaci\'on de cruces, el registro de la reserva y su comprobante se ejecutan en una misma transacci\'on.
+\begin{figure}[H]\centering
+{\small\textbf{Figura 3}}\\{\small\textit{Arquitectura MVC por capas}}\\[4pt]
+\begin{tikzpicture}[
+  band/.style={draw=umlline, line width=0.5pt, rounded corners=3pt, fill=white},
+  chip/.style={draw=umlline, line width=0.4pt, fill=umlutil, rounded corners=1.5pt, font=\umlfst, inner sep=2.6pt, minimum height=0.42cm, align=center},
+  tit/.style={font=\scriptsize\bfseries, text=umlline, align=center, inner sep=0pt},
+  lb/.style={font=\umlfst, text=umlline, inner sep=1.5pt},
+  fl/.style={umlline, line width=0.5pt, -{Straight Barb[length=5.5pt,width=7pt]}},
+  flb/.style={umlline, line width=0.5pt, {Straight Barb[length=5.5pt,width=7pt]}-{Straight Barb[length=5.5pt,width=7pt]}},
+]
+  % --- Vista ---
+  \node[band, minimum width=10.6cm, minimum height=1.35cm, anchor=north west] (vista) at (0,0) {};
+  \node[tit, anchor=west] at ($(vista.west)+(0.25,0)$) {Vista};
+  \node[chip] at (3.05,-0.44) {plantillas Askama};
+  \node[chip] at (6.15,-0.44) {plano.js y ui.js};
+  \node[chip] at (9.15,-0.44) {tema.css y fuentes};
+  \node[chip] at (5.75,-0.98) {HTML + CSS + JS vanilla (sin librer{\'i}as)};
+  % --- Controlador ---
+  \node[band, minimum width=10.6cm, minimum height=0.95cm, anchor=north west] (ctrl) at (0,-2.2) {};
+  \node[tit, anchor=west] at ($(ctrl.west)+(0.25,0)$) {Controlador\\(Axum)};
+  \node[chip] at (3.15,-2.67) {AuthController};
+  \node[chip] at (6.05,-2.67) {ReservaController};
+  \node[chip] at (8.95,-2.67) {PersonalController};
+  % --- Modelo: servicios y patrones ---
+  \node[band, minimum width=10.6cm, minimum height=2.35cm, anchor=north west] (serv) at (0,-4.0) {};
+  \node[tit, anchor=west, text width=1.7cm] at ($(serv.west)+(0.25,0)$) {Modelo:\\servicios y patrones};
+  \node[chip] at (3.1,-4.5) {UsuarioServiceProxy};
+  \node[chip] at (6.2,-4.5) {ReservaServiceProxy};
+  \node[chip] at (9.15,-4.5) {UsuarioServiceImpl};
+  \node[chip] at (3.1,-5.08) {ReservaServiceImpl};
+  \node[chip] at (6.2,-5.08) {UsuarioFactory};
+  \node[chip] at (9.15,-5.08) {ReservaBuilder};
+  \node[chip] at (3.35,-5.66) {ComponenteReserva\\(decoradores)};
+  \node[chip] at (6.35,-5.66) {DisponibilidadService};
+  \node[chip] at (9.15,-5.66) {PagoService};
+  % --- Modelo: acceso a datos ---
+  \node[band, minimum width=10.6cm, minimum height=0.95cm, anchor=north west] (dao) at (0,-6.9) {};
+  \node[tit, anchor=west] at ($(dao.west)+(0.25,0)$) {Modelo:\\acceso a datos};
+  \node[chip] at (3.3,-7.37) {traits *Dao};
+  \node[chip] at (6.2,-7.37) {impls *Sqlx};
+  \node[chip] at (8.85,-7.37) {DbPool};
+  % --- Base de datos ---
+  \node[band, minimum width=10.6cm, minimum height=0.7cm, anchor=north west] (bd) at (0,-8.4) {};
+  \node[tit, anchor=west] at ($(bd.west)+(0.25,0)$) {Base de\\datos};
+  \node[chip] at (4.1,-8.75) {brindis\_db};
+  \node[lb, anchor=west] at (5.65,-8.75) {(13 tablas, 3FN)};
+  % --- Modelo: entidades (lateral) ---
+  \node[band, minimum width=3.2cm, minimum height=3.85cm, anchor=north west] (ent) at (11.2,-4.0) {};
+  \node[tit] at (12.8,-4.45) {Modelo:\\entidades};
+  \node[lb, align=center] at (12.8,-5.75) {structs del dominio\\y DTO\\(Usuario, Reserva, Mesa,\\Plan...)};
+  % --- dependencias hacia las entidades ---
+  \coordinate (e1) at (ent.west |- serv.east);
+  \coordinate (e2) at (ent.west |- dao.east);
+  \draw[fl, dashed] (serv.east) -- (e1);
+  \node[lb, anchor=south] at ($(serv.east)!.5!(e1)+(0,0.03)$) {usan};
+  \draw[fl, dashed] (dao.east) -- (e2);
+  \node[lb, anchor=south] at ($(dao.east)!.5!(e2)+(0,0.03)$) {usan};
+  % --- flujo vertical ---
+  \draw[flb] (vista.south) -- (ctrl.north);
+  \node[lb, anchor=west] at ($(vista.south)!.5!(ctrl.north)+(0.1,0.02)$) {peticiones y respuestas};
+  \draw[fl] (ctrl.south) -- (serv.north);
+  \node[lb, anchor=west] at ($(ctrl.south)!.5!(serv.north)+(0.1,0)$) {usa las interfaces de servicio};
+  \draw[fl] (serv.south) -- (dao.north);
+  \node[lb, anchor=west] at ($(serv.south)!.5!(dao.north)+(0.1,0)$) {consultas};
+  \draw[flb] (dao.south) -- (bd.north);
+  \node[lb, anchor=west] at ($(dao.south)!.5!(bd.north)+(0.1,0)$) {SQL (pool)};
+\end{tikzpicture}
+\\[3pt]{\small\textit{Nota.} Elaboraci{\'o}n propia. Las flechas punteadas indican dependencia de uso: los servicios y los DAO usan las entidades del dominio; la vista no conoce al modelo y el controlador solo conoce las interfaces de servicio (proxies).}
+\end{figure}
 \subsection{Diagrama de clases del modelo}
 Usuario es abstracta y se especializa en Cliente y Empleado; Administrador hereda de Empleado, lo que expresa que puede hacer todo lo del personal. Lo cr\'itico: la Reserva pertenece a un Cliente, puede haber sido creada por un Empleado, ocupa una o varias Mesas y se compone de su pedido anticipado y sus servicios extra. La enumeraci\'on Ocasion sostiene la reserva por ocasi\'on: cada valor conoce la zona sugerida y la decoraci\'on ofrecida.
 \begin{figure}[H]\centering
@@ -614,7 +729,53 @@ Lo cr\'itico: los servicios extra se combinan libremente y cada uno cambia el co
 \end{figure}
 Los controladores dependen de las interfaces de servicio, que en ejecuci\'on est\'an implementadas por los proxies; el servicio real dirige al builder y compone los decoradores; el servicio de usuarios elige la f\'abrica seg\'un el rol; y solo los servicios acceden a los DAO.
 \subsection{Secuencia CU04}
-El controlador hace una sola llamada; el proxy verifica el permiso antes de delegar; y el servicio real usa el builder y los decoradores dentro de una misma transacci\'on: disponibilidad, construcci\'on, c\'alculo total, guardado y comprobante.
+El controlador hace una sola llamada; el proxy verifica el permiso antes de delegar; y el servicio real usa el builder y los decoradores dentro de una misma transacci\'on: disponibilidad, construcci\'on, c\'alculo total, guardado y comprobante. La Figura 12 muestra esa colaboraci{\'o}n paso a paso.
+\begin{figure}[H]\centering
+{\small\textbf{Figura 12}}\\{\small\textit{Diagrama de secuencia al confirmar una reserva (CU04)}}\\[4pt]
+\begin{tikzpicture}[
+  part/.style={draw=umlline, line width=0.5pt, fill=umlcls, font=\umlfst, align=center, minimum width=1.5cm, minimum height=0.62cm, inner sep=1.5pt},
+  msg/.style={umlline, line width=0.5pt, -{Straight Barb[length=5.5pt,width=7pt]}},
+  ret/.style={umlline, line width=0.5pt, dashed, -{Straight Barb[length=5.5pt,width=7pt]}},
+  both/.style={umlline, line width=0.5pt, {Straight Barb[length=5.5pt,width=7pt]}-{Straight Barb[length=5.5pt,width=7pt]}},
+  lab/.style={font=\umlfst, text=umlline, inner sep=1pt},
+  labr/.style={font=\umlfst\itshape, text=umlline, inner sep=1pt},
+]
+  % --- participantes ---
+  \node[part] (cl) at (0.8,0) {Cliente};
+  \node[part] (ctl) at (2.45,0) {Reserva\\Controller};
+  \node[part] (prx) at (4.1,0) {Reserva\\ServiceProxy};
+  \node[part] (imp) at (5.75,0) {Reserva\\ServiceImpl};
+  \node[part] (dis) at (7.4,0) {Disponibilidad\\Service};
+  \node[part] (bld) at (9.05,0) {Reserva\\Builder};
+  \node[part] (cmp) at (10.7,0) {Componente\\Reserva};
+  \node[part] (dao) at (12.35,0) {ReservaDAO};
+  \node[part] (pag) at (14.0,0) {PagoService};
+  % --- l{\'i}neas de vida ---
+  \foreach \p in {cl,ctl,prx,imp,dis,bld,cmp,dao,pag} {\draw[dashed, umlline] (\p.south) -- (\p.south |- 0,-7.8);}
+  % --- barras de activaci{\'o}n ---
+  \draw[draw=umlline, fill=white, line width=0.4pt] (4.02,-1.75) rectangle (4.18,-3.05);
+  \draw[draw=umlline, fill=white, line width=0.4pt] (5.67,-2.95) rectangle (5.83,-7.0);
+  \node[lab, rotate=90, anchor=north] at (5.6,-6.55) {transacci{\'o}n};
+  % --- mensajes ---
+  \draw[msg] (0.8,-1.15) -- (2.45,-1.15) node[lab, above, midway] {POST /reservas};
+  \draw[msg] (2.45,-1.75) -- (4.1,-1.75) node[lab, above, midway] {confirmar(datos)};
+  \draw[msg] (4.16,-2.28) -- (4.62,-2.28) -- (4.62,-2.5) -- (4.16,-2.5);
+  \node[lab] at (4.75,-2.12) {verificar\_rol()};
+  \draw[msg] (4.1,-2.95) -- (5.75,-2.95) node[lab, above, midway] {confirmar(datos)};
+  \draw[both] (5.75,-3.6) -- (7.4,-3.6) node[lab, above, midway] {hay\_cruce()} node[labr, below, midway] {libre = true};
+  \draw[both] (5.75,-4.25) -- (9.05,-4.25) node[lab, above, midway] {construir(datos)} node[labr, below, midway] {reserva};
+  \draw[both] (5.75,-4.9) -- (10.7,-4.9) node[lab, above, midway] {costo()} node[labr, below, midway] {total};
+  \draw[both] (5.75,-5.55) -- (12.35,-5.55) node[lab, above, midway] {guardar()} node[labr, below, midway] {id};
+  \draw[both] (5.75,-6.2) -- (14.0,-6.2);
+  \node[lab] at (9.875,-6.08) {emitir\_comprobante()};
+  \node[labr] at (9.875,-6.34) {comprobante};
+  \draw[ret] (5.75,-6.85) -- (2.45,-6.85);
+  \node[labr] at (4.9,-6.73) {id + comprobante};
+  \draw[ret] (2.45,-7.5) -- (0.8,-7.5);
+  \node[labr] at (1.75,-7.38) {201 Created};
+\end{tikzpicture}
+\\[3pt]{\small\textit{Nota.} Elaboraci{\'o}n propia. El retorno se dibuja en punteado; las barras marcan el per{\'i}odo de ejecuci{\'o}n de cada objeto y la operaci{\'o}n completa corre dentro de una transacci{\'o}n (RNF03): si la disponibilidad falla, nada se guarda.}
+\end{figure}
 \subsection{UI}
 La interfaz sigue la direcci{\'o}n visual ``Le Jardin'' (ADR 0004): paleta marfil, borgo{\~n}a, carb{\'o}n y dorado apagado; tipograf{\'i}a editorial (Cormorant Garamond para t{\'i}tulos e Inter para la interfaz) \textit{self-hosted} en \texttt{static/fuentes/} con licencia OFL, sin CDN. El asistente mantiene 4 pasos con progreso; el paso 2 pinta un plano SVG del sal{\'o}n (muros dobles, ventanales con parteluces, lavados de zona, plantas, barra y puerta con arco) con una silla por puesto: libre en arena, seleccionada en borgo{\~n}a con anillo dorado, reservada en gris c{\'a}lido y bloqueada en gris punteado, con roles ARIA, operaci{\'o}n por teclado (Enter/Espacio) y leyenda; al lado, la ficha de mesa muestra la foto real de su zona y sincroniza el selector de comensales con el campo del paso. El paso 3 gu{\'i}a el pedido por porciones (botones de restar y sumar, ``toda la mesa'' y medidor de cobertura sobre los comensales, con costos vivos en los extras) y el paso 4 revisa la reserva en vivo (fecha, mesas, pedido desglosado y monto seg{\'u}n la modalidad). La cancelaci{\'o}n de una reserva pide confirmaci{\'o}n en un di{\'a}logo propio. Al confirmar una reserva se avisa por correo al cliente y a la administraci{\'o}n, recordando la fecha y el plazo de cancelaci{\'o}n antes del cobro; en la demo los mensajes quedan en un buz{\'o}n visible para el personal en la agenda y, con credenciales SMTP en el entorno, la entrega a buzones reales es efectiva (ADRs 0008 y 0009). El acceso y el registro usan un panel ilustrado a dos columnas, y mis reservas y la agenda comparten tabla editorial con insignias de estado. Los mensajes siguen las heur{\'i}sticas de Nielsen (1993). Prototipos Figs.~13--16 (baja fidelidad).
 
@@ -653,20 +814,20 @@ costo() = envuelto.costo() + tarifa * comensales
 \begin{longtable}{|p{1.0cm}|>{\raggedright\arraybackslash}p{5.4cm}|>{\raggedright\arraybackslash}p{5.0cm}|c|}\hline
 \textbf{ID} & \textbf{Escenario} & \textbf{Resultado esperado} & \textbf{{\textquestiondown}Cumple?}\\\hline
 \endhead
-CP01 & Inicio de sesi{\'o}n con credenciales v{\'a}lidas de cliente. & Redirige a ``Mis reservas''. & \\\hline
-CP02 & Inicio de sesi{\'o}n con contrase{\~n}a incorrecta. & Mensaje gen{\'e}rico de error. & \\\hline
-CP03 & Registro de un cliente nuevo desde la aplicaci{\'o}n. & Queda con rol cliente, tipo general y cero \textit{strikes} (\textit{Factory Method}). & \\\hline
-CP04 & Un cliente intenta abrir la agenda del personal. & Acceso denegado (\textit{Proxy}). & \\\hline
-CP05 & Un cliente intenta cancelar la reserva de otro cliente. & Acceso denegado (\textit{Proxy}). & \\\hline
-CP06 & Dos usuarios seleccionan la misma mesa en la misma franja. & El segundo la ve bloqueada y no puede tomarla (RN03). & \\\hline
-CP07 & Reservar para 6 personas con mesas que suman 4 puestos. & Se rechaza por RN02 (\textit{Builder}). & \\\hline
-CP08 & Cliente general elige pago en el restaurante. & Se rechaza por RN06 (\textit{Builder}). & \\\hline
-CP09 & Pedido de \$180.000, decoraci{\'o}n de \$80.000 y barra de \$45.000 por persona para 4 personas. & Total de \$440.000 (\textit{Decorator}). & \\\hline
-CP10 & Cliente general cancela 2 horas antes, con \$132.000 pagados. & Reembolso de \$118.800 y comprobante de reembolso parcial (RN08). & \\\hline
-CP11 & Cliente VIP cancela 30 minutos antes. & Retenci{\'o}n del 10~\% y un \textit{strike} (RN09). & \\\hline
-CP12 & El personal marca una inasistencia a un cliente VIP con dos \textit{strikes}. & El cliente pasa a general (RN10). & \\\hline
-CP13 & Un empleado registra una reserva para un cliente nuevo. & Se crea el cliente con contrase{\~n}a gen{\'e}rica y la reserva queda con el empleado como creador. & \\\hline
-CP14 & Reserva de restaurante completo en una franja libre. & Se asocian todas las mesas en servicio (RN04). & \\\hline
+CP01 & Inicio de sesi{\'o}n con credenciales v{\'a}lidas de cliente. & Redirige a ``Mis reservas''. & S{\'i} \\\hline
+CP02 & Inicio de sesi{\'o}n con contrase{\~n}a incorrecta. & Mensaje gen{\'e}rico de error. & S{\'i} \\\hline
+CP03 & Registro de un cliente nuevo desde la aplicaci{\'o}n. & Queda con rol cliente, tipo general y cero \textit{strikes} (\textit{Factory Method}). & S{\'i} \\\hline
+CP04 & Un cliente intenta abrir la agenda del personal. & Acceso denegado (\textit{Proxy}). & S{\'i} \\\hline
+CP05 & Un cliente intenta cancelar la reserva de otro cliente. & Acceso denegado (\textit{Proxy}). & S{\'i} \\\hline
+CP06 & Dos usuarios seleccionan la misma mesa en la misma franja. & El segundo la ve bloqueada y no puede tomarla (RN03). & S{\'i} \\\hline
+CP07 & Reservar para 6 personas con mesas que suman 4 puestos. & Se rechaza por RN02 (\textit{Builder}). & S{\'i} \\\hline
+CP08 & Cliente general elige pago en el restaurante. & Se rechaza por RN06 (\textit{Builder}). & S{\'i} \\\hline
+CP09 & Pedido de \$180.000, decoraci{\'o}n de \$80.000 y barra de \$45.000 por persona para 4 personas. & Total de \$440.000 (\textit{Decorator}). & S{\'i} \\\hline
+CP10 & Cliente general cancela 2 horas antes, con \$132.000 pagados. & Reembolso de \$118.800 y comprobante de reembolso parcial (RN08). & S{\'i} \\\hline
+CP11 & Cliente VIP cancela 30 minutos antes. & Retenci{\'o}n del 10~\% y un \textit{strike} (RN09). & S{\'i} \\\hline
+CP12 & El personal marca una inasistencia a un cliente VIP con dos \textit{strikes}. & El cliente pasa a general (RN10). & S{\'i} \\\hline
+CP13 & Un empleado registra una reserva para un cliente nuevo. & Se crea el cliente con contrase{\~n}a gen{\'e}rica y la reserva queda con el empleado como creador. & S{\'i} \\\hline
+CP14 & Reserva de restaurante completo en una franja libre. & Se asocian todas las mesas en servicio (RN04). & S{\'i} \\\hline
 \end{longtable}
 \section{Video explicativo}
 Link YouTube: (pegar aqu\'i). Guion: programaci\'on por capas/MVC, Factory + Builder, Proxy + Decorator y ejecuci\'on (login, 4 pasos, agenda, cancelaci\'on).
