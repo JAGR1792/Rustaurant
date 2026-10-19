@@ -2,17 +2,22 @@
 //! Vista: Askama + plano.js | Controlador: handlers de `vistas.rs` |
 //! Modelo: dominio + patrones (factory/builder/proxy/decorator) + DAO/estado.
 
-pub mod builder;
-pub mod correo;
-pub mod dao;
-pub mod decorator;
-pub mod dominio;
-pub mod estado;
-pub mod factory;
-pub mod formato;
-pub mod proxy;
-pub mod servicios;
+pub mod controladores;
+pub mod modelo;
 pub mod vistas;
+
+// Compatibilidad (Etapa 1): re-exportar submódulos del modelo en la raíz
+// del crate para no romper referencias internas existentes.
+pub use modelo::entidades::dominio;
+pub use modelo::entidades::formato;
+pub use modelo::patrones::creacionales::builder;
+pub use modelo::patrones::creacionales::fabrica as factory;
+pub use modelo::patrones::estructurales::decorador as decorator;
+pub use modelo::patrones::estructurales::proxy;
+pub use modelo::repositorios::dao;
+pub use modelo::repositorios::estado;
+pub use modelo::servicios::correo;
+pub use modelo::servicios::reserva_servicio as servicios;
 
 use axum::{
     Router,
@@ -39,6 +44,14 @@ async fn main() {
     let app = Router::new()
         .route("/", get(vistas::inicio))
         .route("/login", get(vistas::login_get).post(vistas::login_post))
+        .route(
+            "/recuperar",
+            get(vistas::recuperar_get).post(vistas::recuperar_post),
+        )
+        .route(
+            "/restablecer",
+            get(vistas::restablecer_get).post(vistas::restablecer_post),
+        )
         .route(
             "/registro",
             get(vistas::registro_get).post(vistas::registro_post),

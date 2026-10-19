@@ -1678,6 +1678,109 @@ pub async fn disponibilidad(
     Json(mesas).into_response()
 }
 
+/// Formulario para solicitar recuperacion de contrasena.
+pub async fn recuperar_get() -> Response {
+    axum::response::Html(
+        r#"<!doctype html><html lang="es"><head><meta charset="utf-8"><title>Recuperar contrasena - Brindis</title></head><body>
+        <h1>Recuperar contrasena</h1>
+        <form method="post" action="/recuperar">
+            <label>Correo <input type="email" name="correo" required></label>
+            <button type="submit">Enviar enlace</button>
+        </form>
+        <p><a href="/login">Volver al login</a></p>
+        </body></html>"#
+            .to_string(),
+    )
+    .into_response()
+}
+
+#[derive(Deserialize)]
+pub struct FormRecuperar {
+    correo: String,
+}
+
+pub async fn recuperar_post(State(e): State<Estado>, Form(f): Form<FormRecuperar>) -> Response {
+    let correo = f.correo.trim().to_string();
+    let token_opt = {
+        let mut d = e.lock().unwrap();
+        d.generar_token_recuperacion(&correo)
+    };
+    if let Some(token) = token_opt {
+        let mensajes = {
+            let mut d = e.lock().unwrap();
+            crate::correo::notificar_recuperacion(&mut d, &correo, &token)
+        };
+        crate::correo::entregar(&e, &mensajes).await;
+    }
+    axum::response::Html(
+        r#"<!doctype html><html lang="es"><head><meta charset="utf-8"><title>Recuperar contrasena - Brindis</title></head><body>
+        <h1>Revisa tu correo</h1>
+        <p>Si el correo esta registrado, te enviamos un enlace para restablecer tu contrasena.</p>
+        <p><a href="/login">Volver al login</a></p>
+        </body></html>"#
+            .to_string(),
+    )
+    .into_response()
+}
+
+/// Formulario para fijar nueva contrasena a partir del token.
+pub async fn restablecer_get(
+    State(e): State<Estado>,
+    Query(q): Query<HashMap<String, String>>,
+) -> Response {
+    let token = q.get("token").cloned().unwrap_or_default();
+    let valido = {
+        let d = e.lock().unwrap();
+        d.validar_token_recuperacion(&token).is_some()
+    };
+    if !valido {
+        return axum::response::Html("Token invalido o expirado.".to_string()).into_response();
+    }
+    axum::response::Html(format!(
+        r#"<!doctype html><html lang="es"><head><meta charset="utf-8"><title>Restablecer contrasena - Brindis</title></head><body>
+        <h1>Nueva contrasena</h1>
+        <form method="post" action="/restablecer">
+            <input type="hidden" name="token" value="{token}">
+            <label>Nueva contrasena <input type="password" name="password" required minlength="8"></label>
+            <label>Repetir <input type="password" name="password2" required minlength="8"></label>
+            <button type="submit">Guardar</button>
+        </form>
+        </body></html>"#,
+        token = token
+    ))
+    .into_response()
+}
+
+#[derive(Deserialize)]
+pub struct FormRestablecer {
+    token: String,
+    password: String,
+    password2: String,
+}
+
+pub async fn restablecer_post(State(e): State<Estado>, Form(f): Form<FormRestablecer>) -> Response {
+    if f.password != f.password2 {
+        return axum::response::Html("Las contrasenas no coinciden.".to_string()).into_response();
+    }
+    if f.password.len() < 8 {
+        return axum::response::Html("La contrasena debe tener al menos 8 caracteres.".to_string())
+            .into_response();
+    }
+    let ok = {
+        let mut d = e.lock().unwrap();
+        d.restablecer_password(&f.token, &f.password)
+    };
+    if ok {
+        axum::response::Html(r#"<!doctype html><html lang="es"><head><meta charset="utf-8"><title>Restablecer contrasena - Brindis</title></head><body>
+        <h1>Contrasena actualizada</h1>
+        <p>Ya puedes iniciar sesion con tu nueva contrasena.</p>
+        <p><a href="/login">Ir al login</a></p>
+        </body></html>"#.to_string()).into_response()
+    } else {
+        axum::response::Html("Token invalido o expirado.".to_string()).into_response()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
