@@ -42,45 +42,51 @@ async fn main() {
     let estado = estado::sembrar();
 
     let app = Router::new()
-        .route("/", get(vistas::inicio))
-        .route("/login", get(vistas::login_get).post(vistas::login_post))
+        .route("/", get(controladores::inicio))
+        .route(
+            "/login",
+            get(controladores::login_get).post(controladores::login_post),
+        )
         .route(
             "/recuperar",
-            get(vistas::recuperar_get).post(vistas::recuperar_post),
+            get(controladores::recuperar_get).post(controladores::recuperar_post),
         )
         .route(
             "/restablecer",
-            get(vistas::restablecer_get).post(vistas::restablecer_post),
+            get(controladores::restablecer_get).post(controladores::restablecer_post),
         )
         .route(
             "/registro",
-            get(vistas::registro_get).post(vistas::registro_post),
+            get(controladores::registro_get).post(controladores::registro_post),
         )
-        .route("/logout", get(vistas::logout))
+        .route("/logout", get(controladores::logout))
         .route(
             "/reservar",
-            get(vistas::reservar_get).post(vistas::reserva_post),
+            get(controladores::reservar_get).post(controladores::reserva_post),
         )
-        .route("/mis-reservas", get(vistas::mis_reservas))
-        .route("/reservas/{id}/cancelar", post(vistas::cancelar))
-        .route("/dashboard", get(vistas::dashboard))
-        .route("/dashboard/hacer-vip", post(vistas::hacer_vip_cliente))
-        .route("/agenda", get(vistas::agenda))
-        .route("/agenda/dia", get(vistas::agenda_dia))
-        .route("/panel-empleado", get(vistas::agenda))
+        .route("/mis-reservas", get(controladores::mis_reservas))
+        .route("/reservas/{id}/cancelar", post(controladores::cancelar))
+        .route("/dashboard", get(controladores::dashboard))
+        .route(
+            "/dashboard/hacer-vip",
+            post(controladores::hacer_vip_cliente),
+        )
+        .route("/agenda", get(controladores::agenda))
+        .route("/agenda/dia", get(controladores::agenda_dia))
+        .route("/panel-empleado", get(controladores::agenda))
         .route(
             "/empleado/reserva/{id}/estado",
-            post(vistas::cambiar_estado_reserva),
+            post(controladores::cambiar_estado_reserva),
         )
         .route(
             "/admin/cliente/{id}/toggle-vip",
-            post(vistas::toggle_vip_cliente),
+            post(controladores::toggle_vip_cliente),
         )
         .route(
             "/admin/cliente/{id}/reset-strikes",
-            post(vistas::reset_strikes_cliente),
+            post(controladores::reset_strikes_cliente),
         )
-        .route("/api/disponibilidad", get(vistas::disponibilidad))
+        .route("/api/disponibilidad", get(controladores::disponibilidad))
         .nest_service("/static", ServeDir::new("static"))
         .layer(TraceLayer::new_for_http())
         .with_state(estado);

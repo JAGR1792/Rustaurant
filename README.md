@@ -77,7 +77,7 @@ render.yaml           # servicio web en Render (ADR 0010)
 db/                   # brindis_db.sql (13 tablas 3FN: esquema, indices, datos de prueba)
 src/                  # Axum + MVC por capas (vistas/controladores/modelo)
   main.rs             # wiring: router + estado + capas
-  vistas/             # CAPA VISTA: structs Askama
+  vistas/             # CAPA VISTA: structs Askama + DTOs (structs.rs)
   controladores/      # CAPA CONTROLADOR: handlers Axum (auth, reserva, agenda, dashboard, recuperar)
   modelo/             # CAPA MODELO
     entidades/        # dominio (Figura 4) + formato
