@@ -497,7 +497,12 @@ CASUAL & Cualquiera & Ninguna & Servicio est{\'a}ndar.\\\hline
 \end{tabular}
 }
 \subsection{Modelo relacional \texttt{brindis\_db}}
-13 tablas normalizadas 3FN (Elmasri y Navathe, 2016): usuario, token\_reactivacion, mesa (solo DISPONIBLE/FUERA\_DE\_SERVICIO; reservada/bloqueada se calcula por franja desde reserva\_mesa + bloqueo\_mesa), horario\_atencion, reserva (codigo único, id\_creador nulable), reserva\_mesa, item\_menu, reserva\_detalle\_pedido (precio congelado), plan\_servicio\_extra, reserva\_servicio\_extra (precio congelado), detalle\_pago (0--100), comprobante\_pago (id\_empleado nulable). Índices en reserva\_mesa.id\_mesa y reserva.fecha\_hora\_inicio (RN01). Script SQL en Anexo.
+13 tablas normalizadas 3FN (Elmasri y Navathe, 2016): usuario, token\_reactivacion, zona, mesa (solo DISPONIBLE/FUERA\_DE\_SERVICIO; reservada/bloqueada se calcula por franja desde reserva\_mesa + bloqueo\_mesa), horario\_atencion, bloqueo\_mesa, reserva (codigo único, id\_creador nulable, porcentaje\_pago entre 0 y 100), reserva\_mesa, item\_menu, reserva\_detalle\_pedido (precio congelado), plan\_servicio\_extra, reserva\_servicio\_extra (precio congelado), comprobante\_pago (id\_empleado nulable). Índices en reserva\_mesa.id\_mesa, reserva.fecha\_hora\_inicio (RN01) y bloqueo\_mesa (mesa\_id, inicio, fin). Script SQL en \texttt{db/brindis\_db.sql} y en el Anexo.
+\begin{figure}[H]\centering
+{\small\textbf{Figura 5}}\\{\small\textit{Diagrama de la base de datos \texttt{brindis\_db} (SQL Server Management Studio)}}\\[4pt]
+\IfFileExists{../diagramas/brindis/Fig5_DiagramaBD.png}{\includegraphics[height=0.78\textheight,keepaspectratio]{../diagramas/brindis/Fig5_DiagramaBD.png}}{\fbox{\parbox{0.9\linewidth}{\small Para ver la figura, abra el diagrama de base de datos en SQL Server Management Studio 21 (\texttt{brindis\_db} \textgreater\ Diagramas de base de datos \textgreater\ Copiar diagrama como imagen) y guarde el archivo como \texttt{diagramas/brindis/Fig5\_DiagramaBD.png}.}}}
+\\[3pt]{\small\textit{Nota.} Elaboraci{\'o}n propia. El {\'i}cono de llave se{\~n}ala la clave primaria; el resto de {\'i}conos marca restricciones de unicidad y claves for{\'a}neas; cada l{\'i}nea indica una relaci{\'o}n con su cardinalidad en los extremos (uno a muchos o muchos a muchos resueltos con tabla intermedia). La figura se gener{\'o} desde la base real cargada con \texttt{db/brindis\_db.sql}.}
+\end{figure}
 \subsection{Diagrama de clases DAO}
 \begin{figure}[H]\centering
 {\small\textbf{Figura 6}}\\{\small\textit{Diagrama de clases DAO}}\\[4pt]
@@ -535,7 +540,7 @@ CASUAL & Cualquiera & Ninguna & Servicio est{\'a}ndar.\\\hline
 \end{tikzpicture}
 \\[3pt]{\small\textit{Nota.} Elaboraci{\'o}n propia.}
 \end{figure}
-\texttt{GenericDAO<T,ID>} $\rightarrow$ \texttt{trait GenericDao<T,Id>} async; \texttt{UsuarioDao, MesaDao, ReservaDao, CatalogoDao, PagoDao} + impls \texttt{*Sqlx} con \texttt{DbPool} (\texttt{sqlx::MySqlPool} clonable). \texttt{UsuarioDaoSqlx} usa la f\'abrica para reconstruir cada registro con la subclase de su rol. L\'inea continua+tri\'angulo: herencia; discontinua+tri\'angulo: realizaci\'on; discontinua+flecha: dependencia (sin multiplicidad); continua+flecha: asociaci\'on navegable, con la multiplicidad en cada extremo (\texttt{1}, \texttt{0..1}, \texttt{1..*}, \texttt{0..*}); rombo vac\'io: agregaci\'on. Nombre en cursiva: clase abstracta.
+\texttt{GenericDAO<T,ID>} $\rightarrow$ \texttt{trait GenericDao<T,Id>} async; \texttt{UsuarioDao, MesaDao, ReservaDao, CatalogoDao, PagoDao} + impls \texttt{*Sqlx} con \texttt{DbPool} (\texttt{sqlx::MssqlPool} clonable). \texttt{UsuarioDaoSqlx} usa la f\'abrica para reconstruir cada registro con la subclase de su rol. L\'inea continua+tri\'angulo: herencia; discontinua+tri\'angulo: realizaci\'on; discontinua+flecha: dependencia (sin multiplicidad); continua+flecha: asociaci\'on navegable, con la multiplicidad en cada extremo (\texttt{1}, \texttt{0..1}, \texttt{1..*}, \texttt{0..*}); rombo vac\'io: agregaci\'on. Nombre en cursiva: clase abstracta.
 \subsection{Patrones aplicados}
 Se aplican exactamente cuatro patrones del cat{\'a}logo de Gamma et al.\ (1994): dos creacionales y dos estructurales. La Tabla 11 resume el problema que resuelve cada uno.
 \begin{center}{\small\textbf{Tabla 11}}\\{\small\textit{Patrones de dise{\~n}o aplicados en Brindis}}\end{center}
@@ -1197,6 +1202,9 @@ Factory centraliz\'o la creaci\'on por rol; Builder impide reservas inv\'alidas;
 \end{thebibliography}
 \appendix
 \section{Anexo: validaci\'on de diagramas}
-Las figuras 6 a 11 est\'an dibujadas en TikZ dentro de este mismo documento (vectoriales, con la tipograf\'ia del texto) y se revisaron una a una: ninguna l\'inea cruza cajas ni hay etiquetas pisadas, y cada asociaci\'on lleva su multiplicidad.
+Las figuras 6 a 11 est\'an dibujadas en TikZ dentro de este mismo documento (vectoriales, con la tipograf\'ia del texto) y se revisaron una a una: ninguna l\'inea cruza cajas ni hay etiquetas pisadas, y cada asociaci\'on lleva su multiplicidad. La figura 5 se gener\'o directamente desde la base de datos real con la herramienta de diagramas de SQL Server Management Studio 21, partiendo de la instancia cargada con el script que se incluye en el anexo siguiente.
+\section{Anexo: script de creaci\'on de la base de datos}
+El listado completo de \texttt{db/brindis\_db.sql} (creaci\'on de \texttt{brindis\_db}, 13 tablas con sus restricciones, {\'i}ndices y datos de prueba) es el siguiente; con este mismo script se carg\'o la instancia de SQL Server 2025 desde la que se gener\'o la figura 5:
+\lstinputlisting[language=SQL,basicstyle=\ttfamily\scriptsize]{../db/brindis_db.sql}
 \end{document}
 
