@@ -110,11 +110,10 @@ a:hover { color: var(--vino-oscuro); text-decoration-color: var(--dorado); }
 .menu-enlace:hover { color: var(--vino); border-bottom-color: var(--dorado); }
 .nav-vip-link { color: var(--vino); font-weight: 600; }
 .vip-corona-nav {
-  display: inline-block; font-size: .75rem; color: #b8860b;
-  margin-left: .25rem; font-weight: 700;
-  animation: vip-pulso 2.4s infinite ease-in-out;
+  display: inline-block; font-size: .66rem; font-weight: 800; letter-spacing: .07em;
+  color: #2b1f14; background: linear-gradient(135deg, var(--dorado-claro) 0%, var(--dorado) 100%);
+  padding: .12rem .5rem; border-radius: 999px; margin-left: .35rem; vertical-align: middle;
 }
-@keyframes vip-pulso { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.08); } }
 
 .nav-personal-link {
   background: rgba(112, 44, 59, .08); color: var(--vino);
@@ -135,7 +134,7 @@ a:hover { color: var(--vino-oscuro); text-decoration-color: var(--dorado); }
 .usuario-avatar {
   width: 1.6rem; height: 1.6rem; border-radius: 50%;
   background: var(--carbon); color: #fff; display: grid; place-items: center;
-  font-size: .85rem; font-weight: 700;
+  font-family: var(--serif); font-size: .85rem; font-weight: 700;
 }
 .usuario-pill--vip .usuario-avatar {
   background: linear-gradient(135deg, var(--vino) 0%, #3e101a 100%);
@@ -516,7 +515,10 @@ section[id^="paso-"] { margin-bottom: 2rem; }
 .hero-descripcion { font-size: 1.05rem; line-height: 1.7; color: var(--carbon-suave); }
 .hero-caracteristicas { display: grid; gap: .55rem; margin: 1.3rem 0; font-size: .9rem; color: var(--carbon); }
 .caracteristica-item { display: flex; align-items: center; gap: .5rem; }
-.caract-icono { color: var(--dorado); font-weight: 700; }
+.caract-icono {
+  flex: 0 0 auto; display: inline-block; width: 7px; height: 7px;
+  background: var(--dorado); transform: rotate(45deg); border-radius: 1px;
+}
 .hero-figura-marco { position: relative; }
 .hero-figura-badge {
   position: absolute; bottom: 1rem; left: 1rem; right: 1rem;
@@ -583,7 +585,12 @@ section[id^="paso-"] { margin-bottom: 2rem; }
 .demo-card:hover { border-color: var(--dorado); transform: translateY(-2px); box-shadow: 0 12px 28px -14px rgba(38, 35, 31, .35); }
 .demo-card--vip { border-color: var(--dorado); background: linear-gradient(135deg, #fffcf5 0%, #f6ede0 100%); }
 .demo-card__header { display: flex; gap: .75rem; align-items: center; }
-.demo-card__icono { font-size: 1.6rem; }
+.demo-card__icono {
+  flex: 0 0 auto; width: 2.3rem; height: 2.3rem; border-radius: 50%;
+  border: 1px solid var(--dorado-claro); background: #fffdf9;
+  display: grid; place-items: center; color: var(--vino);
+}
+.demo-card__icono svg { width: 1.2rem; height: 1.2rem; display: block; }
 .demo-card__header strong { display: block; font-family: var(--serif); font-size: 1.2rem; }
 .demo-card__rol { font-size: .78rem; color: var(--carbon-suave); }
 .demo-card__credenciales {
@@ -706,8 +713,10 @@ section[id^="paso-"] { margin-bottom: 2rem; }
 .vip-panel-icono {
   width: 2.8rem; height: 2.8rem; border-radius: 12px;
   background: linear-gradient(135deg, #431320 0%, #2a0b13 100%);
-  border: 1px solid var(--dorado); display: grid; place-items: center; font-size: 1.4rem;
+  border: 1px solid var(--dorado); display: grid; place-items: center;
+  color: var(--dorado-claro);
 }
+.vip-panel-icono svg { width: 1.5rem; height: 1.5rem; display: block; }
 .vip-descripcion { color: var(--carbon-suave); font-size: .95rem; margin-bottom: 1.1rem; }
 .vip-beneficios-lista {
   list-style: none; padding: 0; margin: 0 0 1.6rem; display: grid; gap: .6rem;
@@ -716,7 +725,8 @@ section[id^="paso-"] { margin-bottom: 2rem; }
   position: relative; padding-left: 1.6rem; font-size: .92rem; color: var(--carbon);
 }
 .vip-beneficios-lista li::before {
-  content: "✦"; position: absolute; left: 0; color: var(--dorado); font-weight: 700;
+  content: ""; position: absolute; left: .3rem; top: .52em; width: 7px; height: 7px;
+  background: var(--dorado); transform: rotate(45deg);
 }
 
 /* Caminos VIP */
@@ -811,6 +821,10 @@ section[id^="paso-"] { margin-bottom: 2rem; }
   background: rgba(78, 125, 87, .12); color: #3c6647; font-size: .78rem; font-weight: 700;
   padding: .35rem .85rem; border-radius: 999px; border: 1px solid rgba(78, 125, 87, .3);
 }
+.badge-en-vivo::before {
+  content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 50%;
+  background: #4e7d57; margin-right: .45rem; vertical-align: middle;
+}
 
 /* Grid de citas inmediatas */
 .proximas-citas-grid {
@@ -874,6 +888,10 @@ section[id^="paso-"] { margin-bottom: 2rem; }
 .boton-mes:hover { border-color: var(--dorado); color: var(--vino); }
 .calendario-dias-grid {
   display: grid; grid-template-columns: repeat(7, 1fr); gap: .55rem;
+}
+.dia-semana {
+  text-align: center; font-size: .68rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .1em; color: var(--carbon-suave); padding-bottom: .1rem;
 }
 @media (max-width: 580px) { .calendario-dias-grid { gap: .3rem; } }
 .dia-celda {

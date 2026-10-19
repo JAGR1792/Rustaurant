@@ -42,9 +42,9 @@
   <div class="seccion-cabecera-flex">
     <div>
       <p class="eyebrow">Atención Inmediata</p>
-      <h2>⚡ Próximas Citas y Servicio en Vivo</h2>
+      <h2>Próximas Citas y Servicio en Vivo</h2>
     </div>
-    <span class="badge-en-vivo">● Monitoreo en sala</span>
+    <span class="badge-en-vivo">Monitoreo en sala</span>
   </div>
 
   {% if proximas.is_empty() %}
@@ -65,7 +65,7 @@
         <div class="cita-cliente-fila">
           <strong class="cliente-nombre">{{ p.cliente }}</strong>
           {% if p.es_vip %}
-          <span class="badge-vip-pequeno">👑 VIP</span>
+          <span class="badge-vip-pequeno">VIP</span>
           {% endif %}
         </div>
         <p class="cita-mesa-info">
@@ -76,7 +76,7 @@
         </p>
         {% if p.alerta %}
         <div class="alerta-alergia-box" role="alert">
-          ⚠️ <strong>Alerta:</strong> {{ p.restricciones }}
+          <strong>Alerta:</strong> {{ p.restricciones }}
         </div>
         {% endif %}
       </div>
@@ -85,13 +85,13 @@
         {% if p.puede_sentar %}
         <form method="post" action="/empleado/reserva/{{ p.id }}/estado" style="display:inline;">
           <input type="hidden" name="nuevo" value="en-mesa">
-          <button type="submit" class="boton-accion-sala btn-sentar">🪑 Sentar en mesa</button>
+          <button type="submit" class="boton-accion-sala btn-sentar">Sentar en mesa</button>
         </form>
         {% endif %}
         {% if p.puede_completar %}
         <form method="post" action="/empleado/reserva/{{ p.id }}/estado" style="display:inline;">
           <input type="hidden" name="nuevo" value="completada">
-          <button type="submit" class="boton-accion-sala btn-completar">✓ Completar servicio</button>
+          <button type="submit" class="boton-accion-sala btn-completar">Completar servicio</button>
         </form>
         {% endif %}
         {% if p.puede_inasistir %}
@@ -111,7 +111,7 @@
 <!-- SECCIÓN 2: CALENDARIO DE RESERVAS Y AGENDA DIARIA -->
 <section class="seccion" aria-label="Calendario interactivo de reservas">
   <p class="eyebrow">Planificador Visual</p>
-  <h2>📅 Calendario de Reservas</h2>
+  <h2>Calendario de Reservas</h2>
 
   <div class="calendario-contenedor">
     <div class="calendario-mes-nav">
@@ -120,8 +120,16 @@
       <a href="/agenda?dia={{ mes_siguiente }}" class="boton-mes">Mes siguiente →</a>
     </div>
 
-    <!-- Cuadrícula de Días del Mes -->
+    <!-- Cuadrícula de Días del Mes (semana de lunes a domingo) -->
     <div class="calendario-dias-grid">
+      <span class="dia-semana">Lun</span>
+      <span class="dia-semana">Mar</span>
+      <span class="dia-semana">Mié</span>
+      <span class="dia-semana">Jue</span>
+      <span class="dia-semana">Vie</span>
+      <span class="dia-semana">Sáb</span>
+      <span class="dia-semana">Dom</span>
+      {% if espacios_mes > 0 %}<div class="calendario-espacios" style="grid-column: span {{ espacios_mes }};" aria-hidden="true"></div>{% endif %}
       {% for d in calendario %}
       <a href="/agenda?dia={{ d.fecha_iso }}"
          class="dia-celda {% if d.es_seleccionado %}dia-seleccionado{% endif %} {% if d.es_hoy %}dia-hoy{% endif %} {% if d.num_reservas > 0 %}dia-con-reservas{% endif %}"
@@ -204,7 +212,7 @@
   <div class="seccion-cabecera-flex">
     <div>
       <p class="eyebrow">Dirección de Clientes</p>
-      <h2>👑 Clientes Registrados y Membresías VIP</h2>
+      <h2>Clientes Registrados y Membresías VIP</h2>
     </div>
   </div>
   <p class="pedido-ayuda">
@@ -229,7 +237,7 @@
           <td>{{ c.telefono }}</td>
           <td>
             {% if c.es_vip %}
-            <span class="badge-vip-pill">👑 VIP</span>
+            <span class="badge-vip-pill">VIP</span>
             {% else %}
             <span class="badge">General</span>
             {% endif %}
@@ -244,7 +252,7 @@
               {% if c.es_vip %}
               <button type="submit" class="btn-micro btn-quitar-vip">Quitar VIP</button>
               {% else %}
-              <button type="submit" class="btn-micro btn-dar-vip">✨ Hacer VIP</button>
+              <button type="submit" class="btn-micro btn-dar-vip">Hacer VIP</button>
               {% endif %}
             </form>
             {% if c.strikes > 0 %}
@@ -262,7 +270,7 @@
 
 <!-- SECCIÓN 4: BUZÓN DE CORREOS Y COMUNICACIONES -->
 <section class="correos" aria-label="Correos enviados">
-  <h2>✉️ Buzón de Demostración del Sistema</h2>
+  <h2>Buzón de Demostración del Sistema</h2>
   <p class="pedido-ayuda">
     Avisos de reserva (ADR 0008): confirmaciones y notificaciones al cliente y a la administración.
   </p>

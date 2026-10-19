@@ -31,7 +31,7 @@
       {% if usuario != "" && !es_personal %}
       <a href="/dashboard" class="menu-enlace nav-dashboard-link">
         Mi Dashboard
-        {% if es_vip %}<span class="vip-corona-nav" title="Membresía VIP">👑 VIP</span>{% endif %}
+        {% if es_vip %}<span class="vip-corona-nav" title="Membresía VIP">VIP</span>{% endif %}
       </a>
       {% endif %}
       {% if es_personal %}
@@ -41,7 +41,7 @@
       {% endif %}
       {% if usuario != "" %}
       <div class="usuario-pill {% if es_vip %}usuario-pill--vip{% endif %}">
-        <span class="usuario-avatar">{% if es_vip %}👑{% else %}👤{% endif %}</span>
+        <span class="usuario-avatar" aria-hidden="true">{{ usuario.chars().next().unwrap_or('B') }}</span>
         <span class="usuario-nombre">{{ usuario }}</span>
         {% if es_vip %}
         <span class="badge-vip-micro">VIP</span>
