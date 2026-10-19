@@ -294,15 +294,15 @@ impl Datos {
     /// Actualiza el estatus VIP de un cliente por su ID.
     pub fn actualizar_vip_cliente(&mut self, id_cliente: i64, vip: bool) -> bool {
         for u in &mut self.usuarios {
-            if let UsuarioSesion::Cliente(c) = u {
-                if c.base.id == id_cliente {
-                    if vip {
-                        c.hacer_vip();
-                    } else {
-                        c.quitar_vip();
-                    }
-                    return true;
+            if let UsuarioSesion::Cliente(c) = u
+                && c.base.id == id_cliente
+            {
+                if vip {
+                    c.hacer_vip();
+                } else {
+                    c.quitar_vip();
                 }
+                return true;
             }
         }
         false
@@ -311,11 +311,11 @@ impl Datos {
     /// Restablece los strikes de un cliente por su ID.
     pub fn limpiar_strikes_cliente(&mut self, id_cliente: i64) -> bool {
         for u in &mut self.usuarios {
-            if let UsuarioSesion::Cliente(c) = u {
-                if c.base.id == id_cliente {
-                    c.limpiar_strikes();
-                    return true;
-                }
+            if let UsuarioSesion::Cliente(c) = u
+                && c.base.id == id_cliente
+            {
+                c.limpiar_strikes();
+                return true;
             }
         }
         false
@@ -337,14 +337,11 @@ impl Datos {
             r.cambiar_estado(nuevo)?;
             r.id_cliente
         };
-        if nuevo == EstadoReserva::Inasistida {
-            if let Some(UsuarioSesion::Cliente(c)) = self
-                .usuarios
-                .iter_mut()
-                .find(|u| u.id() == id_cliente)
-            {
-                c.incrementar_strike();
-            }
+        if nuevo == EstadoReserva::Inasistida
+            && let Some(UsuarioSesion::Cliente(c)) =
+                self.usuarios.iter_mut().find(|u| u.id() == id_cliente)
+        {
+            c.incrementar_strike();
         }
         Ok(())
     }
@@ -453,7 +450,10 @@ mod tests {
         let c3 = d.usuarios.iter().find(|u| u.id() == 3).unwrap();
         assert!(c3.es_vip());
 
-        assert!(d.cambiar_estado_reserva(1, EstadoReserva::ClienteEnMesa).is_ok());
+        assert!(
+            d.cambiar_estado_reserva(1, EstadoReserva::ClienteEnMesa)
+                .is_ok()
+        );
         let r1 = d.reservas.iter().find(|r| r.id == 1).unwrap();
         assert_eq!(r1.estado, EstadoReserva::ClienteEnMesa);
 
@@ -464,11 +464,13 @@ mod tests {
     fn inasistencia_suma_strike_al_cliente() {
         let e = sembrar();
         let mut d = e.lock().unwrap();
-        assert!(d.cambiar_estado_reserva(1, EstadoReserva::Inasistida).is_ok());
+        assert!(
+            d.cambiar_estado_reserva(1, EstadoReserva::Inasistida)
+                .is_ok()
+        );
         match d.usuarios.iter().find(|u| u.id() == 3) {
             Some(UsuarioSesion::Cliente(c)) => assert_eq!(c.strikes, 1),
             _ => panic!("la semilla debe incluir al cliente 3"),
         }
     }
 }
-
