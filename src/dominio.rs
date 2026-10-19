@@ -290,48 +290,10 @@ impl TokenReactivacion {
     }
 }
 
-/// Tipo de empleado: el `rol` concede los permisos y el tipo decide el
-/// foco operativo del panel de cada persona (mesero: sus mesas; cocina:
-/// las restricciones por preparar; gerente: la administración).
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
-pub enum TipoEmpleado {
-    Gerente,
-    Mesero,
-    Cocina,
-}
-
-impl TipoEmpleado {
-    pub fn clave(&self) -> &'static str {
-        match self {
-            TipoEmpleado::Gerente => "gerente",
-            TipoEmpleado::Mesero => "mesero",
-            TipoEmpleado::Cocina => "cocina",
-        }
-    }
-
-    pub fn etiqueta(&self) -> &'static str {
-        match self {
-            TipoEmpleado::Gerente => "Gerente",
-            TipoEmpleado::Mesero => "Mesero",
-            TipoEmpleado::Cocina => "Cocina",
-        }
-    }
-
-    pub fn desde_clave(clave: &str) -> Option<TipoEmpleado> {
-        match clave.trim().to_lowercase().as_str() {
-            "gerente" => Some(TipoEmpleado::Gerente),
-            "mesero" => Some(TipoEmpleado::Mesero),
-            "cocina" => Some(TipoEmpleado::Cocina),
-            _ => None,
-        }
-    }
-}
-
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Empleado {
     pub base: BaseUsuario,
     pub fecha_contratacion: Option<chrono::NaiveDate>,
-    pub tipo: TipoEmpleado,
 }
 
 impl Usuario for Empleado {
@@ -367,24 +329,6 @@ impl Usuario for Administrador {
     }
     fn rol(&self) -> Rol {
         Rol::Administrador
-    }
-}
-
-/// Turno de un empleado (franja con zona asignada): el panel muestra el
-/// turno de hoy y la asignación de meseros exige que cubra la reserva.
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct Jornada {
-    pub id: i64,
-    pub id_empleado: i64,
-    pub inicio: DateTime<Utc>,
-    pub fin: DateTime<Utc>,
-    pub zona: String,
-}
-
-impl Jornada {
-    /// `true` si la franja del turno contiene el instante dado.
-    pub fn cubre(&self, cuando: DateTime<Utc>) -> bool {
-        self.inicio <= cuando && cuando < self.fin
     }
 }
 
@@ -458,16 +402,6 @@ impl UsuarioSesion {
         match self {
             UsuarioSesion::Cliente(c) => c.es_vip(),
             _ => false,
-        }
-    }
-
-    /// Tipo de empleado del personal (`None` para clientes): decide el foco
-    /// del panel (mesero, cocina o gerente).
-    pub fn tipo_empleado(&self) -> Option<TipoEmpleado> {
-        match self {
-            UsuarioSesion::Empleado(e) => Some(e.tipo),
-            UsuarioSesion::Administrador(a) => Some(a.0.tipo),
-            UsuarioSesion::Cliente(_) => None,
         }
     }
 }
@@ -615,7 +549,6 @@ pub struct Reserva {
     pub codigo: String,          // 8 alfanuméricos, único (RN15)
     pub id_cliente: i64,         // 1 Cliente -> 1..* Reservas
     pub id_creador: Option<i64>, // 0..1 Empleado crea 1..* Reservas (RN12)
-    pub id_mesero: Option<i64>,  // 0..1 mesero asignado por la gerencia
     pub tipo_restaurante_completo: bool,
     pub mesa_ids: Vec<i64>, // vía ReservaMesa; 1..* Mesas <-> 0..* Reservas
     pub inicio: DateTime<Utc>,
@@ -631,12 +564,11 @@ pub struct Reserva {
 }
 
 impl Reserva {
-    /// Solo el Builder la llama (12 piezas = toda la reserva CU04).
+    /// Solo el Builder la llama (11 piezas = toda la reserva CU04).
     #[allow(clippy::too_many_arguments)]
     pub(crate) fn new(
         id_cliente: i64,
         id_creador: Option<i64>,
-        id_mesero: Option<i64>,
         tipo_restaurante_completo: bool,
         mesa_ids: Vec<i64>,
         inicio: DateTime<Utc>,
@@ -652,7 +584,6 @@ impl Reserva {
             codigo: generar_codigo(),
             id_cliente,
             id_creador,
-            id_mesero,
             tipo_restaurante_completo,
             mesa_ids,
             inicio,
@@ -725,28 +656,6 @@ mod tests {
     }
 
     #[test]
-    fn tipo_empleado_claves_y_jornada_cubre_franja() {
-        assert_eq!(
-            TipoEmpleado::desde_clave("MESERO"),
-            Some(TipoEmpleado::Mesero)
-        );
-        assert_eq!(TipoEmpleado::Cocina.clave(), "cocina");
-        assert_eq!(TipoEmpleado::Gerente.etiqueta(), "Gerente");
-        assert_eq!(TipoEmpleado::desde_clave("chef"), None);
-        let inicio = Utc::now();
-        let j = Jornada {
-            id: 1,
-            id_empleado: 2,
-            inicio,
-            fin: inicio + chrono::Duration::hours(4),
-            zona: "General".into(),
-        };
-        assert!(j.cubre(inicio + chrono::Duration::hours(1)));
-        assert!(!j.cubre(inicio + chrono::Duration::hours(4)));
-        assert!(!j.cubre(inicio - chrono::Duration::minutes(1)));
-    }
-
-    #[test]
     fn rn08_rn09_ventanas_de_cancelacion() {
         // General: 4 h de gracia; tarde = 10 % sin strike.
         let p = politica_cancelacion(TipoCliente::General, 4);
@@ -767,7 +676,6 @@ mod tests {
             codigo: "ABCDEFGH".into(),
             id_cliente: 1,
             id_creador: None,
-            id_mesero: None,
             tipo_restaurante_completo: false,
             mesa_ids: vec![1],
             inicio: Utc::now(),

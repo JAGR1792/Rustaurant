@@ -11,8 +11,8 @@ use crate::correo::Mensaje;
 use crate::dao::{DaoError, GenericDao, UsuarioDao};
 use crate::dominio::{
     Administrador, BaseUsuario, BloqueoMesa, Cliente, ComprobantePago, DetallePago, Empleado,
-    EstadoReserva, ItemMenu, Jornada, Mesa, ModalidadPago, Ocasion, PlanServicioExtra, Reserva,
-    TipoCliente, TipoEmpleado, UsuarioSesion,
+    EstadoReserva, ItemMenu, Mesa, ModalidadPago, Ocasion, PlanServicioExtra, Reserva, TipoCliente,
+    UsuarioSesion,
 };
 
 #[derive(Default)]
@@ -20,8 +20,6 @@ pub struct Datos {
     pub usuarios: Vec<UsuarioSesion>,
     pub mesas: Vec<Mesa>,
     pub reservas: Vec<Reserva>,
-    /// Turnos del personal: alimentan los paneles por tipo de empleado.
-    pub jornadas: Vec<Jornada>,
     pub bloqueos: Vec<BloqueoMesa>,
     pub items: Vec<ItemMenu>,
     pub planes: Vec<PlanServicioExtra>,
@@ -89,32 +87,14 @@ pub fn sembrar() -> Estado {
             activo: true,
             debe_cambiar_pw: false,
         };
-        let cocina = BaseUsuario {
-            id: 5,
-            correo: "cocina@brindis.co".into(),
-            hash_pw: bcrypt::hash("Cocina123!", bcrypt::DEFAULT_COST).unwrap(),
-            tipo_documento: "CC".into(),
-            documento: "5".into(),
-            nombre: "Cocina".into(),
-            telefono: "3000000005".into(),
-            activo: true,
-            debe_cambiar_pw: false,
-        };
         d.usuarios
             .push(UsuarioSesion::Administrador(Administrador(Empleado {
                 base: admin,
                 fecha_contratacion: None,
-                tipo: TipoEmpleado::Gerente,
             })));
         d.usuarios.push(UsuarioSesion::Empleado(Empleado {
             base: empleado,
             fecha_contratacion: None,
-            tipo: TipoEmpleado::Mesero,
-        }));
-        d.usuarios.push(UsuarioSesion::Empleado(Empleado {
-            base: cocina,
-            fecha_contratacion: None,
-            tipo: TipoEmpleado::Cocina,
         }));
         d.usuarios.push(UsuarioSesion::Cliente(Cliente {
             base: cliente,
@@ -144,38 +124,6 @@ pub fn sembrar() -> Estado {
                 id += 1;
             }
         }
-
-        // Jornadas demo: turno de hoy del mesero (en servicio ahora), un
-        // turno futuro que cubre DEMO0001, turno de cocina y del gerente.
-        let ahora = Utc::now();
-        d.jornadas.push(Jornada {
-            id: 1,
-            id_empleado: 2,
-            inicio: ahora - Duration::hours(2),
-            fin: ahora + Duration::hours(6),
-            zona: "General".into(),
-        });
-        d.jornadas.push(Jornada {
-            id: 2,
-            id_empleado: 2,
-            inicio: ahora + Duration::days(2) - Duration::hours(5),
-            fin: ahora + Duration::days(2) + Duration::hours(3),
-            zona: "Terraza".into(),
-        });
-        d.jornadas.push(Jornada {
-            id: 3,
-            id_empleado: 5,
-            inicio: ahora - Duration::hours(1),
-            fin: ahora + Duration::hours(7),
-            zona: "General".into(),
-        });
-        d.jornadas.push(Jornada {
-            id: 4,
-            id_empleado: 1,
-            inicio: ahora - Duration::hours(3),
-            fin: ahora + Duration::hours(5),
-            zona: "VIP".into(),
-        });
 
         // Carta y planes. Las fotos reales de `static/img/fotos` siguen el
         // mismo id (ver `vistas::carta`); los PNG de respaldo se generan con
@@ -238,7 +186,6 @@ pub fn sembrar() -> Estado {
             codigo: "DEMO0001".into(),
             id_cliente: 3,
             id_creador: None,
-            id_mesero: Some(2), // asignada al mesero demo
             tipo_restaurante_completo: false,
             mesa_ids: vec![5],
             inicio,
@@ -266,7 +213,6 @@ pub fn sembrar() -> Estado {
             codigo: "MESA0002".into(),
             id_cliente: 4, // VIP
             id_creador: None,
-            id_mesero: None,
             tipo_restaurante_completo: false,
             mesa_ids: vec![1],
             inicio: hoy_en_mesa,
@@ -294,7 +240,6 @@ pub fn sembrar() -> Estado {
             codigo: "VIP00003".into(),
             id_cliente: 4,
             id_creador: None,
-            id_mesero: None,
             tipo_restaurante_completo: false,
             mesa_ids: vec![2],
             inicio: futuro_vip,
@@ -322,7 +267,6 @@ pub fn sembrar() -> Estado {
             codigo: "HIST0004".into(),
             id_cliente: 3,
             id_creador: None,
-            id_mesero: None,
             tipo_restaurante_completo: false,
             mesa_ids: vec![6],
             inicio: historica,
@@ -399,45 +343,6 @@ impl Datos {
         {
             c.incrementar_strike();
         }
-        Ok(())
-    }
-
-    /// Asigna (o quita, con `None`) el mesero de una reserva desde el panel
-    /// de administración. Solo acepta personal de tipo mesero y exige una
-    /// jornada que cubra la franja de la reserva.
-    pub fn asignar_mesero(
-        &mut self,
-        id_reserva: i64,
-        id_mesero: Option<i64>,
-    ) -> Result<(), String> {
-        let inicio = self
-            .reservas
-            .iter()
-            .find(|r| r.id == id_reserva)
-            .map(|r| r.inicio)
-            .ok_or_else(|| "la reserva no existe".to_string())?;
-        if let Some(candidato) = id_mesero {
-            let es_mesero = self.usuarios.iter().any(|u| {
-                u.id() == candidato
-                    && matches!(u, UsuarioSesion::Empleado(e) if e.tipo == TipoEmpleado::Mesero)
-            });
-            if !es_mesero {
-                return Err("elige un empleado de tipo mesero".into());
-            }
-            let cubre = self
-                .jornadas
-                .iter()
-                .any(|j| j.id_empleado == candidato && j.cubre(inicio));
-            if !cubre {
-                return Err("el mesero no tiene jornada que cubra esa franja".into());
-            }
-        }
-        let r = self
-            .reservas
-            .iter_mut()
-            .find(|r| r.id == id_reserva)
-            .expect("la reserva existe: se validó arriba");
-        r.id_mesero = id_mesero;
         Ok(())
     }
 }
@@ -567,31 +472,5 @@ mod tests {
             Some(UsuarioSesion::Cliente(c)) => assert_eq!(c.strikes, 1),
             _ => panic!("la semilla debe incluir al cliente 3"),
         }
-    }
-
-    #[test]
-    fn asignar_mesero_exige_tipo_mesero_y_jornada_que_cubra() {
-        let e = sembrar();
-        let mut d = e.lock().unwrap();
-        // DEMO0001 (+2 días) cae dentro de la jornada futura del mesero 2.
-        assert!(
-            d.asignar_mesero(3, Some(2)).is_err(),
-            "sin jornada a +4 días"
-        );
-        assert!(d.asignar_mesero(3, Some(5)).is_err(), "cocina no es mesero");
-        assert!(
-            d.asignar_mesero(999, Some(2)).is_err(),
-            "reserva inexistente"
-        );
-        assert!(d.asignar_mesero(1, Some(2)).is_ok());
-        assert_eq!(
-            d.reservas.iter().find(|r| r.id == 1).unwrap().id_mesero,
-            Some(2)
-        );
-        assert!(d.asignar_mesero(1, None).is_ok(), "se puede desasignar");
-        assert_eq!(
-            d.reservas.iter().find(|r| r.id == 1).unwrap().id_mesero,
-            None
-        );
     }
 }

@@ -35,7 +35,7 @@
       </a>
       {% endif %}
       {% if es_personal %}
-      <a href="/panel-empleado" class="menu-enlace nav-personal-link">
+      <a href="/agenda" class="menu-enlace nav-personal-link">
         Panel Empleado
       </a>
       {% endif %}
@@ -75,7 +75,7 @@
           <a href="/mis-reservas">Mis reservas</a>
           <a href="/#carta">Nuestra carta</a>
           {% if usuario != "" && !es_personal %}<a href="/dashboard">Mi Dashboard VIP</a>{% endif %}
-          {% if es_personal %}<a href="/panel-empleado">Panel de Empleado</a>{% endif %}
+          {% if es_personal %}<a href="/agenda">Panel de Empleado</a>{% endif %}
           {% if usuario == "" %}<a href="/login">Acceso de clientes</a>{% endif %}
         </nav>
       </div>

@@ -228,7 +228,6 @@ mod tests {
             codigo: format!("TEST{mesa:04}"),
             id_cliente,
             id_creador: None,
-            id_mesero: None,
             tipo_restaurante_completo: false,
             mesa_ids: vec![mesa],
             inicio,

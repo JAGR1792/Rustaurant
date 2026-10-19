@@ -4,7 +4,7 @@
 
 use crate::dao::{DaoError, UsuarioDao};
 use crate::dominio::{
-    Administrador, BaseUsuario, Cliente, Empleado, Rol, TipoCliente, TipoEmpleado, UsuarioSesion,
+    Administrador, BaseUsuario, Cliente, Empleado, Rol, TipoCliente, UsuarioSesion,
 };
 
 #[derive(Debug, Clone)]
@@ -87,7 +87,6 @@ impl UsuarioFactory for EmpleadoFactory {
         UsuarioSesion::Empleado(Empleado {
             base,
             fecha_contratacion: None,
-            tipo: TipoEmpleado::Mesero,
         })
     }
 }
@@ -100,7 +99,6 @@ impl UsuarioFactory for AdministradorFactory {
         UsuarioSesion::Administrador(Administrador(Empleado {
             base,
             fecha_contratacion: None,
-            tipo: TipoEmpleado::Gerente,
         }))
     }
 }

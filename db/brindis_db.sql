@@ -18,18 +18,12 @@ CREATE TABLE usuario (
     debe_cambiar_pw BIT NOT NULL DEFAULT 0,
     rol VARCHAR(20) NOT NULL,
     tipo_cliente VARCHAR(20) NULL,
-    tipo_empleado VARCHAR(20) NULL,
     strikes INT NOT NULL DEFAULT 0,
     fecha_ultima_actividad DATETIME NULL,
     fecha_contratacion DATE NULL,
     CONSTRAINT UQ_usuario_documento UNIQUE (tipo_documento, documento),
     CONSTRAINT CK_usuario_rol CHECK (rol IN ('CLIENTE', 'EMPLEADO', 'ADMINISTRADOR')),
     CONSTRAINT CK_usuario_tipo_cliente CHECK (tipo_cliente IS NULL OR tipo_cliente IN ('GENERAL', 'VIP')),
-    CONSTRAINT CK_usuario_tipo_empleado CHECK (tipo_empleado IS NULL OR tipo_empleado IN ('GERENTE', 'MESERO', 'COCINA')),
-    CONSTRAINT CK_usuario_tipo_empleado_rol CHECK (
-        (rol = 'CLIENTE' AND tipo_empleado IS NULL) OR
-        (rol IN ('EMPLEADO', 'ADMINISTRADOR') AND tipo_empleado IS NOT NULL)
-    ),
     CONSTRAINT CK_usuario_strikes CHECK (strikes >= 0)
 );
 GO
@@ -40,17 +34,6 @@ CREATE TABLE token_reactivacion (
     token VARCHAR(64) NOT NULL UNIQUE,
     fecha_expiracion DATETIME NOT NULL,
     usado BIT NOT NULL DEFAULT 0
-);
-GO
-
-CREATE TABLE jornada (
-    id_jornada INT IDENTITY PRIMARY KEY,
-    id_empleado INT NOT NULL,
-    fecha_hora_inicio DATETIME NOT NULL,
-    fecha_hora_fin DATETIME NOT NULL,
-    zona VARCHAR(40) NOT NULL,
-    CONSTRAINT CK_jornada_rango CHECK (fecha_hora_fin > fecha_hora_inicio),
-    CONSTRAINT CK_jornada_zona CHECK (zona IN ('VIP', 'General', 'Terraza'))
 );
 GO
 
@@ -136,7 +119,6 @@ CREATE TABLE reserva (
     codigo VARCHAR(8) NOT NULL UNIQUE,
     id_cliente INT NOT NULL,
     id_creador INT NULL,
-    id_mesero INT NULL,
     tipo_restaurante_completo BIT NOT NULL DEFAULT 0,
     fecha_hora_inicio DATETIME NOT NULL,
     duracion_minutos INT NOT NULL DEFAULT 120,
@@ -223,10 +205,6 @@ ALTER TABLE token_reactivacion ADD CONSTRAINT FK_token_reactivacion_id_cliente
     FOREIGN KEY (id_cliente) REFERENCES usuario(id_usuario) ON DELETE CASCADE;
 GO
 
-ALTER TABLE jornada ADD CONSTRAINT FK_jornada_id_empleado 
-    FOREIGN KEY (id_empleado) REFERENCES usuario(id_usuario) ON DELETE CASCADE;
-GO
-
 ALTER TABLE mesa ADD CONSTRAINT FK_mesa_zona_id 
     FOREIGN KEY (zona_id) REFERENCES zona(id_zona) ON DELETE NO ACTION;
 GO
@@ -241,10 +219,6 @@ GO
 
 ALTER TABLE reserva ADD CONSTRAINT FK_reserva_id_creador 
     FOREIGN KEY (id_creador) REFERENCES usuario(id_usuario) ON DELETE NO ACTION;
-GO
-
-ALTER TABLE reserva ADD CONSTRAINT FK_reserva_id_mesero 
-    FOREIGN KEY (id_mesero) REFERENCES usuario(id_usuario) ON DELETE NO ACTION;
 GO
 
 ALTER TABLE reserva_mesa ADD CONSTRAINT FK_reserva_mesa_id_reserva 
@@ -291,35 +265,20 @@ GO
 CREATE INDEX IX_bloqueo_mesa_rango ON bloqueo_mesa(mesa_id, inicio, fin);
 GO
 
-CREATE INDEX IX_reserva_id_mesero ON reserva(id_mesero);
-GO
-
-CREATE INDEX IX_jornada_empleado_inicio ON jornada(id_empleado, fecha_hora_inicio);
-GO
-
 -- ==========================================
 -- DATOS SEMILLA (SEED MÍNIMO COHERENTE)
 -- ==========================================
 
--- 1. Usuarios: 1 Admin (gerente), 2 Empleados (mesero y cocina) y 2 Clientes (1 General, 1 VIP con 2 strikes para prueba RN10)
-INSERT INTO usuario (tipo_documento, documento, nombre, telefono, correo, hash_pw, activo, debe_cambiar_pw, rol, tipo_cliente, tipo_empleado, strikes, fecha_ultima_actividad, fecha_contratacion)
+-- 1. Usuarios: 1 Admin, 1 Empleado, 2 Clientes (1 General, 1 VIP con 2 strikes para prueba RN10)
+INSERT INTO usuario (tipo_documento, documento, nombre, telefono, correo, hash_pw, activo, debe_cambiar_pw, rol, tipo_cliente, strikes, fecha_ultima_actividad, fecha_contratacion)
 VALUES 
-('CC', '10001001', 'Carlos Mendoza', '3001112233', 'admin@brindis.co', 'hash_admin_123', 1, 0, 'ADMINISTRADOR', NULL, 'GERENTE', 0, NULL, '2024-01-15'),
-('CC', '10002002', 'Laura Gómez', '3002223344', 'empleado@brindis.co', 'hash_emp_123', 1, 0, 'EMPLEADO', NULL, 'MESERO', 0, NULL, '2025-03-01'),
-('CC', '10003003', 'Andrés Pérez', '3103334455', 'andres.general@correo.co', 'hash_cli_123', 1, 0, 'CLIENTE', 'GENERAL', NULL, 0, GETDATE(), NULL),
-('CC', '10004004', 'Valeria Soto', '3154445566', 'valeria.vip@correo.co', 'hash_vip_123', 1, 0, 'CLIENTE', 'VIP', NULL, 2, GETDATE(), NULL),
-('CC', '10005005', 'Mario Rojas', '3005556677', 'cocina@brindis.co', 'hash_coc_123', 1, 0, 'EMPLEADO', NULL, 'COCINA', 0, NULL, '2025-06-15');
+('CC', '10001001', 'Carlos Mendoza', '3001112233', 'admin@brindis.co', 'hash_admin_123', 1, 0, 'ADMINISTRADOR', NULL, 0, NULL, '2024-01-15'),
+('CC', '10002002', 'Laura Gómez', '3002223344', 'empleado@brindis.co', 'hash_emp_123', 1, 0, 'EMPLEADO', NULL, 0, NULL, '2025-03-01'),
+('CC', '10003003', 'Andrés Pérez', '3103334455', 'andres.general@correo.co', 'hash_cli_123', 1, 0, 'CLIENTE', 'GENERAL', 0, GETDATE(), NULL),
+('CC', '10004004', 'Valeria Soto', '3154445566', 'valeria.vip@correo.co', 'hash_vip_123', 1, 0, 'CLIENTE', 'VIP', 2, GETDATE(), NULL);
 GO
 
--- 2. Jornadas demo del personal (la del mesero cubre la franja de BRND2026)
-INSERT INTO jornada (id_empleado, fecha_hora_inicio, fecha_hora_fin, zona)
-VALUES 
-(2, '2026-10-23 17:00:00', '2026-10-23 23:00:00', 'General'),
-(5, '2026-10-23 16:00:00', '2026-10-23 23:30:00', 'General'),
-(1, '2026-10-23 12:00:00', '2026-10-23 20:00:00', 'VIP');
-GO
-
--- 3. Zonas: VIP, General, Terraza
+-- 2. Zonas: VIP, General, Terraza
 INSERT INTO zona (nombre, descripcion)
 VALUES 
 ('VIP', 'Salón privado climatizado con iluminación tenue y atención prioritaria'),
@@ -327,12 +286,12 @@ VALUES
 ('Terraza', 'Espacio al aire libre con vista panorámica y ambiente romántico');
 GO
 
--- 4. Horario de Atención (1 horario de ejemplo)
+-- 3. Horario de Atención (1 horario de ejemplo)
 INSERT INTO horario_atencion (dia_semana, hora_apertura, hora_cierre)
 VALUES ('VIERNES', '12:00:00', '23:00:00');
 GO
 
--- 5. Mesas (6 mesas distribuidas en las 3 zonas)
+-- 4. Mesas (6 mesas distribuidas en las 3 zonas)
 INSERT INTO mesa (numero_mesa, zona_id, capacidad, estado_fisico, disponible_fisicamente)
 VALUES 
 (1, 1, 4, 'DISPONIBLE', 1),
@@ -343,14 +302,14 @@ VALUES
 (6, 3, 4, 'DISPONIBLE', 1);
 GO
 
--- 6. Planes de Servicio Extra (1 decoración + 1 barra)
+-- 5. Planes de Servicio Extra (1 decoración + 1 barra)
 INSERT INTO plan_servicio_extra (nombre, tarifa, descripcion, por_persona, subtipo, motivo, nivel, tipo_barra, cobra_por_persona)
 VALUES 
 ('Decoración Aniversario Especial', 120000.00, 'Arreglo floral en mesa, velas aromáticas y pétalos', 0, 'DECORACION', 'Aniversario', 'Elaborado', NULL, NULL),
 ('Barra Libre Coctelería Autor', 85000.00, 'Selección ilimitada de cocteles de la casa durante la reserva', 1, 'BARRA_COCTELES', NULL, NULL, 'CARTA_COMPLETA', 1);
 GO
 
--- 7. Ítems del Menú (3 ítems de la carta)
+-- 6. Ítems del Menú (3 ítems de la carta)
 INSERT INTO item_menu (nombre, tipo, precio_vigente)
 VALUES 
 ('Carpaccio de Res al Parmesano', 'ENTRADA', 42000.00),
@@ -358,11 +317,11 @@ VALUES
 ('Volcán de Chocolate con Helado Artesanal', 'POSTRE', 28000.00);
 GO
 
--- 8. Reserva vigente de ejemplo con su mesa, pedido, servicio extra, pago, comprobante y mesero asignado
+-- 7. Reserva vigente de ejemplo con su mesa, pedido, servicio extra, pago y comprobante
 -- Subtotal menú: (2 * 42000) + (2 * 78000) + (2 * 28000) = 296000
 -- Subtotal extra: 120000 (decoración) = 120000 -> Total Reserva = 416000. Adelanto 30% = 124800
-INSERT INTO reserva (codigo, id_cliente, id_creador, id_mesero, tipo_restaurante_completo, fecha_hora_inicio, duracion_minutos, num_comensales, ocasion, restricciones, observaciones, modalidad_pago, porcentaje_pago, medio_pago, monto_total, estado)
-VALUES ('BRND2026', 4, 2, 2, 0, '2026-10-23 19:00:00', 120, 4, 'ANIVERSARIO', 'Sin frutos secos', 'Mesa apartada, luz tenue', 'ADELANTO', 30, 'TARJETA', 416000.00, 'VIGENTE');
+INSERT INTO reserva (codigo, id_cliente, id_creador, tipo_restaurante_completo, fecha_hora_inicio, duracion_minutos, num_comensales, ocasion, restricciones, observaciones, modalidad_pago, porcentaje_pago, medio_pago, monto_total, estado)
+VALUES ('BRND2026', 4, 2, 0, '2026-10-23 19:00:00', 120, 4, 'ANIVERSARIO', 'Sin frutos secos', 'Mesa apartada, luz tenue', 'ADELANTO', 30, 'TARJETA', 416000.00, 'VIGENTE');
 GO
 
 INSERT INTO reserva_mesa (id_reserva, id_mesa, precio_congelado)
@@ -492,20 +451,4 @@ SELECT
     END AS nuevo_tipo_cliente_rn10
 FROM usuario
 WHERE rol = 'CLIENTE' AND tipo_cliente = 'VIP';
-
--- 6. Verificación RF15: reservas con mesero asignado cuya jornada cubre la franja (asignación válida)
-SELECT 
-    r.codigo,
-    u.nombre AS mesero,
-    r.fecha_hora_inicio,
-    DATEADD(MINUTE, r.duracion_minutos, r.fecha_hora_inicio) AS fin,
-    j.fecha_hora_inicio AS jornada_inicio,
-    j.fecha_hora_fin AS jornada_fin,
-    j.zona
-FROM reserva r
-INNER JOIN usuario u ON r.id_mesero = u.id_usuario
-LEFT JOIN jornada j ON j.id_empleado = u.id_usuario
-    AND r.fecha_hora_inicio >= j.fecha_hora_inicio
-    AND r.fecha_hora_inicio <= j.fecha_hora_fin
-WHERE r.id_mesero IS NOT NULL;
 */

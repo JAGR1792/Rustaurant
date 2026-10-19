@@ -879,40 +879,6 @@ section[id^="paso-"] { margin-bottom: 2rem; }
 .kpi-valor { display: block; font-family: var(--serif); font-size: 2rem; font-weight: 700; color: var(--vino); line-height: 1.1; }
 .kpi-rotulo { font-size: .75rem; color: var(--carbon-suave); text-transform: uppercase; letter-spacing: .06em; }
 
-/* Paneles por tipo de empleado (RF15) */
-.acciones-panel { display: flex; gap: .6rem; flex-wrap: wrap; margin: .9rem 0 0; }
-.ficha-turno {
-  background: var(--marfil-claro); border: 1px solid var(--linea); border-radius: 14px;
-  padding: .9rem 1.1rem; display: grid; gap: .4rem; justify-items: start; min-width: 220px;
-}
-.ficha-turno__rango { margin: 0; font-weight: 600; color: var(--vino); }
-.tag-tipo {
-  border: 1px solid var(--dorado); border-radius: 999px; padding: .12rem .6rem;
-  font-size: .72rem; letter-spacing: .08em; text-transform: uppercase; color: #8c6f37;
-  background: var(--marfil);
-}
-.tag-tipo--mesero { border-color: var(--vino); color: var(--vino); }
-.tag-tipo--cocina { border-color: var(--carbon-suave); color: var(--carbon-suave); }
-.tag-tipo--gerente { border-color: #c5a059; color: #8c6f37; }
-.chip-estado {
-  display: inline-block; border-radius: 999px; padding: .1rem .55rem;
-  font-size: .72rem; border: 1px solid var(--linea); color: var(--carbon-suave);
-}
-.chip-estado--ok { color: #3c6647; border-color: rgba(78, 125, 87, .45); background: rgba(78, 125, 87, .1); }
-.chip-estado--off { color: var(--carbon-suave); }
-.panel-aviso-gerente {
-  background: rgba(168, 138, 89, .1); border: 1px solid rgba(168, 138, 89, .3);
-  border-radius: 12px; padding: .7rem 1rem; margin-bottom: 1.4rem;
-}
-.panel-aviso-gerente p { margin: 0; color: var(--carbon); font-size: .95rem; }
-.panel-aviso-gerente a { color: var(--vino); font-weight: 600; }
-.form-asignar { display: flex; gap: .45rem; align-items: center; margin: 0; }
-.form-asignar select {
-  padding: .35rem .5rem; border: 1px solid var(--linea); border-radius: 8px;
-  background: var(--marfil); color: var(--carbon); font: inherit; font-size: .85rem;
-}
-.kpis-admin { margin-top: 1.2rem; }
-
 .badge-en-vivo {
   background: rgba(78, 125, 87, .12); color: #3c6647; font-size: .78rem; font-weight: 700;
   padding: .35rem .85rem; border-radius: 999px; border: 1px solid rgba(78, 125, 87, .3);

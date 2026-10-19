@@ -18,9 +18,8 @@ use serde::{Deserialize, Serialize};
 use crate::builder::{ReservaBuilder, validar_modalidad};
 use crate::dao::DaoError;
 use crate::dominio::{
-    DetallePago, DetallePedido, EstadoReserva, Jornada, ModalidadPago, Ocasion, Reserva,
-    ReservaServicioExtra, TipoCliente, TipoEmpleado, UMBRAL_VISITAS_VIP, UsuarioSesion,
-    politica_cancelacion,
+    DetallePago, DetallePedido, EstadoReserva, ModalidadPago, Ocasion, Reserva,
+    ReservaServicioExtra, TipoCliente, UMBRAL_VISITAS_VIP, UsuarioSesion, politica_cancelacion,
 };
 use crate::estado::{self, Datos, Estado};
 use crate::factory::{ClienteFactory, DatosRegistro, registrar_con};
@@ -295,8 +294,6 @@ struct Agenda {
     usuario: String,
     es_personal: bool,
     es_vip: bool,
-    /// `true` para el rol Administrador: muestra el enlace al panel de administración.
-    es_admin: bool,
     denegado: bool,
     fecha: String,
     dia_ant: String,
@@ -1340,7 +1337,6 @@ pub async fn agenda(
         usuario: u.nombre().into(),
         es_personal: u.es_personal(),
         es_vip: u.es_vip(),
-        es_admin: matches!(u, UsuarioSesion::Administrador(_)),
         denegado,
         fecha: dia.format("%Y-%m-%d").to_string(),
         dia_ant: (dia - Duration::days(1)).format("%Y-%m-%d").to_string(),
@@ -1404,395 +1400,6 @@ pub async fn agenda_dia(
         vacio: resumen.vacio,
     })
     .into_response()
-}
-
-// ----------------------------------------------- paneles por tipo (RF15)
-
-/// Fila de personal con su tipo y jornada de hoy (panel de administración).
-struct PersonalFila {
-    id: i64,
-    nombre: String,
-    correo: String,
-    rol: String,
-    tipo: String,
-    tipo_clave: String,
-    jornada: String,
-    en_turno: bool,
-}
-
-/// Opción de mesero del selector de asignación.
-struct OpcionMesero {
-    id: i64,
-    nombre: String,
-    actual: bool,
-}
-
-/// Reserva activa con su selector de mesero (panel de administración).
-struct AsignacionFila {
-    reserva_id: i64,
-    codigo: String,
-    fecha: String,
-    cliente: String,
-    mesas: String,
-    actual: String,
-    meseros: Vec<OpcionMesero>,
-}
-
-#[derive(Template)]
-#[template(path = "panel_admin.html")]
-struct PanelAdmin {
-    usuario: String,
-    es_personal: bool,
-    es_vip: bool,
-    aviso: Option<String>,
-    error: Option<String>,
-    activas: usize,
-    comensales_activos: u32,
-    meseros_en_turno: usize,
-    abonado: String,
-    personal: Vec<PersonalFila>,
-    asignaciones: Vec<AsignacionFila>,
-}
-
-/// Restricción alimentaria de una cita próxima (vista de cocina).
-struct RestriccionFila {
-    fecha: String,
-    codigo: String,
-    cliente: String,
-    comensales: u32,
-    restriccion: String,
-}
-
-#[derive(Template)]
-#[template(path = "panel_empleado.html")]
-struct PanelEmpleado {
-    usuario: String,
-    es_personal: bool,
-    es_vip: bool,
-    aviso: Option<String>,
-    error: Option<String>,
-    tipo: String,
-    tipo_clave: String,
-    jornada_hoy: Option<String>,
-    en_turno: bool,
-    es_mesero: bool,
-    es_gerente: bool,
-    mis_mesas: Vec<AgendaFila>,
-    restricciones: Vec<RestriccionFila>,
-}
-
-/// Rango legible de una jornada en hora local: "12:00 – 20:00".
-fn rango_jornada(j: &Jornada) -> String {
-    format!(
-        "{} – {}",
-        utc_a_local(j.inicio).format("%H:%M"),
-        utc_a_local(j.fin).format("%H:%M")
-    )
-}
-
-/// Turno de hoy de un empleado (según la fecha local del inicio).
-fn jornada_de_hoy(jornadas: &[Jornada], id_empleado: i64, hoy: NaiveDate) -> Option<&Jornada> {
-    jornadas
-        .iter()
-        .find(|j| j.id_empleado == id_empleado && utc_a_local(j.inicio).date() == hoy)
-}
-
-/// Vista del panel del empleado: turno de hoy, mesas asignadas y
-/// restricciones próximas; la comparten el handler y las pruebas.
-fn vista_panel_empleado(
-    d: &Datos,
-    u: &UsuarioSesion,
-    aviso: Option<String>,
-    error: Option<String>,
-) -> PanelEmpleado {
-    let ahora = Utc::now();
-    let hoy = utc_a_local(ahora).date();
-    let tipo = u.tipo_empleado().unwrap_or(TipoEmpleado::Mesero);
-    let jornada = jornada_de_hoy(&d.jornadas, u.id(), hoy);
-    let en_turno = jornada.is_some_and(|j| j.cubre(ahora));
-    let jornada_hoy = jornada.map(|j| format!("{} · Zona {}", rango_jornada(j), j.zona));
-    let nombre_de = |id: i64| {
-        d.usuarios
-            .iter()
-            .find(|x| x.id() == id)
-            .map(|x| x.nombre().to_string())
-            .unwrap_or_else(|| format!("Cliente {id}"))
-    };
-    // Mesas asignadas a esta persona (actuales o futuras).
-    let mut propias: Vec<&Reserva> = d
-        .reservas
-        .iter()
-        .filter(|r| {
-            r.id_mesero == Some(u.id())
-                && matches!(
-                    r.estado,
-                    EstadoReserva::Vigente | EstadoReserva::ClienteEnMesa
-                )
-                && r.inicio >= ahora - Duration::hours(2)
-        })
-        .collect();
-    propias.sort_by_key(|r| r.inicio);
-    let mis_mesas = propias
-        .iter()
-        .map(|r| fila_agenda(r, &d.usuarios))
-        .collect();
-    // Restricciones por preparar: hoy y mañana, sin canceladas.
-    let manana = hoy + Duration::days(1);
-    let mut con_restriccion: Vec<&Reserva> = d
-        .reservas
-        .iter()
-        .filter(|r| {
-            let f = utc_a_local(r.inicio).date();
-            (f == hoy || f == manana)
-                && r.estado != EstadoReserva::Cancelada
-                && !r.restricciones.trim().is_empty()
-                && !r.restricciones.eq_ignore_ascii_case("sin alergias")
-        })
-        .collect();
-    con_restriccion.sort_by_key(|r| r.inicio);
-    let restricciones = con_restriccion
-        .iter()
-        .map(|r| RestriccionFila {
-            fecha: fecha_hora_fmt(r.inicio),
-            codigo: r.codigo.clone(),
-            cliente: nombre_de(r.id_cliente),
-            comensales: r.num_comensales,
-            restriccion: r.restricciones.clone(),
-        })
-        .collect();
-    PanelEmpleado {
-        usuario: u.nombre().into(),
-        es_personal: true,
-        es_vip: false,
-        aviso,
-        error,
-        tipo: tipo.etiqueta().into(),
-        tipo_clave: tipo.clave().into(),
-        jornada_hoy,
-        en_turno,
-        es_mesero: tipo == TipoEmpleado::Mesero,
-        es_gerente: matches!(u, UsuarioSesion::Administrador(_)),
-        mis_mesas,
-        restricciones,
-    }
-}
-
-/// Vista del panel de administración: KPIs globales, personal con jornada
-/// y asignación de meseros; la comparten el handler y las pruebas.
-fn vista_panel_admin(
-    d: &Datos,
-    u: &UsuarioSesion,
-    aviso: Option<String>,
-    error: Option<String>,
-) -> PanelAdmin {
-    let ahora = Utc::now();
-    let hoy = utc_a_local(ahora).date();
-    let es_mesero = |id: i64| {
-        d.usuarios.iter().any(|x| {
-            x.id() == id
-                && matches!(x, UsuarioSesion::Empleado(e) if e.tipo == TipoEmpleado::Mesero)
-        })
-    };
-    let turno_cubre = |id: i64, cuando: DateTime<Utc>| {
-        d.jornadas
-            .iter()
-            .any(|j| j.id_empleado == id && j.cubre(cuando))
-    };
-    let activas = d
-        .reservas
-        .iter()
-        .filter(|r| {
-            matches!(
-                r.estado,
-                EstadoReserva::Vigente | EstadoReserva::ClienteEnMesa
-            )
-        })
-        .collect::<Vec<_>>();
-    let comensales_activos = activas.iter().map(|r| r.num_comensales).sum();
-    let meseros_en_turno = d
-        .usuarios
-        .iter()
-        .filter(|x| es_mesero(x.id()) && turno_cubre(x.id(), ahora))
-        .count();
-    let abonado: i64 = d
-        .comprobantes
-        .iter()
-        .filter(|c| c.tipo_movimiento == "INGRESO")
-        .map(|c| c.monto_total)
-        .sum();
-    let personal = d
-        .usuarios
-        .iter()
-        .filter(|x| x.es_personal())
-        .map(|x| {
-            let tipo = x.tipo_empleado().unwrap_or(TipoEmpleado::Gerente);
-            let jornada = jornada_de_hoy(&d.jornadas, x.id(), hoy);
-            PersonalFila {
-                id: x.id(),
-                nombre: x.nombre().into(),
-                correo: x.correo().into(),
-                rol: if matches!(x, UsuarioSesion::Administrador(_)) {
-                    "Administrador"
-                } else {
-                    "Empleado"
-                }
-                .into(),
-                tipo: tipo.etiqueta().into(),
-                tipo_clave: tipo.clave().into(),
-                jornada: jornada
-                    .map(|j| format!("{} · {}", rango_jornada(j), j.zona))
-                    .unwrap_or_else(|| "Sin jornada hoy".into()),
-                en_turno: jornada.is_some_and(|j| j.cubre(ahora)),
-            }
-        })
-        .collect();
-    let mut asignables: Vec<&Reserva> = d
-        .reservas
-        .iter()
-        .filter(|r| {
-            matches!(
-                r.estado,
-                EstadoReserva::Vigente | EstadoReserva::ClienteEnMesa
-            ) && r.inicio >= ahora - Duration::hours(2)
-        })
-        .collect();
-    asignables.sort_by_key(|r| r.inicio);
-    asignables.truncate(8);
-    let asignaciones = asignables
-        .iter()
-        .map(|r| AsignacionFila {
-            reserva_id: r.id,
-            codigo: r.codigo.clone(),
-            fecha: fecha_hora_fmt(r.inicio),
-            cliente: d
-                .usuarios
-                .iter()
-                .find(|x| x.id() == r.id_cliente)
-                .map(|x| x.nombre().to_string())
-                .unwrap_or_else(|| format!("Cliente {}", r.id_cliente)),
-            mesas: r
-                .mesa_ids
-                .iter()
-                .map(|m| format!("M{m}"))
-                .collect::<Vec<_>>()
-                .join(", "),
-            actual: r
-                .id_mesero
-                .and_then(|id| d.usuarios.iter().find(|x| x.id() == id))
-                .map(|x| x.nombre().to_string())
-                .unwrap_or_else(|| "Sin asignar".into()),
-            meseros: d
-                .usuarios
-                .iter()
-                .filter(|x| es_mesero(x.id()) && turno_cubre(x.id(), r.inicio))
-                .map(|x| OpcionMesero {
-                    id: x.id(),
-                    nombre: x.nombre().into(),
-                    actual: r.id_mesero == Some(x.id()),
-                })
-                .collect(),
-        })
-        .collect();
-    PanelAdmin {
-        usuario: u.nombre().into(),
-        es_personal: true,
-        es_vip: false,
-        aviso,
-        error,
-        activas: activas.len(),
-        comensales_activos,
-        meseros_en_turno,
-        abonado: cop(abonado),
-        personal,
-        asignaciones,
-    }
-}
-
-/// Panel del empleado (RF15): turno de hoy y foco según el tipo de empleado.
-pub async fn panel_empleado(
-    State(e): State<Estado>,
-    jar: CookieJar,
-    Query(q): Query<HashMap<String, String>>,
-) -> Response {
-    let Some(u) = sesion_actual(&jar, &e) else {
-        return Redirect::to("/login").into_response();
-    };
-    if !u.es_personal() {
-        return Redirect::to("/login").into_response();
-    }
-    let aviso = match q.get("ok").map(String::as_str) {
-        Some("estado_actualizado") => Some("Estado de la reserva actualizado.".to_string()),
-        _ => None,
-    };
-    let error = match q.get("error").map(String::as_str) {
-        Some("mesero_invalido") => {
-            Some("No se pudo asignar: revisa el tipo del empleado y su jornada.".to_string())
-        }
-        _ => None,
-    };
-    let d = e.lock().unwrap();
-    Html(vista_panel_empleado(&d, &u, aviso, error)).into_response()
-}
-
-/// Panel de administración (RF15): solo el rol Administrador.
-pub async fn panel_admin(
-    State(e): State<Estado>,
-    jar: CookieJar,
-    Query(q): Query<HashMap<String, String>>,
-) -> Response {
-    let Some(u) = sesion_actual(&jar, &e) else {
-        return Redirect::to("/login").into_response();
-    };
-    if !matches!(u, UsuarioSesion::Administrador(_)) {
-        return Redirect::to("/panel-empleado").into_response();
-    }
-    let aviso = match q.get("ok").map(String::as_str) {
-        Some("mesero_asignado") => Some("Mesero asignado a la reserva.".to_string()),
-        _ => None,
-    };
-    let error = match q.get("error").map(String::as_str) {
-        Some("mesero_invalido") => Some(
-            "No se pudo asignar: elige un mesero con jornada que cubra esa franja.".to_string(),
-        ),
-        _ => None,
-    };
-    let d = e.lock().unwrap();
-    Html(vista_panel_admin(&d, &u, aviso, error)).into_response()
-}
-
-#[derive(Deserialize)]
-pub struct FormMesero {
-    /// ID del mesero elegido; vacío = dejar la reserva sin asignar.
-    mesero: Option<String>,
-}
-
-pub async fn asignar_mesero_reserva(
-    State(e): State<Estado>,
-    jar: CookieJar,
-    Path(id): Path<i64>,
-    Form(f): Form<FormMesero>,
-) -> Response {
-    let Some(u) = sesion_actual(&jar, &e) else {
-        return Redirect::to("/login").into_response();
-    };
-    if !matches!(u, UsuarioSesion::Administrador(_)) {
-        return Redirect::to("/panel-empleado").into_response();
-    }
-    let candidato = match f.mesero.as_deref().map(str::trim) {
-        None | Some("") => Ok(None),
-        Some(raw) => raw.parse::<i64>().map(Some).map_err(|_| "mesero inválido"),
-    };
-    let resultado = match candidato {
-        Ok(candidato) => {
-            let mut d = e.lock().unwrap();
-            d.asignar_mesero(id, candidato)
-        }
-        Err(msj) => Err(msj.to_string()),
-    };
-    match resultado {
-        Ok(()) => Redirect::to("/panel-admin?ok=mesero_asignado").into_response(),
-        Err(_) => Redirect::to("/panel-admin?error=mesero_invalido").into_response(),
-    }
 }
 
 pub async fn dashboard(
@@ -1964,8 +1571,6 @@ pub async fn toggle_vip_cliente(
 #[derive(Deserialize)]
 pub struct FormCambioEstado {
     nuevo: String,
-    /// Página a la que volver tras la acción (lista blanca).
-    volver: Option<String>,
 }
 
 pub async fn cambiar_estado_reserva(
@@ -1991,11 +1596,7 @@ pub async fn cambiar_estado_reserva(
         let mut d = e.lock().unwrap();
         let _ = d.cambiar_estado_reserva(id, nuevo_estado);
     }
-    let destino = match f.volver.as_deref() {
-        Some("/panel-empleado") => "/panel-empleado",
-        _ => "/agenda",
-    };
-    Redirect::to(&format!("{destino}?ok=estado_actualizado")).into_response()
+    Redirect::to("/agenda?ok=estado_actualizado").into_response()
 }
 
 pub async fn reset_strikes_cliente(
@@ -2087,7 +1688,6 @@ mod tests {
             codigo: format!("TEST{id:04}"),
             id_cliente: 3,
             id_creador: None,
-            id_mesero: None,
             tipo_restaurante_completo: false,
             mesa_ids: vec![1],
             inicio,
@@ -2248,115 +1848,5 @@ mod tests {
             "el día elegido sin marcar"
         );
         assert!(html.contains("Servicio del"), "sin barra de día");
-    }
-
-    #[test]
-    fn panel_empleado_del_mesero_muestra_turno_y_sus_mesas() {
-        let e = estado::sembrar();
-        let d = e.lock().unwrap();
-        let u = d
-            .usuarios
-            .iter()
-            .find(|x| x.id() == 2)
-            .cloned()
-            .expect("mesero demo");
-        let p = vista_panel_empleado(&d, &u, None, None);
-        assert_eq!(p.tipo, "Mesero");
-        assert_eq!(p.tipo_clave, "mesero");
-        assert!(p.es_mesero && !p.es_gerente);
-        assert!(p.en_turno, "la jornada demo cubre el momento actual");
-        assert!(
-            p.jornada_hoy.as_deref().is_some_and(|j| j.contains("Zona")),
-            "sin rango ni zona: {:?}",
-            p.jornada_hoy
-        );
-        assert_eq!(
-            p.mis_mesas.len(),
-            1,
-            "solo DEMO0001 está asignada al mesero"
-        );
-        assert_eq!(p.mis_mesas[0].codigo, "DEMO0001");
-        assert!(
-            p.restricciones
-                .iter()
-                .all(|r| r.codigo != "VIP00003" && r.codigo != "DEMO0001"),
-            "solo se listan restricciones de hoy y mañana"
-        );
-        let html = p.render().expect("el panel del empleado renderiza");
-        assert!(html.contains("Mis mesas asignadas"));
-        assert!(html.contains("DEMO0001"));
-    }
-
-    #[test]
-    fn panel_empleado_de_cocina_no_lista_mesas_propias() {
-        let e = estado::sembrar();
-        let d = e.lock().unwrap();
-        let u = d
-            .usuarios
-            .iter()
-            .find(|x| x.id() == 5)
-            .cloned()
-            .expect("cocina demo");
-        let p = vista_panel_empleado(&d, &u, None, None);
-        assert_eq!(p.tipo, "Cocina");
-        assert_eq!(p.tipo_clave, "cocina");
-        assert!(!p.es_mesero && !p.es_gerente);
-        assert!(p.en_turno);
-        assert!(p.mis_mesas.is_empty());
-        let html = p.render().expect("el panel de cocina renderiza");
-        assert!(
-            !html.contains("Mis mesas asignadas"),
-            "cocina no ve la sección de mesas"
-        );
-        assert!(html.contains("Restricciones para preparar"));
-    }
-
-    #[test]
-    fn panel_admin_agrega_kpis_personal_y_asignacion_de_meseros() {
-        let e = estado::sembrar();
-        let d = e.lock().unwrap();
-        let u = d
-            .usuarios
-            .iter()
-            .find(|x| x.id() == 1)
-            .cloned()
-            .expect("admin demo");
-        let p = vista_panel_admin(&d, &u, None, None);
-        assert_eq!(p.activas, 3, "DEMO0001, VIP00003 y la mesa en servicio");
-        assert_eq!(p.comensales_activos, 8);
-        assert_eq!(
-            p.meseros_en_turno, 1,
-            "solo el mesero demo está en turno ahora"
-        );
-        assert!(!p.abonado.is_empty());
-        let nombres: Vec<&str> = p.personal.iter().map(|f| f.nombre.as_str()).collect();
-        assert_eq!(nombres, vec!["Admin", "Empleado", "Cocina"]);
-        assert!(
-            p.personal.iter().all(|f| f.en_turno),
-            "los tres tienen jornada hoy"
-        );
-        let demo = p
-            .asignaciones
-            .iter()
-            .find(|a| a.codigo == "DEMO0001")
-            .expect("DEMO0001 asignable");
-        assert_eq!(demo.actual, "Empleado");
-        assert!(
-            demo.meseros.iter().any(|m| m.actual),
-            "el mesero actual va preseleccionado"
-        );
-        let vip = p
-            .asignaciones
-            .iter()
-            .find(|a| a.codigo == "VIP00003")
-            .expect("VIP00003 asignable");
-        assert_eq!(vip.actual, "Sin asignar");
-        assert!(vip.meseros.is_empty(), "nadie tiene jornada a +4 días");
-        let html = p.render().expect("el panel de administración renderiza");
-        assert!(html.contains("Asignación de meseros"));
-        assert!(
-            html.contains("/admin/reserva/"),
-            "faltan los formularios de asignación"
-        );
     }
 }

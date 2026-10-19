@@ -277,7 +277,7 @@ RF11 & Confirmar la reserva, generar un c{\'o}digo {\'u}nico y mostrar el resume
 RF12 & Permitir al personal registrar reservas a nombre de un cliente y crear al cliente si no existe. & Alta & 1\\\hline
 RF13 & Permitir al cliente consultar sus reservas y el estado de cada una. & Media & 1\\\hline
 RF14 & Cancelar una reserva aplicando la pol{\'i}tica de reembolso y de \textit{strikes}, y emitir el comprobante del reembolso. & Media & 1\\\hline
-RF15 & Mostrar al personal la agenda del d{\'i}a con alertas, cambiar el estado de las reservas y ofrecer paneles diferenciados por tipo de empleado (jornada y asignaci{\'o}n de mesero). & Alta & 1\\\hline
+RF15 & Mostrar al personal la agenda del d{\'i}a con alertas, y permitirle cambiar el estado de las reservas. & Alta & 1\\\hline
 RF16 & Modificar una reserva aplicando los precios vigentes y cobrando la diferencia del adelanto. & Media & 2\\\hline
 RF17 & Enviar credenciales gen{\'e}ricas por correo a los clientes creados por el personal y exigir el cambio de contrase{\~n}a en el primer ingreso. & Media & 2\\\hline
 RF18 & Permitir al administrador crear empleados y administradores, ascender usuarios y activarlos o desactivarlos. & Media & 2\\\hline
@@ -466,7 +466,7 @@ La Vista presenta la informaci\'on, el Controlador atiende las peticiones y el M
   \node[band, minimum width=10.6cm, minimum height=0.7cm, anchor=north west] (bd) at (0,-8.4) {};
   \node[tit, anchor=west] at ($(bd.west)+(0.25,0)$) {Base de\\datos};
   \node[chip] at (4.1,-8.75) {brindis\_db};
-  \node[lb, anchor=west] at (5.65,-8.75) {(14 tablas, 3FN)};
+  \node[lb, anchor=west] at (5.65,-8.75) {(13 tablas, 3FN)};
   % --- Modelo: entidades (lateral) ---
   \node[band, minimum width=3.2cm, minimum height=3.85cm, anchor=north west] (ent) at (11.2,-4.0) {};
   \node[tit] at (12.8,-4.45) {Modelo:\\entidades};
@@ -491,7 +491,7 @@ La Vista presenta la informaci\'on, el Controlador atiende las peticiones y el M
 \\[3pt]{\small\textit{Nota.} Las flechas punteadas indican dependencia de uso: los servicios y los DAO usan las entidades del dominio; la vista no conoce al modelo y el controlador solo conoce las interfaces de servicio (proxies).}
 \end{figure}
 \subsection{Diagrama de clases del modelo}
-Usuario es abstracta y se especializa en Cliente y Empleado; Administrador hereda de Empleado, lo que expresa que puede hacer todo lo del personal. El Empleado distingue su tipo (GERENTE, MESERO o COCINA) y se le planifican turnos (Jornada); la Reserva guarda, cuando existe, al mesero asignado (id\_mesero) que atiende la cita (RF15). Lo cr\'itico: la Reserva pertenece a un Cliente, puede haber sido creada por un Empleado, ocupa una o varias Mesas y se compone de su pedido anticipado y sus servicios extra. La enumeraci\'on Ocasion sostiene la reserva por ocasi\'on: cada valor conoce la zona sugerida y la decoraci\'on ofrecida.
+Usuario es abstracta y se especializa en Cliente y Empleado; Administrador hereda de Empleado, lo que expresa que puede hacer todo lo del personal. Lo cr\'itico: la Reserva pertenece a un Cliente, puede haber sido creada por un Empleado, ocupa una o varias Mesas y se compone de su pedido anticipado y sus servicios extra. La enumeraci\'on Ocasion sostiene la reserva por ocasi\'on: cada valor conoce la zona sugerida y la decoraci\'on ofrecida.
 \begin{figure}[H]\centering
 {\small\textbf{Figura 4}}\\{\small\textit{Diagrama de clases del modelo (entidades)}}\\[4pt]
 \IfFileExists{../diagramas/brindis/Fig4_DiagramaClases.png}{\includegraphics[width=0.95\linewidth]{../diagramas/brindis/Fig4_DiagramaClases.png}}{\fbox{\parbox{0.9\linewidth}{\small Para ver la figura, exportar \texttt{diagramas/brindis/Fig4\_DiagramaClases.drawio} a PNG (draw.io: Archivo \textgreater\ Exportar como \textgreater\ PNG, 300\,ppp) con el mismo nombre. Fuente guardada en el repo.}}}
@@ -511,7 +511,7 @@ CASUAL & Cualquiera & Ninguna & Servicio est{\'a}ndar.\\\hline
 \end{tabular}
 }
 \subsection{Modelo relacional \texttt{brindis\_db}}
-14 tablas normalizadas 3FN (Elmasri y Navathe, 2016): usuario (tipo\_empleado nulable: GERENTE/MESERO/COCINA, coherente con el rol), token\_reactivacion, jornada (turnos del personal por franja horaria y zona), zona, mesa (solo DISPONIBLE/FUERA\_DE\_SERVICIO; reservada/bloqueada se calcula por franja desde reserva\_mesa + bloqueo\_mesa), horario\_atencion, bloqueo\_mesa, reserva (codigo único, id\_creador nulable, id\_mesero nulable, porcentaje\_pago entre 0 y 100), reserva\_mesa, item\_menu, reserva\_detalle\_pedido (precio congelado), plan\_servicio\_extra, reserva\_servicio\_extra (precio congelado), comprobante\_pago (id\_empleado nulable). Índices en reserva\_mesa.id\_mesa, reserva.fecha\_hora\_inicio (RN01), reserva.id\_mesero, jornada (id\_empleado, fecha\_hora\_inicio) y bloqueo\_mesa (mesa\_id, inicio, fin). Script SQL en \texttt{db/brindis\_db.sql} y en el Anexo~\ref{anx:sql}.
+13 tablas normalizadas 3FN (Elmasri y Navathe, 2016): usuario, token\_reactivacion, zona, mesa (solo DISPONIBLE/FUERA\_DE\_SERVICIO; reservada/bloqueada se calcula por franja desde reserva\_mesa + bloqueo\_mesa), horario\_atencion, bloqueo\_mesa, reserva (codigo único, id\_creador nulable, porcentaje\_pago entre 0 y 100), reserva\_mesa, item\_menu, reserva\_detalle\_pedido (precio congelado), plan\_servicio\_extra, reserva\_servicio\_extra (precio congelado), comprobante\_pago (id\_empleado nulable). Índices en reserva\_mesa.id\_mesa, reserva.fecha\_hora\_inicio (RN01) y bloqueo\_mesa (mesa\_id, inicio, fin). Script SQL en \texttt{db/brindis\_db.sql} y en el Anexo~\ref{anx:sql}.
 \begin{figure}[H]\centering
 {\small\textbf{Figura 5}}\\{\small\textit{Diagrama de la base de datos \texttt{brindis\_db} (SQL Server Management Studio)}}\\[4pt]
 \IfFileExists{../diagramas/brindis/Fig5_DiagramaBD.png}{\includegraphics[height=0.78\textheight,keepaspectratio]{../diagramas/brindis/Fig5_DiagramaBD.png}}{\fbox{\parbox{0.9\linewidth}{\small Para ver la figura, abra el diagrama de base de datos en SQL Server Management Studio 21 (\texttt{brindis\_db} \textgreater\ Diagramas de base de datos \textgreater\ Copiar diagrama como imagen) y guarde el archivo como \texttt{diagramas/brindis/Fig5\_DiagramaBD.png}.}}}
@@ -821,18 +821,16 @@ La interfaz sigue la direcci{\'o}n visual ``Le Jardin'' (ADR 0004): paleta marfi
 
 \noindent\textbf{Dashboard del usuario y membresía VIP (\texttt{/dashboard}).} Provee un panel integral para el cliente que incorpora una tarjeta digital de membresía VIP con acabado metalizado, simulación de chip EMV y código de socio. El panel desglosa el contador hacia la próxima cita, el estado de penalizaciones (\textit{strikes} con su consecuencia, RN09/RN10) y, para quien aún no es socio, los tres caminos de acceso y permanencia VIP: (1) fidelidad por visitas acumuladas (barra de progreso hacia 3 reservas efectivas), (2) pase directo anual mediante pago único (\$95.000 COP simulado con activación en un clic), y (3) asignación directa por cortesía de la administración; los socios ven en su lugar la confirmación de que sus privilegios ya están activos.
 
-\noindent\textbf{Paneles del personal y agenda con calendario (\texttt{/panel-empleado}, \texttt{/panel-admin} y \texttt{/agenda}).} La operación del restaurante se reparte por rol y tipo de empleado (RF15):
+\noindent\textbf{Panel de empleado y agenda con calendario (\texttt{/panel-empleado} y \texttt{/agenda}).} Centraliza la operación del restaurante:
 \begin{itemize}
-  \item \textbf{Panel de empleado (\texttt{/panel-empleado}):} ficha del turno de hoy (rango horario y zona) con se{\~n}al de ``en turno'' y foco seg{\'u}n el tipo de empleado: el mesero ve sus mesas asignadas con las acciones de estado de la reserva; cocina y mesero ven las restricciones por preparar de hoy y ma{\~n}ana; el gerente obtiene el atajo al panel de administraci{\'o}n.
-  \item \textbf{Panel de administraci{\'o}n (\texttt{/panel-admin}, solo gerente):} KPIs globales (reservas activas, comensales por atender, meseros en turno y total abonado), tabla de personal con su tipo y jornada del d{\'i}a, y la asignaci{\'o}n de mesero por reserva (\texttt{POST /admin/reserva/\{id\}/mesero}); el selector solo ofrece meseros cuya jornada cubre la franja de la cita y la operaci{\'o}n valida tipo MESERO m{\'a}s cobertura del turno.
-  \item \textbf{Pr{\'o}ximas citas inmediatas:} módulo prioritario en la cabecera que resalta las reservas más urgentes con temporizador y botones operacionales en vivo: sentar en mesa (\textit{ClienteEnMesa}), completar servicio (\textit{Completada}) o asentar inasistencia (\textit{Inasistida}, computando \textit{strike} y degradando a cliente general si alcanza el tercer incumplimiento).
+  \item \textbf{Próximas citas inmediatas:} módulo prioritario en la cabecera que resalta las reservas más urgentes con temporizador y botones operacionales en vivo: sentar en mesa (\textit{ClienteEnMesa}), completar servicio (\textit{Completada}) o asentar inasistencia (\textit{Inasistida}, computando \textit{strike} y degradando a cliente general si alcanza el tercer incumplimiento).
   \item \textbf{Calendario mensual interactivo:} cuadrícula visual con selector de días, conteo de reservas por fecha y navegación entre meses para inspeccionar la demanda; la navegación (días, meses y botones de día anterior/siguiente) es dinámica: el fragmento \texttt{GET /agenda/dia} reemplaza KPIs, calendario y tabla sin recargar la página, con \textit{pushState}/\textit{popstate} y navegación completa como respaldo.
   \item \textbf{Listado detallado y gestión de clientes:} tabla del día con distintivos VIP y alertas destacadas de alergias/restricciones, junto a un módulo administrativo para conmutar estado VIP y limpiar penalizaciones (\textit{strikes}).
 \end{itemize}
 
 \noindent\textit{Decisión de stack frontend (vinculante).}
 \begin{itemize}
-  \item \textbf{Plantillas HTML} con bloques estilo Jinja/Askama en \texttt{templates/}: \texttt{base}, \texttt{inicio}, \texttt{login}, \texttt{registro}, \texttt{reservar}, \texttt{mis\_reservas}, \texttt{agenda}, \texttt{panel\_empleado}, \texttt{panel\_admin} y \texttt{dashboard}.
+  \item \textbf{Plantillas HTML} con bloques estilo Jinja/Askama en \texttt{templates/}: \texttt{base}, \texttt{inicio}, \texttt{login}, \texttt{registro}, \texttt{reservar}, \texttt{mis\_reservas}, \texttt{agenda} y \texttt{dashboard}.
   \item \textbf{CSS vanilla} en \texttt{static/css/}: tokens de \texttt{tema.css} (paleta \textit{Le Jardin Élite}, tarjetas VIP, grilla de calendario, botones de acción rápida y estados de mesa) y fuentes \textit{self-hosted} de \texttt{fuentes.css}.
   \item \textbf{JS vanilla} en \texttt{static/js/}: \texttt{plano.js} pinta el plano SVG, gestiona la selección y la ficha de mesa, guía el pedido por porciones y consulta \texttt{GET /api/disponibilidad?fecha=\&hora=\&zona=} sin recargar; \texttt{agenda.js} refresca el panel de empleado por fragmento (\texttt{GET /agenda/dia}); \texttt{ui.js} implementa los toasts y el diálogo de confirmación propios; \texttt{chroma.js} y \texttt{counter.js} alimentan la carta y la cuenta regresiva.
   \item \textbf{Carta de la portada} (\texttt{\#carta} en \texttt{templates/inicio.html}): un spotlight que sigue al cursor revela la foto a color de cada plato; efecto adaptado a JS/CSS vanilla desde el componente ChromaGrid de React Bits (MIT) y portado como código propio en \texttt{static/js/chroma.js} y \texttt{static/css/chroma.css}, con las fotos reales de \texttt{static/img/fotos/}.
@@ -841,7 +839,7 @@ La interfaz sigue la direcci{\'o}n visual ``Le Jardin'' (ADR 0004): paleta marfi
   \item \textbf{Código propio:} no se usa htmx ni librerías externas pesadas; las adaptaciones de la carta y del contador están acreditadas a React Bits y todo lo demás es código original del repo, sin copiar de otros proyectos.
 \end{itemize}
 
-\noindent\textbf{Rutas y estado (fase 1 extendida).} El servidor expone \texttt{/static} y las rutas \texttt{/}, \texttt{/login}, \texttt{/registro}, \texttt{/reservar} (GET y POST), \texttt{/mis-reservas}, \texttt{/reservas/\{id\}/cancelar}, \texttt{/dashboard}, \texttt{/dashboard/hacer-vip}, \texttt{/agenda}, \texttt{/agenda/dia} (fragmento), \texttt{/panel-empleado}, \texttt{/panel-admin}, \texttt{/empleado/reserva/\{id\}/estado}, \texttt{/admin/reserva/\{id\}/mesero}, \texttt{/admin/cliente/\{id\}/toggle-vip} y \texttt{/admin/cliente/\{id\}/reset-strikes}. El flujo completo corre sobre un almacén en memoria (\texttt{src/estado.rs}) con seed de demostración; los DAO sqlx ya definidos son la ruta de conexión al motor relacional.
+\noindent\textbf{Rutas y estado (fase 1 extendida).} El servidor expone \texttt{/static} y las rutas \texttt{/}, \texttt{/login}, \texttt{/registro}, \texttt{/reservar} (GET y POST), \texttt{/mis-reservas}, \texttt{/reservas/\{id\}/cancelar}, \texttt{/dashboard}, \texttt{/dashboard/hacer-vip}, \texttt{/agenda}, \texttt{/agenda/dia} (fragmento), \texttt{/panel-empleado}, \texttt{/empleado/reserva/\{id\}/estado}, \texttt{/admin/cliente/\{id\}/toggle-vip} y \texttt{/admin/cliente/\{id\}/reset-strikes}. El flujo completo corre sobre un almacén en memoria (\texttt{src/estado.rs}) con seed de demostración; los DAO sqlx ya definidos son la ruta de conexión al motor relacional.
 \begin{figure}[H]\centering
 {\small\textbf{Figura 13}}\\{\small\textit{Prototipos de inicio de sesi{\'o}n y paso 1 (ocasi{\'o}n)}}\\[4pt]
 \begin{tikzpicture}
@@ -1258,7 +1256,7 @@ Finalmente, la reserva por ocasión, el plano interactivo y las alertas de restr
 \section{Anexo: validaci\'on de diagramas}
 Las figuras 6 a 11 est\'an dibujadas en TikZ dentro de este mismo documento (vectoriales, con la tipograf\'ia del texto) y se revisaron una a una: ninguna l\'inea cruza cajas ni hay etiquetas pisadas, y cada asociaci\'on lleva su multiplicidad. La figura 5 se gener\'o directamente desde la base de datos real con la herramienta de diagramas de SQL Server Management Studio 21, partiendo de la instancia cargada con el script que se incluye en el anexo siguiente.
 \section{Anexo: script de creaci\'on de la base de datos}\label{anx:sql}
-El listado completo de \texttt{db/brindis\_db.sql} (creaci\'on de \texttt{brindis\_db}, 14 tablas con sus restricciones, {\'i}ndices y datos de prueba) es el siguiente; con este mismo script se carg\'o la instancia de SQL Server 2025 desde la que se gener\'o la figura 5:
+El listado completo de \texttt{db/brindis\_db.sql} (creaci\'on de \texttt{brindis\_db}, 13 tablas con sus restricciones, {\'i}ndices y datos de prueba) es el siguiente; con este mismo script se carg\'o la instancia de SQL Server 2025 desde la que se gener\'o la figura 5:
 \lstinputlisting[language=SQL,basicstyle=\ttfamily\scriptsize]{../db/brindis_db.sql}
 \end{document}
 

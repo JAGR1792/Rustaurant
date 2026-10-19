@@ -28,7 +28,6 @@ pub enum ReservaError {
 pub struct ReservaBuilder {
     id_cliente: Option<i64>,
     id_creador: Option<i64>,
-    id_mesero: Option<i64>,
     tipo_completo: bool,
     mesa_ids: Vec<i64>,
     capacidades: Vec<u8>, // capacidad de cada mesa elegida (para RN02 sin DB)
@@ -51,11 +50,6 @@ impl ReservaBuilder {
     }
     pub fn creador(mut self, id: Option<i64>) -> Self {
         self.id_creador = id;
-        self
-    }
-    /// Mesero asignado por la gerencia (opcional: se asigna tras crear).
-    pub fn mesero(mut self, id: Option<i64>) -> Self {
-        self.id_mesero = id;
         self
     }
     pub fn tipo_completo(mut self, v: bool) -> Self {
@@ -147,7 +141,6 @@ impl ReservaBuilder {
         Ok(Reserva::new(
             id_cliente,
             self.id_creador,
-            self.id_mesero,
             self.tipo_completo,
             self.mesa_ids,
             inicio,
