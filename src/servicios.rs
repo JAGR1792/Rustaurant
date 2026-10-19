@@ -9,7 +9,9 @@ use chrono::{Duration, Utc};
 use crate::decorator::{
     BarraCoctelesDecorator, ComponenteReserva, DecoracionDecorator, ReservaBase,
 };
-use crate::dominio::{ComprobantePago, EstadoReserva, Reserva, UsuarioSesion};
+use crate::dominio::{
+    ComprobantePago, EstadoReserva, Reserva, TipoCliente, UsuarioSesion, politica_cancelacion,
+};
 use crate::estado::{self, Datos, Estado};
 use crate::proxy::{AccesoError, ReservaService};
 
@@ -122,10 +124,14 @@ impl ReservaService for ReservaServiceMemoria {
 
     async fn cancelar(&self, sesion: &UsuarioSesion, reserva_id: i64) -> Result<(), AccesoError> {
         let mut d = self.estado.lock().unwrap();
+        // Reborrow de todo `Datos` para que el compilador vea préstamos
+        // disjuntos de campos (reservas / usuarios) en el mismo bloque.
+        let datos = &mut *d;
         let id_sesion = sesion.id();
         let mut reembolso: Option<ComprobantePago> = None;
+        let mut id_strike: Option<i64> = None;
         {
-            let r = d
+            let r = datos
                 .reservas
                 .iter_mut()
                 .find(|r| r.id == reserva_id)
@@ -138,11 +144,24 @@ impl ReservaService for ReservaServiceMemoria {
             }
             r.cambiar_estado(EstadoReserva::Cancelada)
                 .map_err(|e| AccesoError::Negocio(e.into()))?;
-            // RN08/RN09: con 24 h o más, reembolso total; si no, retención 10%.
+            // RN08/RN09: la ventana de gracia depende del tipo del cliente de
+            // la reserva (no de quien cancela): general 4 h, VIP 1 h; fuera de
+            // la ventana hay retención del 10 % y, para VIP, strike.
+            let id_cliente = r.id_cliente;
+            let tipo_cliente = datos
+                .usuarios
+                .iter()
+                .find(|u| u.id() == id_cliente)
+                .map(UsuarioSesion::tipo_cliente)
+                .unwrap_or(TipoCliente::General);
+            let horas = (r.inicio - Utc::now()).num_hours();
+            let politica = politica_cancelacion(tipo_cliente, horas);
+            if politica.aplica_strike {
+                id_strike = Some(id_cliente);
+            }
             let abonado = pagado(r);
             if abonado > 0 {
-                let horas = (r.inicio - Utc::now()).num_hours();
-                let retencion = if horas >= 24 { 0 } else { abonado / 10 };
+                let retencion = abonado * politica.retencion_pct / 100;
                 reembolso = Some(ComprobantePago {
                     id: 0, // se asigna justo abajo
                     reserva_id: r.id,
@@ -151,7 +170,7 @@ impl ReservaService for ReservaServiceMemoria {
                     } else {
                         None
                     },
-                    concepto: if retencion == 0 {
+                    concepto: if politica.sin_penalidad {
                         "REEMBOLSO_TOTAL"
                     } else {
                         "REEMBOLSO_PARCIAL"
@@ -165,9 +184,16 @@ impl ReservaService for ReservaServiceMemoria {
                 });
             }
         }
+        // El strike (RN09/RN10) se aplica después de soltar el préstamo de la reserva.
+        if let Some(id) = id_strike
+            && let Some(UsuarioSesion::Cliente(c)) =
+                datos.usuarios.iter_mut().find(|u| u.id() == id)
+        {
+            c.incrementar_strike();
+        }
         if let Some(mut c) = reembolso {
-            c.id = siguiente_id(d.comprobantes.iter().map(|x| x.id));
-            d.comprobantes.push(c);
+            c.id = siguiente_id(datos.comprobantes.iter().map(|x| x.id));
+            datos.comprobantes.push(c);
         }
         Ok(())
     }
@@ -235,7 +261,7 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn cancelar_dentro_de_24h_reembolsa_con_10_pct() {
+    async fn cancelar_general_dentro_de_4h_reembolsa_con_10_pct() {
         let e = sembrar();
         let s = ReservaServiceMemoria::new(e.clone());
         let mut r = reserva_prueba(1, Utc::now() + Duration::hours(2), 3);
@@ -265,6 +291,66 @@ mod tests {
     }
 
     #[tokio::test]
+    async fn cancelar_general_con_cinco_horas_reembolsa_todo() {
+        let e = sembrar();
+        let s = ReservaServiceMemoria::new(e.clone());
+        let mut r = reserva_prueba(1, Utc::now() + Duration::hours(5), 3);
+        r.pedido.push(DetallePedido {
+            item_id: 1,
+            cantidad: 1,
+            precio_unitario_congelado: 100_000,
+        });
+        r.pago.modalidad = ModalidadPago::Completo;
+        r.pago.porcentaje = 100;
+        let id = s.confirmar(&usuario(&e, 3), r).await.unwrap();
+        s.cancelar(&usuario(&e, 3), id).await.unwrap();
+        let d = e.lock().unwrap();
+        let reembolso = d
+            .comprobantes
+            .iter()
+            .rev()
+            .find(|c| c.reserva_id == id && c.tipo_movimiento == "EGRESO")
+            .unwrap();
+        assert_eq!(reembolso.monto_retencion, 0);
+        assert_eq!(reembolso.monto_total, 100_000);
+        assert_eq!(reembolso.concepto, "REEMBOLSO_TOTAL");
+    }
+
+    #[tokio::test]
+    async fn cancelar_vip_tarde_reembolsa_con_retencion_y_strike() {
+        // CP11: el VIP cancela dentro de la última hora: retención del 10 % + strike.
+        let e = sembrar();
+        let s = ReservaServiceMemoria::new(e.clone());
+        let mut r = reserva_prueba(2, Utc::now() + Duration::minutes(30), 4);
+        r.pedido.push(DetallePedido {
+            item_id: 1,
+            cantidad: 1,
+            precio_unitario_congelado: 100_000,
+        });
+        r.pago.modalidad = ModalidadPago::Completo;
+        r.pago.porcentaje = 100;
+        let id = s.confirmar(&usuario(&e, 4), r).await.unwrap();
+        s.cancelar(&usuario(&e, 4), id).await.unwrap();
+        let d = e.lock().unwrap();
+        let reembolso = d
+            .comprobantes
+            .iter()
+            .rev()
+            .find(|c| c.reserva_id == id && c.tipo_movimiento == "EGRESO")
+            .unwrap();
+        assert_eq!(reembolso.monto_retencion, 10_000);
+        assert_eq!(reembolso.monto_total, 90_000);
+        assert_eq!(reembolso.concepto, "REEMBOLSO_PARCIAL");
+        let vip = d.usuarios.iter().find(|u| u.id() == 4).unwrap();
+        if let UsuarioSesion::Cliente(c) = vip {
+            assert_eq!(c.strikes, 1);
+            assert!(c.es_vip(), "con un solo strike sigue siendo VIP");
+        } else {
+            panic!("el usuario 4 debe ser cliente");
+        }
+    }
+
+    #[tokio::test]
     async fn confirmar_notifica_al_cliente_y_al_admin() {
         let e = sembrar();
         let s = ReservaServiceMemoria::new(e.clone());
@@ -277,7 +363,7 @@ mod tests {
             .find(|m| m.para == "cliente@brindis.co")
             .expect("correo al cliente");
         assert!(al_cliente.asunto.contains("TEST0001"));
-        assert!(al_cliente.cuerpo.contains("24 horas"));
+        assert!(al_cliente.cuerpo.contains("4 horas"));
         let al_admin = d
             .correos
             .iter()

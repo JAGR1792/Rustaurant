@@ -12,7 +12,10 @@ use lettre::message::{Mailbox, header::ContentType};
 use lettre::transport::smtp::authentication::Credentials;
 use lettre::{AsyncSmtpTransport, AsyncTransport, Message, Tokio1Executor};
 
-use crate::dominio::{ModalidadPago, Reserva, UsuarioSesion};
+use crate::dominio::{
+    HORAS_CANCELACION_GENERAL, HORAS_CANCELACION_VIP, ModalidadPago, RETENCION_CANCELACION_PCT,
+    Reserva, TipoCliente, UsuarioSesion,
+};
 use crate::estado::{Datos, Estado};
 use crate::formato::{cop, fecha_hora_fmt};
 
@@ -108,22 +111,42 @@ fn modalidad_txt(r: &Reserva) -> String {
     }
 }
 
-fn cuerpo_cliente(nombre: &str, r: &Reserva) -> String {
+fn cuerpo_cliente(nombre: &str, r: &Reserva, tipo: TipoCliente) -> String {
     format!(
         "Hola {nombre}:\n\
          \n\
          Tu cita quedó pedida para el {} (mesas {}, {} comensales).\n\
          {}\n\
          \n\
-         Recuerda: puedes cancelar sin retención hasta 24 horas antes del inicio; \
-         si cancelas dentro de las últimas 24 horas se retiene el 10% de lo abonado.\n\
+         {}\n\
          \n\
          Te esperamos en Brindis.",
         fecha_hora_fmt(r.inicio),
         mesas(r),
         r.num_comensales,
         linea_pago(r),
+        regla_cancelacion_txt(tipo),
     )
+}
+
+/// Recordatorio del plazo de cancelación (RN08/RN09) derivado de las
+/// constantes del dominio, para que el correo nunca contradiga al servicio.
+fn regla_cancelacion_txt(tipo: TipoCliente) -> String {
+    match tipo {
+        TipoCliente::Vip => format!(
+            "Como socio VIP puedes cancelar sin retención hasta {h} hora antes del inicio; \
+             si cancelas dentro de esa última hora se retiene el {r}% de lo abonado y se \
+             registra un strike (RN09).",
+            h = HORAS_CANCELACION_VIP,
+            r = RETENCION_CANCELACION_PCT,
+        ),
+        TipoCliente::General => format!(
+            "Puedes cancelar sin retención hasta {h} horas antes del inicio; si cancelas \
+             dentro de esas últimas {h} horas se retiene el {r}% de lo abonado (RN08).",
+            h = HORAS_CANCELACION_GENERAL,
+            r = RETENCION_CANCELACION_PCT,
+        ),
+    }
 }
 
 fn cuerpo_admin(nombre_cliente: &str, correo_cliente: &str, r: &Reserva) -> String {
@@ -156,13 +179,16 @@ pub fn notificar_reserva(d: &mut Datos, r: &Reserva) -> Vec<Mensaje> {
         .map(|u| u.nombre().to_string())
         .unwrap_or_else(|| format!("Cliente {}", r.id_cliente));
     let correo_cliente = cliente.map(|u| u.correo().to_string()).unwrap_or_default();
+    let tipo_cliente = cliente
+        .map(UsuarioSesion::tipo_cliente)
+        .unwrap_or(TipoCliente::General);
 
     let mut pendientes: Vec<(String, String, String)> = Vec::new();
     if !correo_cliente.is_empty() {
         pendientes.push((
             correo_cliente.clone(),
             format!("Brindis: tu cita quedó pedida ({})", r.codigo),
-            cuerpo_cliente(&nombre, r),
+            cuerpo_cliente(&nombre, r, tipo_cliente),
         ));
     }
     for admin in d

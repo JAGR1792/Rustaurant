@@ -14,9 +14,12 @@ SMTP ni credenciales (y no pueden commitearse secretos).
 
 - `src/correo.rs` redacta el aviso al confirmar la reserva
   (`ReservaServiceMemoria::confirmar`): un correo al cliente con fecha,
-  mesas, comensales, abono y la regla de cancelación (sin retención con
-  24 h o más; 10% de lo abonado dentro de las últimas 24 h, RN08/RN09) y
-  uno a cada usuario con rol Administrador con el detalle operativo.
+  mesas, comensales, abono y la regla de cancelación vigente — general:
+  sin retención hasta 4 h antes, después 10 % de lo abonado (RN08); VIP:
+  sin retención hasta 1 h antes, después 10 % y strike (RN09); el texto
+  se deriva de `dominio::politica_cancelacion` para no contradecir al
+  servicio — y uno a cada usuario con rol Administrador con el detalle
+  operativo.
 - Los mensajes se depositan en `Datos::correos` (buzón en memoria) y
   `tracing` deja constancia; el personal los ve en la agenda
   ("Correos enviados", últimos 6).
