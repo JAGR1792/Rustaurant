@@ -19,7 +19,7 @@ use crate::builder::{ReservaBuilder, validar_modalidad};
 use crate::dao::DaoError;
 use crate::dominio::{
     DetallePago, DetallePedido, EstadoReserva, ModalidadPago, Ocasion, Reserva,
-    ReservaServicioExtra, UsuarioSesion,
+    ReservaServicioExtra, UMBRAL_VISITAS_VIP, UsuarioSesion,
 };
 use crate::estado::{self, Datos, Estado};
 use crate::factory::{ClienteFactory, DatosRegistro, registrar_con};
@@ -293,6 +293,7 @@ struct Agenda {
     mes_anterior: String,
     mes_siguiente: String,
     calendario: Vec<DiaCalendarioVista>,
+    espacios_mes: usize,
     filas: Vec<AgendaFila>,
     proximas: Vec<AgendaFila>,
     clientes: Vec<ClienteGestionVista>,
@@ -514,7 +515,7 @@ fn render_reservar(
     Html(Reservar {
         usuario: u.nombre().into(),
         es_personal: u.es_personal(),
-        es_vip: u.es_vip() || u.es_personal(),
+        es_vip: u.es_vip(),
         error,
         fecha,
         fecha_hoy,
@@ -998,6 +999,7 @@ pub async fn agenda(
     let mut clientes: Vec<ClienteGestionVista> = vec![];
     let mut correos: Vec<CorreoVista> = vec![];
     let mut calendario: Vec<DiaCalendarioVista> = vec![];
+    let mut espacios_mes = 0usize;
     let mut total_hoy = 0;
     let mut comensales_hoy = 0;
     let mut ocupacion_mesas_hoy = 0;
@@ -1063,6 +1065,10 @@ pub async fn agenda(
                 }
                 _ => 30,
             };
+            // Desfase de la primera semana: 0 = lunes, 6 = domingo.
+            espacios_mes = NaiveDate::from_ymd_opt(anio, mes, 1)
+                .map(|f| f.weekday().num_days_from_monday() as usize)
+                .unwrap_or(0);
             for d_num in 1..=dias_en_mes {
                 if let Some(fecha_dia) = NaiveDate::from_ymd_opt(anio, mes, d_num) {
                     let num_reservas = reservas
@@ -1135,8 +1141,15 @@ pub async fn agenda(
                 .filter(|r| utc_a_local(r.inicio).date() == dia)
                 .collect();
             del_dia.sort_by_key(|r| r.inicio);
-            total_hoy = del_dia.len();
-            comensales_hoy = del_dia.iter().map(|r| r.num_comensales).sum();
+            total_hoy = del_dia
+                .iter()
+                .filter(|r| r.estado != EstadoReserva::Cancelada)
+                .count();
+            comensales_hoy = del_dia
+                .iter()
+                .filter(|r| r.estado != EstadoReserva::Cancelada)
+                .map(|r| r.num_comensales)
+                .sum();
             let mut mesas_ocupadas_set = std::collections::HashSet::new();
             for r in &del_dia {
                 if matches!(
@@ -1237,6 +1250,7 @@ pub async fn agenda(
         mes_anterior,
         mes_siguiente,
         calendario,
+        espacios_mes,
         filas,
         proximas,
         clientes,
@@ -1284,7 +1298,7 @@ pub async fn dashboard(
         .filter(|r| r.estado == EstadoReserva::Completada)
         .count();
     let es_vip = u.es_vip();
-    let progreso_meta = 3;
+    let progreso_meta = UMBRAL_VISITAS_VIP;
     let progreso_vip = reservas_completadas.min(progreso_meta);
     let progreso_pct = ((progreso_vip as f32 / progreso_meta as f32) * 100.0) as u32;
     let puede_reclamar_vip = !es_vip && reservas_completadas >= progreso_meta;
