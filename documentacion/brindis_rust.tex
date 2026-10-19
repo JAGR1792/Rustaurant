@@ -1,7 +1,6 @@
-% Brindis en Rust --- Analisis y diseno OO del modulo de reservas
-% Adaptación fiel del PDF original (Java/Spring) a Rust (Axum + sqlx).
-% Cambios mínimos y justos para que sea idiomático en Rust, manteniendo
-% trazabilidad con el documento base (mismos CU, RF, RN, figuras y tablas).
+% Brindis --- Análisis y diseño OO del módulo de reservas de restaurantes.
+% Documento de entrega del parcial de Patrones de diseño de software.
+% Implementación propia en Rust (Axum + Askama + sqlx).
 \documentclass[12pt]{article}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
@@ -195,28 +194,44 @@ Bogot\'a D.C., 18 de octubre de 2026}
 \newpage
 
 \section{Introducción}
-La reserva por ocasión (cumpleaños, aniversario, propuesta, romántica, negocios, casual) exige zona, decoración y servicio distintos. Brindis guía en 4 pasos (ocasión, mesas, pedido+extras, pago) con plano interactivo y bloqueo temporal de 5 min (RN03). Tres roles: cliente (general/VIP + strikes), empleado y administrador (hereda de empleado). Arquitectura MVC por capas + DAO (Alur et al., 2003) + 4 patrones (Gamma et al., 1994). \textbf{Cambio Rust:} Thymeleaf $\rightarrow$ Askama/Tera; Spring Controllers $\rightarrow$ handlers Axum; JDBC/ConexionBD $\rightarrow$ \texttt{sqlx} + \texttt{DbPool}; \texttt{BCrypt} $\rightarrow$ crate \texttt{bcrypt}; \texttt{PreparedStatement} $\rightarrow$ queries preparadas sqlx; transacciones sqlx (RNF02/RNF03).
+La reserva de mesas es uno de los puntos de contacto más importantes entre un restaurante y sus clientes. Sin embargo, la mayoría de los sistemas de reserva tratan todas las visitas de la misma manera: piden una fecha, una hora y un número de personas, y asignan la primera mesa libre. Una cena de aniversario, una propuesta de matrimonio y un almuerzo casual reciben el mismo trato, aunque cada una exige una mesa, una ambientación y un servicio diferentes.
+
+Este documento presenta el análisis, el diseño y el desarrollo orientado a objetos de \textbf{Brindis}, un módulo web de gestión de reservas cuyo elemento diferenciador es la \textbf{reserva por ocasión}. El cliente inicia la reserva indicando qué celebra; a partir de esa elección, el sistema le sugiere una zona del restaurante, le muestra un plano interactivo para elegir una o varias mesas, le ofrece los planes de decoración que corresponden a su ocasión y le permite preordenar los platos, contratar una barra de cócteles y definir cómo pagará. El personal del restaurante, por su parte, recibe en su agenda cada reserva con las restricciones alimentarias y las indicaciones de servicio que debe preparar.
+
+El sistema contempla tres roles (cliente, empleado y administrador), una clasificación de clientes en VIP y generales con un sistema de \textit{strikes}, una política de cancelación con reembolsos y la emisión de comprobantes de pago. Se construye con una arquitectura Modelo--Vista--Controlador (MVC) organizada en capas, una capa de acceso a datos basada en el patrón \textit{Data Access Object} (DAO) (Alur et al., 2003) y exactamente cuatro patrones de diseño del catálogo de Gamma et al. (1994): dos creacionales (\textit{Factory Method} y \textit{Builder}) y dos estructurales (\textit{Proxy} y \textit{Decorator}). La implementación del prototipo se desarrolló en Rust, con Axum como servidor, plantillas Askama, acceso a datos con \texttt{sqlx} y cifrado de contraseñas con \texttt{bcrypt}; las piezas críticas se documentan en la sección de Implementación.
 
 \section{Planteamiento del problema}
-Idéntico al original: asignación ineficiente y duplicados, pérdida de alergias/ocasión, venta extra no ofrecida, cancelaciones sin control, falta de control de acceso. Se requiere módulo que reserve sencillo y personalizado y que el personal controle mesas/horarios/reservas/pagos.
+Los restaurantes pequeños y medianos suelen gestionar sus reservas por teléfono, por mensajería o en cuadernos, lo que genera cinco dificultades recurrentes:
+
+\begin{enumerate}
+  \item \textbf{Asignación ineficiente de mesas y reservas duplicadas.} Sin una vista del salón se asignan mesas inadecuadas, y cuando un empleado reserva por teléfono mientras un cliente reserva en línea, ambos pueden tomar la misma mesa.
+  \item \textbf{Pérdida de información del cliente.} Las alergias, el motivo de la visita y los servicios especiales se comunican de palabra y no siempre llegan a cocina ni al personal de sala.
+  \item \textbf{Oportunidades de venta desaprovechadas.} No se ofrecen de forma sistemática servicios adicionales (decoración, barra de cócteles, preorden del menú) que el cliente estaría dispuesto a pagar en una ocasión especial.
+  \item \textbf{Cancelaciones e inasistencias sin control.} Cuando un cliente cancela tarde o no se presenta, el personal ya preparó la zona y los platos, pero no existen reglas claras de reembolso ni un registro del comportamiento del cliente.
+  \item \textbf{Falta de control de acceso.} No se distingue qué puede hacer un cliente, un empleado o un administrador, lo que expone información de otros clientes y operaciones sensibles.
+\end{enumerate}
+
+Se requiere entonces un módulo que permita al cliente reservar de forma sencilla y personalizada, y al personal controlar sus mesas, horarios, reservas y pagos con toda la información necesaria para preparar el servicio.
 
 \section{Objetivos}
 \subsection{Objetivo general}
-Analizar, diseñar y desarrollar con el paradigma orientado a objetos (en Rust: traits + structs + enums) un módulo web de reservas con login y formulario para cliente y administrador, MVC por capas, 2 creacionales y 2 estructurales.
+Analizar, diseñar y desarrollar con el paradigma orientado a objetos (en Rust, a través de estructuras, enumeraciones y \textit{traits}) un módulo web de gestión de reservas de restaurantes, con inicio de sesión y formulario de reservas para los roles de cliente y administrador, aplicando una arquitectura MVC por capas, dos patrones de diseño creacionales y dos estructurales.
 \subsection{Objetivos específicos}
 \begin{enumerate}
-\item Identificar actores, RF/RNF, RN y CU.
-\item Diseñar modelo relacional y DAO.
-\item Aplicar Factory Method y Builder en Rust.
-\item Aplicar Proxy y Decorator en Rust.
-\item Implementar UI intuitiva en 4 pasos con plano.
+  \item Identificar los actores, los requerimientos funcionales y no funcionales, las reglas de negocio y los casos de uso del módulo.
+  \item Diseñar el modelo relacional de la base de datos y su capa de acceso a datos mediante el patrón DAO.
+  \item Aplicar los patrones creacionales \textit{Factory Method} y \textit{Builder} para crear los usuarios según su rol y construir reservas válidas paso a paso.
+  \item Aplicar los patrones estructurales \textit{Proxy} y \textit{Decorator} para controlar el acceso según el rol y calcular dinámicamente el costo de los servicios extra.
+  \item Implementar una interfaz intuitiva que guíe la reserva en cuatro pasos, con un plano interactivo de mesas.
 \end{enumerate}
 
 \section{Alcance y propuesta de valor}
 \subsection{Alcance}
-Fase 1: login + formulario (cliente en línea, personal a nombre de cliente), consulta, cancelación con reembolso/strikes, agenda del día. Pagos simulados (se registra modalidad y comprobante, sin pasarela). Fase 2 diseñada: modificación, usuarios/mesas, estadísticas, reactivación, VIP automático. Fuera: pasarela real, app móvil.
+De acuerdo con el enunciado, en este parcial se implementan el inicio de sesión y el formulario de reservas. El cliente usa el formulario para reservar en línea y el personal del restaurante lo usa para registrar reservas a nombre de un cliente (por ejemplo, las recibidas por teléfono). El diseño contempla tres roles: cliente, empleado y administrador; como el administrador hereda todas las funciones del empleado, el rol de administrador que exige el enunciado queda cubierto y el empleado comparte sus mismas pantallas.
+
+Además del formulario, en la primera fase se implementan la consulta de reservas del cliente, la cancelación con la política de reembolso y la agenda del día del personal. Los pagos se simulan: el sistema registra la modalidad de pago y emite el comprobante, pero no se conecta con una pasarela real. Las demás funciones (modificación de reservas, gestión de usuarios y mesas, estadísticas, reactivación de cuentas y promoción automática a VIP) quedan diseñadas en este documento para una fase posterior, y sus datos iniciales se cargan con el script SQL del Anexo~\ref{anx:sql}. Quedan fuera del alcance la pasarela de pagos real y la aplicación móvil nativa.
 \subsection{Propuesta de valor}
-Ver Tabla~\ref{tab:valor}: ocasión $\rightarrow$ \texttt{enum Ocasion} + Builder; plano + bloqueo $\rightarrow$ servicio disponibilidad; pedido/extras $\rightarrow$ Decorator; VIP/strikes $\rightarrow$ Factory + Proxy; alertas $\rightarrow$ Decorator.
+La Tabla~\ref{tab:valor} resume los elementos que diferencian a Brindis de un sistema de reservas convencional.
 \begin{table}[h]\centering\caption{Elementos diferenciadores}\label{tab:valor}
 \begin{tabular}{>{\raggedright\arraybackslash}p{3cm}>{\raggedright\arraybackslash}p{7cm}>{\raggedright\arraybackslash}p{3cm}}\toprule
 Elemento & Descripción & Soporte\\\midrule
@@ -229,7 +244,7 @@ Restricciones & Alergias como alerta en agenda. & Decorator\\\bottomrule
 \end{table}
 
 \section{Análisis}
-Enfoque Larman (2004); RF/RNF según Pressman y Maxim (2020).
+El análisis sigue el enfoque orientado a objetos basado en casos de uso propuesto por Larman (2004) y la clasificación de requerimientos funcionales y no funcionales de Pressman y Maxim (2020).
 \subsection{Actores y roles}
 \begin{table}[H]\centering
 \caption{Actores del sistema}\label{tab:actores}
@@ -496,7 +511,7 @@ CASUAL & Cualquiera & Ninguna & Servicio est{\'a}ndar.\\\hline
 \end{tabular}
 }
 \subsection{Modelo relacional \texttt{brindis\_db}}
-13 tablas normalizadas 3FN (Elmasri y Navathe, 2016): usuario, token\_reactivacion, zona, mesa (solo DISPONIBLE/FUERA\_DE\_SERVICIO; reservada/bloqueada se calcula por franja desde reserva\_mesa + bloqueo\_mesa), horario\_atencion, bloqueo\_mesa, reserva (codigo único, id\_creador nulable, porcentaje\_pago entre 0 y 100), reserva\_mesa, item\_menu, reserva\_detalle\_pedido (precio congelado), plan\_servicio\_extra, reserva\_servicio\_extra (precio congelado), comprobante\_pago (id\_empleado nulable). Índices en reserva\_mesa.id\_mesa, reserva.fecha\_hora\_inicio (RN01) y bloqueo\_mesa (mesa\_id, inicio, fin). Script SQL en \texttt{db/brindis\_db.sql} y en el Anexo.
+13 tablas normalizadas 3FN (Elmasri y Navathe, 2016): usuario, token\_reactivacion, zona, mesa (solo DISPONIBLE/FUERA\_DE\_SERVICIO; reservada/bloqueada se calcula por franja desde reserva\_mesa + bloqueo\_mesa), horario\_atencion, bloqueo\_mesa, reserva (codigo único, id\_creador nulable, porcentaje\_pago entre 0 y 100), reserva\_mesa, item\_menu, reserva\_detalle\_pedido (precio congelado), plan\_servicio\_extra, reserva\_servicio\_extra (precio congelado), comprobante\_pago (id\_empleado nulable). Índices en reserva\_mesa.id\_mesa, reserva.fecha\_hora\_inicio (RN01) y bloqueo\_mesa (mesa\_id, inicio, fin). Script SQL en \texttt{db/brindis\_db.sql} y en el Anexo~\ref{anx:sql}.
 \begin{figure}[H]\centering
 {\small\textbf{Figura 5}}\\{\small\textit{Diagrama de la base de datos \texttt{brindis\_db} (SQL Server Management Studio)}}\\[4pt]
 \IfFileExists{../diagramas/brindis/Fig5_DiagramaBD.png}{\includegraphics[height=0.78\textheight,keepaspectratio]{../diagramas/brindis/Fig5_DiagramaBD.png}}{\fbox{\parbox{0.9\linewidth}{\small Para ver la figura, abra el diagrama de base de datos en SQL Server Management Studio 21 (\texttt{brindis\_db} \textgreater\ Diagramas de base de datos \textgreater\ Copiar diagrama como imagen) y guarde el archivo como \texttt{diagramas/brindis/Fig5\_DiagramaBD.png}.}}}
@@ -1221,7 +1236,13 @@ CP14 & Reserva de restaurante completo en una franja libre. & Se asocian todas l
 \section{Video explicativo}
 Link YouTube: (pegar aqu\'i). Guion: programaci\'on por capas/MVC, Factory + Builder, Proxy + Decorator y ejecuci\'on (login, 4 pasos, agenda, cancelaci\'on).
 \section{Conclusiones}
-Factory centraliz\'o la creaci\'on por rol; Builder impide reservas inv\'alidas; Proxy separ\'o el acceso de la l\'ogica; Decorator combin\'o los extras sin explosi\'on de subclases. El estado de mesa por franja + bloqueo evita duplicados; ocasi\'on + plano + alertas acercan a la operaci\'on real; cancelaci\'on y strikes protegen al restaurante.
+Los cuatro patrones aplicados responden a problemas reales del dominio y no se incluyeron de forma decorativa. \textit{Factory Method} centralizó la creación de clientes, empleados y administradores, cada uno con sus propias reglas, y permite agregar roles sin modificar el código existente. \textit{Builder} concentró en un solo lugar las reglas de negocio de la reserva (capacidad, horario, modalidad de pago), de modo que ningún objeto \texttt{Reserva} puede existir en un estado inválido.
+
+En el plano estructural, \textit{Proxy} separó el control de acceso de la lógica de negocio: las mismas operaciones se permiten o se niegan según el rol y la titularidad de la reserva, y la herencia entre \texttt{Administrador} y \texttt{Empleado} hizo que los permisos del personal se extendieran al administrador sin código adicional. \textit{Decorator} resolvió la combinación libre de servicios extra, cuyo costo e indicaciones de servicio se calculan sin importar cuántos se agreguen; en la prueba CP09, pedido, decoración y barra para cuatro personas dan \$440.000.
+
+La arquitectura MVC por capas y el patrón DAO hicieron que cada cambio afecte a una sola capa. Distinguir entre el estado físico de la mesa y su estado en una franja, junto con el bloqueo temporal, evita las reservas duplicadas entre el canal en línea y el telefónico.
+
+Finalmente, la reserva por ocasión, el plano interactivo y las alertas de restricciones alimentarias acercan el software a la operación real de un restaurante. Las reglas de cancelación y de \textit{strikes}, por su parte, protegen al restaurante del trabajo que pierde cuando un cliente cancela tarde o no se presenta.
 \begin{thebibliography}{9}
 \bibitem{alur} Alur, D., Crupi, J., \& Malks, D. (2003). \textit{Core J2EE patterns} (2.\textordfeminine\ ed.). Prentice Hall.
 \bibitem{elmasri} Elmasri, R., \& Navathe, S. B. (2016). \textit{Fundamentals of database systems} (7.\textordfeminine\ ed.). Pearson.
@@ -1234,7 +1255,7 @@ Factory centraliz\'o la creaci\'on por rol; Builder impide reservas inv\'alidas;
 \appendix
 \section{Anexo: validaci\'on de diagramas}
 Las figuras 6 a 11 est\'an dibujadas en TikZ dentro de este mismo documento (vectoriales, con la tipograf\'ia del texto) y se revisaron una a una: ninguna l\'inea cruza cajas ni hay etiquetas pisadas, y cada asociaci\'on lleva su multiplicidad. La figura 5 se gener\'o directamente desde la base de datos real con la herramienta de diagramas de SQL Server Management Studio 21, partiendo de la instancia cargada con el script que se incluye en el anexo siguiente.
-\section{Anexo: script de creaci\'on de la base de datos}
+\section{Anexo: script de creaci\'on de la base de datos}\label{anx:sql}
 El listado completo de \texttt{db/brindis\_db.sql} (creaci\'on de \texttt{brindis\_db}, 13 tablas con sus restricciones, {\'i}ndices y datos de prueba) es el siguiente; con este mismo script se carg\'o la instancia de SQL Server 2025 desde la que se gener\'o la figura 5:
 \lstinputlisting[language=SQL,basicstyle=\ttfamily\scriptsize]{../db/brindis_db.sql}
 \end{document}
