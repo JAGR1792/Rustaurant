@@ -255,7 +255,7 @@ Cliente (general o VIP) & Inicia sesi{\'o}n, registra reservas, elige mesas en e
 Empleado & Consulta la agenda del d{\'i}a, registra, modifica o cancela reservas a nombre de los clientes, crea clientes que no est{\'a}n registrados y actualiza el estado de las reservas. & Un administrador.\\\hline
 Administrador & Hace todo lo que hace el empleado y, adem{\'a}s, consulta estad{\'i}sticas, crea empleados y administradores, asciende empleados a administrador, asciende clientes a VIP y activa o desactiva usuarios. & Otro administrador.\\\hline
 \end{tabular}
-\\[2pt]{\small\textit{Nota.} Elaboraci{\'o}n propia.}
+
 \end{table}
 \subsection{Requerimientos funcionales}
 En la Tabla 3, la columna \textit{Fase} indica si el requerimiento se implementa en este parcial (1) o si queda dise{\~n}ado para una entrega posterior (2).
@@ -286,7 +286,7 @@ RF20 & Gestionar mesas, zonas, horarios de atenci{\'o}n, carta y planes de servi
 RF21 & Desactivar clientes por inactividad y permitir su reactivaci{\'o}n con un \textit{token} enviado por correo. & Baja & 2\\\hline
 RF22 & Promover autom{\'a}ticamente a VIP a los clientes que cumplan los criterios definidos. & Baja & 2\\\hline
 \end{longtable}
-{\small\textit{Nota.} Elaboraci{\'o}n propia.}
+
 \subsection{Requerimientos no funcionales}
 \begin{center}{\small\textbf{Tabla 4}}\\{\small\textit{Requerimientos no funcionales}}\end{center}
 \begin{longtable}{|p{1.4cm}|p{2.6cm}|>{\raggedright\arraybackslash}p{8.6cm}|}\hline
@@ -327,7 +327,7 @@ Administrador especializa a Empleado, por lo que hereda todos sus casos de uso. 
 \begin{figure}[H]\centering
 {\small\textbf{Figura 1}}\\{\small\textit{Diagrama de casos de uso de Brindis}}\\[4pt]
 \IfFileExists{../diagramas/brindis/Fig1_CasosUso.png}{\includegraphics[width=0.95\linewidth]{../diagramas/brindis/Fig1_CasosUso.png}}{\fbox{\parbox{0.9\linewidth}{\small Para ver la figura, exportar \texttt{diagramas/brindis/Fig1\_CasosUso.drawio} a PNG (draw.io: Archivo \textgreater\ Exportar como \textgreater\ PNG, 300\,ppp) con el mismo nombre. Fuente guardada en el repo.}}}
-\\[3pt]{\small\textit{Nota.} Elaboraci{\'o}n propia. La flecha con tri{\'a}ngulo vac{\'i}o entre actores indica que el administrador hereda los casos de uso del empleado. CU04 \textit{Registrar reserva} incluye CU05 y CU06 y se extiende con CU07 y CU08. \texttt{CU01} Iniciar sesi{\'o}n incluye \textit{Validar estado de cuenta} y se extiende con \textit{Registrarse} y \textit{Reactivar cuenta}.}
+\\[3pt]{\small\textit{Nota.} La flecha con tri{\'a}ngulo vac{\'i}o entre actores indica que el administrador hereda los casos de uso del empleado. CU04 \textit{Registrar reserva} incluye CU05 y CU06 y se extiende con CU07 y CU08. \texttt{CU01} Iniciar sesi{\'o}n incluye \textit{Validar estado de cuenta} y se extiende con \textit{Registrarse} y \textit{Reactivar cuenta}.}
 \end{figure}
 An{\'a}lisis: el Cliente concentra el flujo de reserva (CU04) y sus extensiones opcionales de valor (pedido y extras), mientras que el personal comparte ese n{\'u}cleo y a{\~n}ade gesti{\'o}n (agenda CU10, modificar/cancelar CU09, registro de clientes CU11). El Administrador no repite casos: los hereda del Empleado y suma los propios (usuarios, VIP, estad{\'i}sticas). Los \textit{include} marcan lo obligatorio y los \textit{extend} lo opcional, por eso el total y los comprobantes solo aparecen cuando corresponde (RN07, RN14).
 \subsection{Casos principales}
@@ -348,7 +348,7 @@ An{\'a}lisis: el Cliente concentra el flujo de reserva (CU04) y sus extensiones 
 \textbf{Flujos alternos} & 1a. Si el actor es del personal, primero busca al cliente por documento; si no existe, lo registra (CU11). 1b. Si elige restaurante completo, el sistema omite el paso 3 y asocia todas las mesas (RN04). 3a. La capacidad seleccionada no alcanza: el sistema lo indica y no permite continuar. 8a. El bloqueo venci{\'o} y otro usuario tom{\'o} la mesa: el sistema informa y regresa al paso 2. 8b. Se eligi{\'o} pago en el restaurante sin cumplir RN06: el sistema lo rechaza.\\\hline
 \textbf{Postcondici{\'o}n} & La reserva queda en estado \textit{vigente}, con su c{\'o}digo, sus mesas, su detalle de pago y su comprobante.\\\hline
 \end{longtable}
-{\small\textit{Nota.} Elaboraci{\'o}n propia.}
+
 
 \begin{center}{\small\textbf{Tabla 8}}\\{\small\textit{Especificaci{\'o}n del caso de uso CU09 Modificar o cancelar reserva (cancelaci{\'o}n)}}\end{center}
 \begin{tabular}{|p{2.8cm}|>{\raggedright\arraybackslash}p{10.2cm}|}\hline
@@ -358,7 +358,7 @@ An{\'a}lisis: el Cliente concentra el flujo de reserva (CU04) y sus extensiones 
 \textbf{Flujos alternos} & 1a. Un cliente intenta cancelar una reserva ajena: el control de acceso lo rechaza. 2a. No hubo pagos: la reserva se cancela sin comprobante.\\\hline
 \textbf{Postcondici{\'o}n} & La reserva queda cancelada y el reembolso queda registrado.\\\hline
 \end{tabular}
-{\small\textit{Nota.} Elaboraci{\'o}n propia.}
+
 
 \begin{center}{\small\textbf{Tabla 9}}\\{\small\textit{Especificaci{\'o}n del caso de uso CU10 Gestionar agenda del d{\'i}a}}\end{center}
 \begin{tabular}{|p{2.8cm}|>{\raggedright\arraybackslash}p{10.2cm}|}\hline
@@ -368,7 +368,7 @@ An{\'a}lisis: el Cliente concentra el flujo de reserva (CU04) y sus extensiones 
 \textbf{Flujos alternos} & 1a. El usuario elige otra fecha. 3a. La transici{\'o}n no es v{\'a}lida (por ejemplo, completar una reserva cancelada): el sistema la rechaza.\\\hline
 \textbf{Postcondici{\'o}n} & El estado de la reserva queda actualizado.\\\hline
 \end{tabular}
-{\small\textit{Nota.} Elaboraci{\'o}n propia.}
+
 \subsection{Ciclo de vida}
 VIGENTE $\rightarrow$ CLIENTE\_EN\_MESA $\rightarrow$ COMPLETADA; VIGENTE $\rightarrow$ CANCELADA/INASISTIDA; la modificaci{\'o}n se hace sobre una reserva vigente. La Figura 2 resume los estados de una reserva y los eventos que producen cada transici{\'o}n.
 \begin{figure}[H]\centering
@@ -415,7 +415,7 @@ VIGENTE $\rightarrow$ CLIENTE\_EN\_MESA $\rightarrow$ COMPLETADA; VIGENTE $\righ
   \draw[fl] ($(vig.south)+(-0.75,0)$) .. controls +(-0.25,-1.2) and +(0.6,-1.2) .. ($(vig.south)+(-0.15,0)$);
   \node[ev, anchor=north, align=center] at ($(vig.south)+(-0.45,-1.5)$) {cliente o personal\\modifican la reserva};
 \end{tikzpicture}
-\\[3pt]{\small\textit{Nota.} Elaboraci{\'o}n propia. Las transiciones inv{\'a}lidas (por ejemplo, completar una reserva cancelada) se rechazan en \texttt{cambiar\_estado()} (\texttt{src/dominio.rs}).}
+\\[3pt]{\small\textit{Nota.} Las transiciones inv{\'a}lidas (por ejemplo, completar una reserva cancelada) se rechazan en \texttt{cambiar\_estado()} (\texttt{src/dominio.rs}).}
 \end{figure}
 
 \section{Diseño}
@@ -488,14 +488,14 @@ La Vista presenta la informaci\'on, el Controlador atiende las peticiones y el M
   \draw[flb] (dao.south) -- (bd.north);
   \node[lb, anchor=west] at ($(dao.south)!.5!(bd.north)+(0.1,0)$) {SQL (pool)};
 \end{tikzpicture}
-\\[3pt]{\small\textit{Nota.} Elaboraci{\'o}n propia. Las flechas punteadas indican dependencia de uso: los servicios y los DAO usan las entidades del dominio; la vista no conoce al modelo y el controlador solo conoce las interfaces de servicio (proxies).}
+\\[3pt]{\small\textit{Nota.} Las flechas punteadas indican dependencia de uso: los servicios y los DAO usan las entidades del dominio; la vista no conoce al modelo y el controlador solo conoce las interfaces de servicio (proxies).}
 \end{figure}
 \subsection{Diagrama de clases del modelo}
 Usuario es abstracta y se especializa en Cliente y Empleado; Administrador hereda de Empleado, lo que expresa que puede hacer todo lo del personal. Lo cr\'itico: la Reserva pertenece a un Cliente, puede haber sido creada por un Empleado, ocupa una o varias Mesas y se compone de su pedido anticipado y sus servicios extra. La enumeraci\'on Ocasion sostiene la reserva por ocasi\'on: cada valor conoce la zona sugerida y la decoraci\'on ofrecida.
 \begin{figure}[H]\centering
 {\small\textbf{Figura 4}}\\{\small\textit{Diagrama de clases del modelo (entidades)}}\\[4pt]
 \IfFileExists{../diagramas/brindis/Fig4_DiagramaClases.png}{\includegraphics[width=0.95\linewidth]{../diagramas/brindis/Fig4_DiagramaClases.png}}{\fbox{\parbox{0.9\linewidth}{\small Para ver la figura, exportar \texttt{diagramas/brindis/Fig4\_DiagramaClases.drawio} a PNG (draw.io: Archivo \textgreater\ Exportar como \textgreater\ PNG, 300\,ppp) con el mismo nombre. Fuente guardada en el repo.}}}
-\\[3pt]{\small\textit{Nota.} Elaboraci{\'o}n propia. Se omiten los m{\'e}todos \textit{get} y \textit{set}. El rombo relleno indica composici{\'o}n. Las relaciones de muchos a muchos (por ejemplo, Reserva con Mesa, ItemMenu o PlanServicioExtra) se solucionan en la base de datos con una tabla intermedia (reserva\_mesa, reserva\_detalle\_pedido, reserva\_servicio\_extra, que adem{\'a}s conservan el precio vigente RN07), pero por facilidad de lectura el diagrama las muestra como asociaci{\'o}n directa con su multiplicidad; impl{\'i}citamente la l{\'o}gica ha de contemplar esas tablas intermedias.}
+\\[3pt]{\small\textit{Nota.} Se omiten los m{\'e}todos \textit{get} y \textit{set}. El rombo relleno indica composici{\'o}n. Las relaciones de muchos a muchos (por ejemplo, Reserva con Mesa, ItemMenu o PlanServicioExtra) se solucionan en la base de datos con una tabla intermedia (reserva\_mesa, reserva\_detalle\_pedido, reserva\_servicio\_extra, que adem{\'a}s conservan el precio vigente RN07), pero por facilidad de lectura el diagrama las muestra como asociaci{\'o}n directa con su multiplicidad; impl{\'i}citamente la l{\'o}gica ha de contemplar esas tablas intermedias.}
 \end{figure}
 An{\'a}lisis: la jerarqu{\'i}a de usuarios concentra en \textit{Usuario} lo com{\'u}n (identidad, credenciales, estado) y deja en cada subclase lo propio (strikes y VIP en Cliente, legajo y agenda en Empleado, gesti{\'o}n en Administrador), lo que sostiene a \textit{Factory Method} y al \textit{Proxy}. La Reserva es el agregado central: sus composiciones (detalle de pedido y de pago, comprobantes) mueren con ella, mientras que Mesa, Zona, Horario y Planes existen por s{\'i} mismos y solo se asocian con su multiplicidad (\texttt{1}, \texttt{0..1}, \texttt{1..*}, \texttt{0..*}). BloqueoMesa y TokenReactivacion modelan lo temporal (RN03, RN13) sin contaminar a Mesa ni a Cliente.
 \begin{center}{\small\textbf{Tabla 10}}\\{\small\textit{Valores de la enumeraci{\'o}n Ocasion}}\end{center}
@@ -515,7 +515,7 @@ CASUAL & Cualquiera & Ninguna & Servicio est{\'a}ndar.\\\hline
 \begin{figure}[H]\centering
 {\small\textbf{Figura 5}}\\{\small\textit{Diagrama de la base de datos \texttt{brindis\_db} (SQL Server Management Studio)}}\\[4pt]
 \IfFileExists{../diagramas/brindis/Fig5_DiagramaBD.png}{\includegraphics[height=0.78\textheight,keepaspectratio]{../diagramas/brindis/Fig5_DiagramaBD.png}}{\fbox{\parbox{0.9\linewidth}{\small Para ver la figura, abra el diagrama de base de datos en SQL Server Management Studio 21 (\texttt{brindis\_db} \textgreater\ Diagramas de base de datos \textgreater\ Copiar diagrama como imagen) y guarde el archivo como \texttt{diagramas/brindis/Fig5\_DiagramaBD.png}.}}}
-\\[3pt]{\small\textit{Nota.} Elaboraci{\'o}n propia. El {\'i}cono de llave se{\~n}ala la clave primaria; el resto de {\'i}conos marca restricciones de unicidad y claves for{\'a}neas; cada l{\'i}nea indica una relaci{\'o}n con su cardinalidad en los extremos (uno a muchos o muchos a muchos resueltos con tabla intermedia). La figura se gener{\'o} desde la base real cargada con \texttt{db/brindis\_db.sql}.}
+\\[3pt]{\small\textit{Nota.} El {\'i}cono de llave se{\~n}ala la clave primaria; el resto de {\'i}conos marca restricciones de unicidad y claves for{\'a}neas; cada l{\'i}nea indica una relaci{\'o}n con su cardinalidad en los extremos (uno a muchos o muchos a muchos resueltos con tabla intermedia). La figura se gener{\'o} desde la base real cargada con \texttt{db/brindis\_db.sql}.}
 \end{figure}
 \subsection{Diagrama de clases DAO}
 \begin{figure}[H]\centering
@@ -552,7 +552,7 @@ CASUAL & Cualquiera & Ninguna & Servicio est{\'a}ndar.\\\hline
 \node[mu] at ($(pool.west)+(-0.3,0.2)$) {1};
 \node[el] at ($(pool.west)+(-0.5,-0.22)$) {$-$pool};
 \end{tikzpicture}
-\\[3pt]{\small\textit{Nota.} Elaboraci{\'o}n propia.}
+
 \end{figure}
 \texttt{GenericDAO<T,ID>} $\rightarrow$ \texttt{trait GenericDao<T,Id>} async; \texttt{UsuarioDao, MesaDao, ReservaDao, CatalogoDao, PagoDao} + impls \texttt{*Sqlx} con \texttt{DbPool} (\texttt{sqlx::MssqlPool} clonable). \texttt{UsuarioDaoSqlx} usa la f\'abrica para reconstruir cada registro con la subclase de su rol. L\'inea continua+tri\'angulo: herencia; discontinua+tri\'angulo: realizaci\'on; discontinua+flecha: dependencia (sin multiplicidad); continua+flecha: asociaci\'on navegable, con la multiplicidad en cada extremo (\texttt{1}, \texttt{0..1}, \texttt{1..*}, \texttt{0..*}); rombo vac\'io: agregaci\'on. Nombre en cursiva: clase abstracta.
 \subsection{Patrones aplicados}
@@ -604,7 +604,7 @@ Lo cr\'itico: cada rol se crea con datos y reglas distintas (tipo y strikes del 
 \draw[gen] (cli.south) -- (cli.south |- bus) -| (usu.north);
 \draw[gen] (emp.south) -- (emp.south |- bus) -| (usu.north);
 \end{tikzpicture}
-\\[3pt]{\small\textit{Nota.} Elaboraci{\'o}n propia.}
+
 \end{figure}
 \subsubsection{Builder: reserva validada (Fig.~8)}
 Lo cr\'itico: la reserva asocia cliente, mesas, consumos, extras y pago, con datos obligatorios y opcionales. Todas las validaciones se concentran en \texttt{build()}: capacidad RN02, horario RN05 y modalidad de pago RN06. Si falta algo o se viola una regla, la reserva jam\'as llega a existir en estado inv\'alido.
@@ -637,7 +637,7 @@ Lo cr\'itico: la reserva asocia cliente, mesas, consumos, extras y pago, con dat
   {build() concentra RN02 capacidad, RN05 horario y RN06 pago. Si algo falla, la Reserva jam\'as existe.};
 \draw[umlline,dashed,line width=0.4pt] (nt.north) -- (bld.south);
 \end{tikzpicture}
-\\[3pt]{\small\textit{Nota.} Elaboraci{\'o}n propia.}
+
 \end{figure}
 \subsubsection{Proxy: acceso por rol (Fig.~9)}
 Lo cr\'itico: las mismas operaciones se permiten o se niegan seg\'un el rol y la propiedad de la reserva. Un cliente solo opera a su nombre; solo el personal ve la agenda, registra por otro y cambia estados; solo el administrador ve estad\'isticas. Separar este control de la l\'ogica permite cambiar pol\'iticas sin tocar el servicio real.
@@ -668,7 +668,7 @@ Lo cr\'itico: las mismas operaciones se permiten o se niegan seg\'un el rol y la
 \draw[dep] (prx.west |- yr) -- (ses.east |- yr);
 \node[el] at ($(prx.west |- yr)!.5!(ses.east |- yr)+(0,0.2)$) {verifica rol};
 \end{tikzpicture}
-\\[3pt]{\small\textit{Nota.} Elaboraci{\'o}n propia.}
+
 \end{figure}
 \subsubsection{Decorator: costo de extras (Fig.~10)}
 Lo cr\'itico: los servicios extra se combinan libremente y cada uno cambia el costo y las indicaciones (decoraci\'on 20 min antes, barra por persona). El total se calcula sin importar cu\'antos haya ni el orden. Ej.: $180.000+80.000+4\times45.000=440.000$ (CP09).
@@ -692,7 +692,7 @@ Lo cr\'itico: los servicios extra se combinan libremente y cada uno cambia el co
 \node[mu] at ($(cmp.east)+(0.32,0.2)$) {1};
 \node[el,anchor=west] at ($(dec.east)+(1.25,1.0)$) {$-$envuelto};
 \end{tikzpicture}
-\\[3pt]{\small\textit{Nota.} Elaboraci{\'o}n propia.}
+
 \end{figure}
 \subsection{Diagrama de clases de control}
 \begin{figure}[H]\centering
@@ -753,7 +753,7 @@ Lo cr\'itico: los servicios extra se combinan libremente y cada uno cambia el co
 \coordinate (xl) at (-0.6,0);
 \draw[dep] (uim.west) -- (uim.west -| xl) |- (dao.west);
 \end{tikzpicture}
-\\[3pt]{\small\textit{Nota.} Elaboraci{\'o}n propia.}
+
 \end{figure}
 Los controladores dependen de las interfaces de servicio, que en ejecuci\'on est\'an implementadas por los proxies; el servicio real dirige al builder y compone los decoradores; el servicio de usuarios elige la f\'abrica seg\'un el rol; y solo los servicios acceden a los DAO.
 \subsection{Secuencia CU04}
@@ -802,7 +802,7 @@ El controlador hace una sola llamada; el proxy verifica el permiso antes de dele
   \draw[ret] (2.45,-7.5) -- (0.8,-7.5);
   \node[labr] at (1.75,-7.38) {201 Created};
 \end{tikzpicture}
-\\[3pt]{\small\textit{Nota.} Elaboraci{\'o}n propia. El retorno se dibuja en punteado; las barras marcan el per{\'i}odo de ejecuci{\'o}n de cada objeto y la operaci{\'o}n completa corre dentro de una transacci{\'o}n (RNF03): si la disponibilidad falla, nada se guarda.}
+\\[3pt]{\small\textit{Nota.} El retorno se dibuja en punteado; las barras marcan el per{\'i}odo de ejecuci{\'o}n de cada objeto y la operaci{\'o}n completa corre dentro de una transacci{\'o}n (RNF03): si la disponibilidad falla, nada se guarda.}
 \end{figure}
 \subsection{UI}
 La interfaz sigue la direcci{\'o}n visual ``Le Jardin'' (ADR 0004): paleta marfil, borgo{\~n}a, carb{\'o}n y dorado apagado, y tipograf{\'i}a editorial (Cormorant Garamond para t{\'i}tulos e Inter para la interfaz) \textit{self-hosted} en \texttt{static/fuentes/} con licencia OFL, sin CDN.
@@ -911,7 +911,7 @@ La interfaz sigue la direcci{\'o}n visual ``Le Jardin'' (ADR 0004): paleta marfi
   \node[wfg] at (3.5,-5.5) {(b) Paso 1: ocasi{\'o}n, fecha y comensales};
   \end{scope}
 \end{tikzpicture}
-\\[3pt]{\small\textit{Nota.} Elaboraci{\'o}n propia.}
+
 \end{figure}
 \begin{figure}[H]\centering
 {\small\textbf{Figura 14}}\\{\small\textit{Prototipos del paso 2 (plano de mesas) y paso 3 (pedido y servicios extra)}}\\[4pt]
@@ -1021,7 +1021,7 @@ La interfaz sigue la direcci{\'o}n visual ``Le Jardin'' (ADR 0004): paleta marfi
   \node[wfg] at (3.5,-6.5) {(b) Paso 3: pedido, extras y resumen};
   \end{scope}
 \end{tikzpicture}
-\\[3pt]{\small\textit{Nota.} Elaboraci{\'o}n propia. Los precios est{\'a}n en pesos colombianos y son ilustrativos.}
+\\[3pt]{\small\textit{Nota.} Los precios est{\'a}n en pesos colombianos y son ilustrativos.}
 \end{figure}
 \begin{figure}[H]\centering
 {\small\textbf{Figura 15}}\\{\small\textit{Prototipos del paso 4 (pago) y de las reservas del cliente}}\\[4pt]
@@ -1108,7 +1108,7 @@ La interfaz sigue la direcci{\'o}n visual ``Le Jardin'' (ADR 0004): paleta marfi
   \node[wfg] at (3.5,-6.5) {(b) Reservas del cliente y ventana de cancelaci{\'o}n};
   \end{scope}
 \end{tikzpicture}
-\\[3pt]{\small\textit{Nota.} Elaboraci{\'o}n propia.}
+
 \end{figure}
 \begin{figure}[H]\centering
 {\small\textbf{Figura 16}}\\{\small\textit{Prototipo de la agenda del personal}}\\[4pt]
@@ -1182,7 +1182,7 @@ La interfaz sigue la direcci{\'o}n visual ``Le Jardin'' (ADR 0004): paleta marfi
   \draw[wfo] (8.65,-3.83) rectangle (9.95,-4.05);
   \node[wfm] at (9.3,-3.94) {Cancelada};
 \end{tikzpicture}
-\\[3pt]{\small\textit{Nota.} Elaboraci{\'o}n propia. Las opciones de usuarios y estad{\'i}sticas solo aparecen para el administrador.}
+\\[3pt]{\small\textit{Nota.} Las opciones de usuarios y estad{\'i}sticas solo aparecen para el administrador.}
 \end{figure}
 \section{Implementaci{\'o}n: backend cr{\'i}tico y patrones}
 Lo importante del backend son cinco piezas, una por patr{\'o}n m{\'a}s la transacci{\'o}n. El resto (vistas, DTO) solo transporta datos. C{\'o}digo completo en \texttt{src/}: compila con \texttt{cargo check} y el caso CP09 pasa con \texttt{cargo test}.
