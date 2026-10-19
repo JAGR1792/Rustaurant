@@ -17,9 +17,11 @@ por zonas, ficha de mesa con foto real y pedido guiado por porciones
 (ADR 0006), notificación por correo al cliente y a la administración al
 confirmar (buzón de demostración visible en la agenda, ADR 0008, con
 entrega real por SMTP si el entorno trae credenciales, ADR 0009), mis
-reservas con cancelación confirmada y reembolso (RN08/RN09), cuenta
-regresiva de la próxima reserva (contador de cifras rodantes, ver ADR
-0003) y agenda del personal protegida por el Proxy. La portada incluye
+reservas con cancelaci��n confirmada y reembolso (RN08/RN09), c��digo de
+reserva de 8 caracteres (RN15), cuenta regresiva de la pr��xima reserva
+(contador de cifras rodantes, ver ADR 0003), recuperaci��n de contrase��a
+por correo con token (enlace de restablecimiento) y agenda del personal
+protegida por el Proxy. La portada incluye
 la carta de platos con un efecto de spotlight que sigue al cursor y
 revela la foto a color (port vanilla del ChromaGrid de React Bits, ver
 ADR 0002).
