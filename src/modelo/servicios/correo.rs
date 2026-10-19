@@ -389,10 +389,18 @@ pub fn notificar_recuperacion(d: &mut Datos, correo: &str, token: &str) -> Vec<M
          Abre este enlace para crear una nueva (valido por 1 hora):\n{enlace}\n\n\
          Si no fuiste tu, ignora este mensaje.\n\nBrindis"
     );
-    let html = Some(format!(
-        "<p>Hola,</p><p>Recibimos una solicitud para restablecer tu contrasena.</p>\
-         <p><a href=\"{enlace}\">Restablecer contrasena</a> (valido por 1 hora)</p>\
-         <p>Si no fuiste tu, ignora este mensaje.</p><p>Brindis</p>"
+    let contenido = format!(
+        "<h1 style=\"margin:0 0 6px;font-family:Georgia,'Times New Roman',serif;font-size:24px;line-height:1.25;font-weight:600;color:{vino};\">Hola</h1>\
+         <p style=\"margin:0 0 18px;font-family:Helvetica,Arial,sans-serif;font-size:14px;line-height:1.6;color:{suave};\">Recibimos una solicitud para restablecer tu contrasena.</p>\
+         <p style=\"margin:0 0 22px;font-family:Helvetica,Arial,sans-serif;font-size:13px;line-height:1.6;color:{suave};\">El enlace es valido por 1 hora. Si no fuiste tu, ignora este mensaje.</p>\
+         {boton}",
+        vino = C_VINO,
+        suave = C_SUAVE,
+        boton = boton_html("Restablecer contrasena", &enlace),
+    );
+    let html = Some(marco_html(
+        "Recibes este aviso porque solicitaste restablecer tu contrasena en Brindis.",
+        &contenido,
     ));
     let id = d.correos.iter().map(|m| m.id).max().unwrap_or(0) + 1;
     let mensaje = Mensaje {
