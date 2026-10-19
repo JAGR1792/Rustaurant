@@ -2,17 +2,22 @@
 //! Vista: Askama + plano.js | Controlador: handlers de `vistas.rs` |
 //! Modelo: dominio + patrones (factory/builder/proxy/decorator) + DAO/estado.
 
-pub mod builder;
-pub mod correo;
-pub mod dao;
-pub mod decorator;
-pub mod dominio;
-pub mod estado;
-pub mod factory;
-pub mod formato;
-pub mod proxy;
-pub mod servicios;
+pub mod controladores;
+pub mod modelo;
 pub mod vistas;
+
+// Compatibilidad (Etapa 1): re-exportar submódulos del modelo en la raíz
+// del crate para no romper referencias internas existentes.
+pub use modelo::entidades::dominio as dominio;
+pub use modelo::entidades::formato as formato;
+pub use modelo::repositorios::dao as dao;
+pub use modelo::repositorios::estado as estado;
+pub use modelo::servicios::correo as correo;
+pub use modelo::servicios::servicios as servicios;
+pub use modelo::patrones::creacionales::fabrica as factory;
+pub use modelo::patrones::creacionales::builder as builder;
+pub use modelo::patrones::estructurales::proxy as proxy;
+pub use modelo::patrones::estructurales::decorador as decorator;
 
 use axum::{
     Router,
