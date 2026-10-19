@@ -80,8 +80,8 @@
     </thead>
     <tbody>
       {% for r in filas %}
-      <tr>
-        <td><code>{{ r.codigo }}</code></td>
+      <tr id="reserva-{{ r.codigo }}" class="{% if r.resaltada %}fila-resaltada{% endif %}">
+        <td><code>{{ r.codigo }}</code>{% if r.resaltada %} <span class="chip-correo">Desde tu correo</span>{% endif %}</td>
         <td><strong>{{ r.fecha }}</strong></td>
         <td>{{ r.mesas }}</td>
         <td>{{ r.comensales }}</td>

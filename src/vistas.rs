@@ -163,6 +163,9 @@ struct ReservaFila {
     puede_cancelar: bool,
     /// Consecuencia exacta de cancelar ahora, para el modal (RN08/RN09).
     aviso_cancelacion: String,
+    /// `true` cuando se llegó desde el enlace del correo
+    /// (`/mis-reservas?reserva=CÓDIGO`): la fila se resalta.
+    resaltada: bool,
 }
 
 /// Panel de cuenta regresiva para la próxima reserva del cliente
@@ -216,6 +219,8 @@ struct CorreoVista {
     para: String,
     asunto: String,
     cuerpo: String,
+    /// Versión HTML del aviso (multipart/alternative) para la vista previa.
+    html: Option<String>,
     cuando: String,
     /// `true` si el SMTP confirmó la entrega real (ADR 0009).
     entregado: bool,
@@ -990,6 +995,7 @@ pub async fn mis_reservas(
                     estado_clase: r.estado.clase().into(),
                     puede_cancelar: r.estado == EstadoReserva::Vigente,
                     aviso_cancelacion: aviso_cancelacion(r, tipo_cliente),
+                    resaltada: q.get("reserva").is_some_and(|c| c == &r.codigo),
                 }
             })
             .collect();
@@ -1319,6 +1325,7 @@ pub async fn agenda(
                     para: m.para.clone(),
                     asunto: m.asunto.clone(),
                     cuerpo: m.cuerpo.clone(),
+                    html: m.html.clone(),
                     cuando: fecha_hora_fmt(m.enviado_en),
                     entregado: m.entregado,
                 })
@@ -1475,6 +1482,7 @@ pub async fn dashboard(
         estado_clase: r.estado.clase().into(),
         puede_cancelar: r.estado == EstadoReserva::Vigente,
         aviso_cancelacion: aviso_cancelacion(&r, u.tipo_cliente()),
+        resaltada: false,
     });
 
     let (documento, telefono, strikes) = match &u {

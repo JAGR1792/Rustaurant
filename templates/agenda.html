@@ -187,6 +187,12 @@
       <time>{{ c.cuando }}</time>
     </summary>
     <pre class="correo-cuerpo">{{ c.cuerpo }}</pre>
+    {% if let Some(h) = c.html %}
+    <details class="correo-html">
+      <summary>Ver versión HTML</summary>
+      <iframe class="correo-marco" srcdoc="{{ h }}" sandbox title="Versión HTML del correo"></iframe>
+    </details>
+    {% endif %}
   </details>
   {% endfor %}
   {% endif %}
