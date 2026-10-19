@@ -4,16 +4,16 @@
 
 use std::collections::HashMap;
 
+#[cfg(test)]
 use askama::Template;
 use axum::{
     Form, Json,
     extract::{Path, Query, State},
-    http::{StatusCode, header},
+    http::StatusCode,
     response::{IntoResponse, Redirect, Response},
 };
 use axum_extra::extract::cookie::{Cookie, CookieJar, SameSite};
 use chrono::{DateTime, Datelike, Duration, NaiveDate, NaiveTime, Utc};
-use serde::{Deserialize, Serialize};
 
 use crate::builder::{ReservaBuilder, validar_modalidad};
 use crate::dao::DaoError;
@@ -26,29 +26,9 @@ use crate::factory::{ClienteFactory, DatosRegistro, registrar_con};
 use crate::formato::{cop, fecha_hora_fmt, fecha_iso_local, local_a_utc, utc_a_local};
 use crate::proxy::{AccesoError, ReservaService, ReservaServiceProxy};
 use crate::servicios::ReservaServiceMemoria;
+use crate::vistas::*;
 
 // ------------------------------------------------------------------ utilidades
-
-/// Respuesta HTML de una plantilla Askama (integración mínima y propia).
-struct Html<T: Template>(T);
-
-impl<T: Template> IntoResponse for Html<T> {
-    fn into_response(self) -> Response {
-        match self.0.render() {
-            Ok(cuerpo) => {
-                ([(header::CONTENT_TYPE, "text/html; charset=utf-8")], cuerpo).into_response()
-            }
-            Err(e) => {
-                tracing::error!("no se pudo renderizar la plantilla: {e}");
-                (
-                    StatusCode::INTERNAL_SERVER_ERROR,
-                    "Error interno al renderizar la vista.",
-                )
-                    .into_response()
-            }
-        }
-    }
-}
 
 /// La reserva futura más cercana (solo vigentes): alimenta la cuenta
 /// regresiva que aparece tras reservar.
@@ -99,275 +79,6 @@ fn parsear_modalidad(clave: &str) -> (ModalidadPago, u8) {
 
 // ------------------------------------------------------------------ vistas (structs Askama)
 
-struct ZonaVista {
-    nombre: String,
-    mesas: usize,
-    puestos: u32,
-}
-
-struct OcasionVista {
-    clave: String,
-    nombre: String,
-    zona: String,
-    decoracion: Option<String>,
-    activa: bool,
-}
-
-/// Opción del select de zonas con su marca de selección ya resuelta
-/// (Askama 0.13 no compara cómodamente `&String` contra `String`).
-struct ZonaOpcion {
-    nombre: String,
-    seleccionada: bool,
-}
-
-struct ItemVista {
-    id: i64,
-    nombre: String,
-    precio: i64,
-    precio_fmt: String,
-    imagen: String,
-    imagen_webp: String,
-}
-
-/// Tarjeta de "La carta" en la portada (efecto chroma del frontend).
-/// Imagen y acento son presentación, por eso el mapeo vive aquí y no
-/// en el dominio.
-struct ItemCartaVista {
-    titulo: String,
-    subtitulo: String,
-    imagen: String,
-    imagen_webp: String,
-    accent: String,
-    url: String,
-}
-
-struct PlanVista {
-    id: i64,
-    nombre: String,
-    tarifa: i64,
-    tarifa_fmt: String,
-    por_persona: bool,
-}
-
-struct ReservaFila {
-    id: i64,
-    codigo: String,
-    fecha: String,
-    mesas: String,
-    comensales: u32,
-    ocasion: String,
-    total: String,
-    movimiento: String,
-    estado: String,
-    estado_clase: String,
-    puede_cancelar: bool,
-    /// Consecuencia exacta de cancelar ahora, para el modal (RN08/RN09).
-    aviso_cancelacion: String,
-    /// `true` cuando se llegó desde el enlace del correo
-    /// (`/mis-reservas?reserva=CÓDIGO`): la fila se resalta.
-    resaltada: bool,
-}
-
-/// Panel de cuenta regresiva para la próxima reserva del cliente
-/// (la dibuja `counter.js` a partir de `iso`).
-struct CuentaRegresiva {
-    codigo: String,
-    detalle: String,
-    iso: String,
-}
-
-struct AgendaFila {
-    id: i64,
-    hora: String,
-    fecha: String,
-    codigo: String,
-    cliente: String,
-    es_vip: bool,
-    mesas: String,
-    comensales: u32,
-    ocasion: String,
-    indicacion: String,
-    restricciones: String,
-    alerta: bool,
-    estado: String,
-    estado_clase: String,
-    puede_sentar: bool,
-    puede_completar: bool,
-    puede_inasistir: bool,
-}
-
-struct DiaCalendarioVista {
-    dia: u32,
-    fecha_iso: String,
-    es_hoy: bool,
-    es_seleccionado: bool,
-    num_reservas: usize,
-}
-
-struct ClienteGestionVista {
-    id: i64,
-    nombre: String,
-    correo: String,
-    documento: String,
-    telefono: String,
-    es_vip: bool,
-    strikes: u8,
-}
-
-/// Fila del buzón de demostración que ve el personal en la agenda.
-struct CorreoVista {
-    para: String,
-    asunto: String,
-    cuerpo: String,
-    /// Versión HTML del aviso (multipart/alternative) para la vista previa.
-    html: Option<String>,
-    cuando: String,
-    /// `true` si el SMTP confirmó la entrega real (ADR 0009).
-    entregado: bool,
-}
-
-#[derive(Template)]
-#[template(path = "inicio.html")]
-struct Inicio {
-    usuario: String,
-    es_personal: bool,
-    es_vip: bool,
-    zonas: Vec<ZonaVista>,
-    carta: Vec<ItemCartaVista>,
-}
-
-#[derive(Template)]
-#[template(path = "login.html")]
-struct Login {
-    usuario: String,
-    es_personal: bool,
-    es_vip: bool,
-    error: Option<String>,
-    reactivar: bool,
-    correo: String,
-}
-
-#[derive(Template)]
-#[template(path = "registro.html")]
-struct Registro {
-    usuario: String,
-    es_personal: bool,
-    es_vip: bool,
-    error: Option<String>,
-}
-
-#[derive(Template)]
-#[template(path = "reservar.html")]
-struct Reservar {
-    usuario: String,
-    es_personal: bool,
-    es_vip: bool,
-    error: Option<String>,
-    fecha: String,
-    fecha_hoy: String,
-    fecha_max: String,
-    hora: String,
-    comensales: u32,
-    zonas: Vec<ZonaOpcion>,
-    ocasiones: Vec<OcasionVista>,
-    items: Vec<ItemVista>,
-    planes: Vec<PlanVista>,
-}
-
-#[derive(Template)]
-#[template(path = "mis_reservas.html")]
-struct MisReservas {
-    usuario: String,
-    es_personal: bool,
-    es_vip: bool,
-    aviso: Option<String>,
-    filas: Vec<ReservaFila>,
-    vacio: bool,
-    cuenta: Option<CuentaRegresiva>,
-    /// Strikes acumulados del cliente (RN10); solo aplica a clientes.
-    strikes: u8,
-}
-
-#[derive(Template)]
-#[template(path = "agenda.html")]
-struct Agenda {
-    usuario: String,
-    es_personal: bool,
-    es_vip: bool,
-    denegado: bool,
-    fecha: String,
-    dia_ant: String,
-    dia_sig: String,
-    mes_nombre: String,
-    mes_anterior: String,
-    mes_siguiente: String,
-    calendario: Vec<DiaCalendarioVista>,
-    espacios_mes: usize,
-    filas: Vec<AgendaFila>,
-    proximas: Vec<AgendaFila>,
-    clientes: Vec<ClienteGestionVista>,
-    total_hoy: usize,
-    comensales_hoy: u32,
-    ocupacion_mesas_hoy: usize,
-    total_mesas: usize,
-    vacio: bool,
-    correos: Vec<CorreoVista>,
-    aviso: Option<String>,
-}
-
-/// Fragmento del panel de agenda: lo sirve GET /agenda/dia para navegar por
-/// días y meses sin recargar la página completa.
-#[derive(Template)]
-#[template(path = "agenda_dia.html")]
-struct AgendaDia {
-    fecha: String,
-    dia_ant: String,
-    dia_sig: String,
-    mes_nombre: String,
-    mes_anterior: String,
-    mes_siguiente: String,
-    calendario: Vec<DiaCalendarioVista>,
-    espacios_mes: usize,
-    filas: Vec<AgendaFila>,
-    total_hoy: usize,
-    comensales_hoy: u32,
-    ocupacion_mesas_hoy: usize,
-    total_mesas: usize,
-    vacio: bool,
-}
-
-#[derive(Template)]
-#[template(path = "dashboard.html")]
-struct Dashboard {
-    usuario: String,
-    es_personal: bool,
-    es_vip: bool,
-    nombre: String,
-    correo: String,
-    documento: String,
-    telefono: String,
-    tipo_cliente: String,
-    strikes: u8,
-    total_reservas: usize,
-    reservas_completadas: usize,
-    progreso_vip: usize,
-    progreso_meta: usize,
-    progreso_pct: u32,
-    puede_reclamar_vip: bool,
-    proxima: Option<ReservaFila>,
-    cuenta: Option<CuentaRegresiva>,
-    aviso: Option<String>,
-}
-
-#[derive(Template)]
-#[template(path = "error.html")]
-struct ErrorPagina {
-    usuario: String,
-    es_personal: bool,
-    es_vip: bool,
-    mensaje: String,
-}
-
 fn lista_ocasiones(seleccionada: &str) -> Vec<OcasionVista> {
     use Ocasion::*;
     [
@@ -408,15 +119,6 @@ fn tipo_legible(tipo: &str) -> &'static str {
         "BEBIDA" => "Bebida",
         _ => "De la casa",
     }
-}
-
-/// Par de la foto real de un plato: WebP para el `<picture>` de la UI y
-/// el JPEG/PNG original como respaldo (ver
-/// `static/img/fotos/descargar_fotos.py` y `creditos.md`). Un id nuevo
-/// cae al PNG genérico de `static/img/carta`.
-struct Foto {
-    jpg: &'static str,
-    webp: &'static str,
 }
 
 fn foto_item(id: i64) -> Foto {
@@ -477,16 +179,6 @@ fn carta(d: &Datos) -> Vec<ItemCartaVista> {
             }
         })
         .collect()
-}
-
-/// Campos del asistente que se conservan al re-renderizar con error.
-#[derive(Clone, Default)]
-struct CamposReserva {
-    ocasion: String,
-    fecha: String,
-    hora: String,
-    comensales: String,
-    zona: String,
 }
 
 fn render_reservar(
@@ -611,12 +303,6 @@ pub async fn login_get(State(e): State<Estado>, jar: CookieJar) -> Response {
     .into_response()
 }
 
-#[derive(Deserialize)]
-pub struct FormLogin {
-    correo: String,
-    password: String,
-}
-
 pub async fn login_post(
     State(e): State<Estado>,
     jar: CookieJar,
@@ -674,13 +360,6 @@ pub async fn registro_get(State(e): State<Estado>, jar: CookieJar) -> Response {
         error: None,
     })
     .into_response()
-}
-
-#[derive(Deserialize)]
-pub struct FormRegistro {
-    nombre: String,
-    correo: String,
-    password: String,
 }
 
 pub async fn registro_post(
@@ -1088,15 +767,6 @@ fn fila_agenda(r: &Reserva, usuarios: &[UsuarioSesion]) -> AgendaFila {
         puede_completar: r.estado == EstadoReserva::ClienteEnMesa,
         puede_inasistir: r.estado == EstadoReserva::Vigente,
     }
-}
-
-/// Contadores y filas del día seleccionado.
-struct ResumenDia {
-    filas: Vec<AgendaFila>,
-    total_hoy: usize,
-    comensales_hoy: u32,
-    ocupacion_mesas_hoy: usize,
-    vacio: bool,
 }
 
 /// Resumen del día para el panel de agenda: lo comparten la página completa
@@ -1522,12 +1192,6 @@ pub async fn dashboard(
     .into_response()
 }
 
-#[derive(Deserialize)]
-pub struct FormHacerVip {
-    #[allow(dead_code)]
-    motivo: Option<String>,
-}
-
 pub async fn hacer_vip_cliente(
     State(e): State<Estado>,
     jar: CookieJar,
@@ -1566,11 +1230,6 @@ pub async fn toggle_vip_cliente(
         d.actualizar_vip_cliente(id, !es_vip_actual);
     }
     Redirect::to("/agenda?ok=cliente_actualizado").into_response()
-}
-
-#[derive(Deserialize)]
-pub struct FormCambioEstado {
-    nuevo: String,
 }
 
 pub async fn cambiar_estado_reserva(
@@ -1615,21 +1274,6 @@ pub async fn reset_strikes_cliente(
         d.limpiar_strikes_cliente(id);
     }
     Redirect::to("/agenda?ok=strikes_reiniciados").into_response()
-}
-
-#[derive(Deserialize)]
-pub struct ParamDisponibilidad {
-    fecha: Option<String>,
-    hora: Option<String>,
-    zona: Option<String>,
-}
-
-#[derive(Serialize)]
-struct MesaDto {
-    id: i64,
-    zona: String,
-    capacidad: u8,
-    estado: &'static str,
 }
 
 /// API del plano: GET /api/disponibilidad?fecha=&hora=&zona=
@@ -1694,11 +1338,6 @@ pub async fn recuperar_get() -> Response {
     .into_response()
 }
 
-#[derive(Deserialize)]
-pub struct FormRecuperar {
-    correo: String,
-}
-
 pub async fn recuperar_post(State(e): State<Estado>, Form(f): Form<FormRecuperar>) -> Response {
     let correo = f.correo.trim().to_string();
     let token_opt = {
@@ -1749,13 +1388,6 @@ pub async fn restablecer_get(
         token = token
     ))
     .into_response()
-}
-
-#[derive(Deserialize)]
-pub struct FormRestablecer {
-    token: String,
-    password: String,
-    password2: String,
 }
 
 pub async fn restablecer_post(State(e): State<Estado>, Form(f): Form<FormRestablecer>) -> Response {
