@@ -29,6 +29,37 @@ pub(crate) fn fecha_iso_local(dt: DateTime<Utc>) -> String {
         .to_string()
 }
 
+/// Nombres de mes en español (calendario del panel y correos).
+#[allow(dead_code)]
+const MESES: [&str; 12] = [
+    "enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre",
+    "octubre", "noviembre", "diciembre",
+];
+#[allow(dead_code)]
+const MESES_CORTOS: [&str; 12] = [
+    "ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic",
+];
+
+/// "octubre" a partir del número de mes (1..=12).
+#[allow(dead_code)]
+pub(crate) fn mes_largo(mes: u32) -> &'static str {
+    MESES[(mes.clamp(1, 12) - 1) as usize]
+}
+
+/// "oct" para las etiquetas compactas (tarjetas de próximas citas).
+#[allow(dead_code)]
+pub(crate) fn mes_corto(mes: u32) -> &'static str {
+    MESES_CORTOS[(mes.clamp(1, 12) - 1) as usize]
+}
+
+/// "18 oct" en hora local: la fecha corta de las tarjetas del panel.
+#[allow(dead_code)]
+pub(crate) fn fecha_corta(dt: DateTime<Utc>) -> String {
+    use chrono::Datelike;
+    let l = utc_a_local(dt);
+    format!("{} {}", l.day(), mes_corto(l.month()))
+}
+
 /// Pesos colombianos con separador de miles: 440000 -> "440.000".
 pub(crate) fn cop(n: i64) -> String {
     let s = n.abs().to_string();

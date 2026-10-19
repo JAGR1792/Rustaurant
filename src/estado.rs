@@ -201,11 +201,131 @@ pub fn sembrar() -> Estado {
                 porcentaje: 30,
                 medio: "TARJETA".into(),
                 monto_total: 0,
+                propina_pct: 0,
             },
             estado: EstadoReserva::Vigente,
         });
+
+        // Reserva activa de hoy para demostración del panel de empleado (mesa en servicio).
+        let hoy_en_mesa = Utc::now() - Duration::hours(1);
+        d.reservas.push(Reserva {
+            id: 2,
+            codigo: "MESA0002".into(),
+            id_cliente: 4, // VIP
+            id_creador: None,
+            tipo_restaurante_completo: false,
+            mesa_ids: vec![1],
+            inicio: hoy_en_mesa,
+            duracion_minutos: 120,
+            num_comensales: 2,
+            ocasion: Ocasion::Aniversario,
+            pedido: vec![],
+            servicios_extra: vec![],
+            restricciones: "Alérgica a mariscos".into(),
+            observaciones: "Mesa decorada con rosas".into(),
+            pago: DetallePago {
+                modalidad: ModalidadPago::EnRestaurante,
+                porcentaje: 0,
+                medio: "TARJETA".into(),
+                monto_total: 120_000,
+                propina_pct: 0,
+            },
+            estado: EstadoReserva::ClienteEnMesa,
+        });
+
+        // Reserva futura para el VIP (+4 días, posterior a DEMO0001).
+        let futuro_vip = Utc::now() + Duration::days(4);
+        d.reservas.push(Reserva {
+            id: 3,
+            codigo: "VIP00003".into(),
+            id_cliente: 4,
+            id_creador: None,
+            tipo_restaurante_completo: false,
+            mesa_ids: vec![2],
+            inicio: futuro_vip,
+            duracion_minutos: 120,
+            num_comensales: 2,
+            ocasion: Ocasion::Propuesta,
+            pedido: vec![],
+            servicios_extra: vec![],
+            restricciones: "Sin gluten".into(),
+            observaciones: String::new(),
+            pago: DetallePago {
+                modalidad: ModalidadPago::Completo,
+                porcentaje: 100,
+                medio: "TARJETA".into(),
+                monto_total: 190_000,
+                propina_pct: 10,
+            },
+            estado: EstadoReserva::Vigente,
+        });
+
+        // Reserva histórica completada para el cliente general (cuenta para progreso VIP).
+        let historica = Utc::now() - Duration::days(14);
+        d.reservas.push(Reserva {
+            id: 4,
+            codigo: "HIST0004".into(),
+            id_cliente: 3,
+            id_creador: None,
+            tipo_restaurante_completo: false,
+            mesa_ids: vec![6],
+            inicio: historica,
+            duracion_minutos: 120,
+            num_comensales: 4,
+            ocasion: Ocasion::Cumpleanos,
+            pedido: vec![],
+            servicios_extra: vec![],
+            restricciones: "Sin alergias".into(),
+            observaciones: String::new(),
+            pago: DetallePago {
+                modalidad: ModalidadPago::Completo,
+                porcentaje: 100,
+                medio: "TARJETA".into(),
+                monto_total: 145_000,
+                propina_pct: 0,
+            },
+            estado: EstadoReserva::Completada,
+        });
     }
     e
+}
+
+impl Datos {
+    /// Actualiza el estatus VIP de un cliente por su ID.
+    pub fn actualizar_vip_cliente(&mut self, id_cliente: i64, vip: bool) -> bool {
+        for u in &mut self.usuarios {
+            if let UsuarioSesion::Cliente(c) = u {
+                if c.base.id == id_cliente {
+                    if vip {
+                        c.hacer_vip();
+                    } else {
+                        c.quitar_vip();
+                    }
+                    return true;
+                }
+            }
+        }
+        false
+    }
+
+    /// Restablece los strikes de un cliente por su ID.
+    pub fn limpiar_strikes_cliente(&mut self, id_cliente: i64) -> bool {
+        for u in &mut self.usuarios {
+            if let UsuarioSesion::Cliente(c) = u {
+                if c.base.id == id_cliente {
+                    c.limpiar_strikes();
+                    return true;
+                }
+            }
+        }
+        false
+    }
+
+    /// Cambia el estado de una reserva según las transiciones del ciclo de vida.
+    pub fn cambiar_estado_reserva(&mut self, id_reserva: i64, nuevo: EstadoReserva) -> Result<(), &'static str> {
+        let r = self.reservas.iter_mut().find(|r| r.id == id_reserva).ok_or("reserva no encontrada")?;
+        r.cambiar_estado(nuevo)
+    }
 }
 
 /// Busca por correo exacto.
@@ -298,3 +418,24 @@ pub fn estado_de_mesa(
     });
     if cruzada { "reservada" } else { "libre" }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn actualizacion_vip_y_estado_reserva_en_datos() {
+        let e = sembrar();
+        let mut d = e.lock().unwrap();
+        assert!(d.actualizar_vip_cliente(3, true));
+        let c3 = d.usuarios.iter().find(|u| u.id() == 3).unwrap();
+        assert!(c3.es_vip());
+
+        assert!(d.cambiar_estado_reserva(1, EstadoReserva::ClienteEnMesa).is_ok());
+        let r1 = d.reservas.iter().find(|r| r.id == 1).unwrap();
+        assert_eq!(r1.estado, EstadoReserva::ClienteEnMesa);
+
+        assert!(d.limpiar_strikes_cliente(3));
+    }
+}
+

@@ -1,34 +1,63 @@
 {% extends "base.html" %}
-{# Portada editorial ("Le Jardin"): hero con la ilustración del salón, la
-   carta (efecto chroma), zonas del salón y cuentas de demostración. #}
-{% block titulo %}Brindis — reservas por ocasión{% endblock %}
+{# Portada editorial "Le Jardin Élite": hero de alta cocina con ilustración del salón,
+   carta estacional (efecto chroma), zonas ambientadas con fotos reales y pases de demostración. #}
+{% block titulo %}Brindis — Restaurante de Ocasión & Alta Cocina{% endblock %}
 {% block head %}
 <link rel="stylesheet" href="/static/css/chroma.css">
 {% endblock %}
 {% block contenido %}
-<section class="hero">
+<section class="hero hero-elite">
   <div class="hero-texto">
-    <p class="eyebrow">Restaurante Brindis · Bogotá</p>
+    <div class="hero-tag-bar">
+      <span class="hero-tag">Bogotá · Zona G</span>
+      <span class="hero-tag hero-tag--oro">Haute Cuisine</span>
+    </div>
     <h1>Celebra sin preocuparte por la mesa</h1>
-    <p>Reserva por ocasión: elige tu mesa sobre el plano del salón, ajusta el
-    pedido anticipado y los servicios extra en un asistente de 4 pasos. La
-    disponibilidad la confirma el servidor, mesa por mesa.</p>
-    <p class="hero-acciones">
-      <a class="boton" href="/reservar">Reservar ahora</a>
-      <a class="boton secundario" href="#carta">Ver la carta</a>
+    <p class="hero-descripcion">
+      Una experiencia sensorial concebida para tus momentos más memorables. Elige tu mesa sobre el plano interactivo del salón, personaliza tu maridaje anticipado y deja los detalles de ocasión en manos de nuestro equipo.
     </p>
+    <div class="hero-caracteristicas">
+      <div class="caracteristica-item">
+        <span class="caract-icono">✦</span>
+        <span>Plano interactivo en tiempo real</span>
+      </div>
+      <div class="caracteristica-item">
+        <span class="caract-icono">✦</span>
+        <span>Zonas General, Terraza & VIP Privé</span>
+      </div>
+      <div class="caracteristica-item">
+        <span class="caract-icono">✦</span>
+        <span>Precios congelados al reservar</span>
+      </div>
+    </div>
+    <div class="hero-acciones">
+      <a class="boton boton-lujo" href="/reservar">Reservar ahora</a>
+      <a class="boton secundario" href="#carta">Explorar la carta</a>
+    </div>
   </div>
   <figure class="hero-figura">
-    <picture>
-      <source srcset="/static/img/fotos/salon-hero.webp" type="image/webp">
-      <img src="/static/img/fotos/salon-hero.jpg" alt="Interior cálido de un restaurante parisino: mesas vestidas entre columnas de madera y lámparas con pantalla roja" width="1920" height="1080" fetchpriority="high">
-    </picture>
+    <div class="hero-figura-marco">
+      <picture>
+        <source srcset="/static/img/fotos/salon-hero.webp" type="image/webp">
+        <img src="/static/img/fotos/salon-hero.jpg" alt="Interior cálido de un restaurante parisino: mesas vestidas entre columnas de madera y lámparas con pantalla roja" width="1920" height="1080" fetchpriority="high">
+      </picture>
+      <div class="hero-figura-badge">
+        <span class="badge-anno">Salón Central</span>
+        <span class="badge-ambiente">Luz tenue & mantelería fina</span>
+      </div>
+    </div>
   </figure>
 </section>
 
-<section id="carta" class="seccion">
-  <p class="eyebrow">Nuestra cocina</p>
-  <h2>La carta</h2>
+<!-- Carta Chroma -->
+<section id="carta" class="seccion seccion-carta">
+  <div class="seccion-intro-editorial">
+    <p class="eyebrow">Nuestra Cocina de Autor</p>
+    <h2>La carta estacional</h2>
+    <p class="seccion-bajada">
+      Ingredientes de origen seleccionados por nuestro chef ejecutivo. Pide anticipado con tarifas congeladas o solicita a la carta durante tu servicio.
+    </p>
+  </div>
   <div class="chroma-grid has-frame" data-chroma-grid data-damping="0.45"
        data-fade-out="0.6" data-softness="0.6">
     <span class="chroma-frame-rim" aria-hidden="true"></span>
@@ -62,27 +91,142 @@
   </div>
 </section>
 
-<section class="seccion">
-  <p class="eyebrow">El salón</p>
-  <h2>Tres zonas, tres formas de celebrar</h2>
-  <div class="tarjetas">
-    {% for z in zonas %}
-    <article class="tarjeta tarjeta-zona">
-      <strong>{{ z.nombre }}</strong>
-      <span>{{ z.mesas }} mesas · {{ z.puestos }} puestos</span>
+<!-- Tres Zonas del Salón con Fotos Reales -->
+<section class="seccion seccion-zonas">
+  <div class="seccion-intro-editorial">
+    <p class="eyebrow">Atmósferas</p>
+    <h2>Tres zonas, tres formas de celebrar</h2>
+    <p class="seccion-bajada">
+      Cada rincón de Brindis cuenta con su propia personalidad acústica, iluminación y disposición de mesa.
+    </p>
+    <div class="zonas-resumen-pills">
+      {% for z in zonas %}
+      <span class="zona-resumen-pill"><strong>{{ z.nombre }}:</strong> {{ z.mesas }} mesas · {{ z.puestos }} puestos</span>
+      {% endfor %}
+    </div>
+  </div>
+  <div class="zonas-galeria-grid">
+    <article class="zona-card">
+      <div class="zona-card__foto-envoltura">
+        <picture>
+          <source srcset="/static/img/fotos/mesa-general.webp" type="image/webp">
+          <img src="/static/img/fotos/mesa-general.jpg" alt="Salón Principal de Brindis" width="800" height="600" loading="lazy">
+        </picture>
+        <span class="zona-card__tag">Salón Principal</span>
+      </div>
+      <div class="zona-card__cuerpo">
+        <h3>Salón General</h3>
+        <p class="zona-card__desc">El corazón del restaurante: mesas clásicas, música suave, ambiente vibrante y servicio continuo.</p>
+        <div class="zona-card__meta">
+          <span>4 mesas · 14 puestos</span>
+          <span class="zona-ocasion-sugerida">Ideal: Cumpleaños & Casual</span>
+        </div>
+      </div>
     </article>
-    {% endfor %}
+
+    <article class="zona-card zona-card--vip">
+      <div class="zona-card__foto-envoltura">
+        <picture>
+          <source srcset="/static/img/fotos/mesa-vip.webp" type="image/webp">
+          <img src="/static/img/fotos/mesa-vip.jpg" alt="Zona VIP Privé de Brindis" width="800" height="600" loading="lazy">
+        </picture>
+        <span class="zona-card__tag zona-card__tag--oro">👑 Zona VIP Privé</span>
+      </div>
+      <div class="zona-card__cuerpo">
+        <h3>Zona VIP Privé</h3>
+        <p class="zona-card__desc">Máxima privacidad, atención dedicada y atmósfera íntima. Exclusiva para miembros VIP o celebraciones especiales.</p>
+        <div class="zona-card__meta">
+          <span>2 mesas · 6 puestos</span>
+          <span class="zona-ocasion-sugerida">Ideal: Aniversarios & Propuestas</span>
+        </div>
+      </div>
+    </article>
+
+    <article class="zona-card">
+      <div class="zona-card__foto-envoltura">
+        <picture>
+          <source srcset="/static/img/fotos/mesa-terraza.webp" type="image/webp">
+          <img src="/static/img/fotos/mesa-terraza.jpg" alt="Terraza Botánica de Brindis" width="800" height="600" loading="lazy">
+        </picture>
+        <span class="zona-card__tag">Terraza Botánica</span>
+      </div>
+      <div class="zona-card__cuerpo">
+        <h3>Terraza Botánica</h3>
+        <p class="zona-card__desc">Espacio semicubierto rodeado de vegetación natural, iluminación cálida y brisa acogedora.</p>
+        <div class="zona-card__meta">
+          <span>2 mesas · 6 puestos</span>
+          <span class="zona-ocasion-sugerida">Ideal: Veladas Románticas</span>
+        </div>
+      </div>
+    </article>
   </div>
 </section>
 
-<section class="seccion">
-  <p class="eyebrow">Para probar</p>
-  <h2>Cuentas de demostración</h2>
-  <div class="demo-grid">
-    <article class="demo"><strong>Cliente</strong><code>cliente@brindis.co</code><code>Cliente123!</code></article>
-    <article class="demo"><strong>VIP</strong><code>vip@brindis.co</code><code>Vip123!</code></article>
-    <article class="demo"><strong>Empleado</strong><code>empleado@brindis.co</code><code>Empleado123!</code></article>
-    <article class="demo"><strong>Admin</strong><code>brindis.rust@gmail.com</code><code>Admin123!</code></article>
+<!-- Cuentas Demo Mejoradas -->
+<section class="seccion seccion-demo">
+  <div class="seccion-intro-editorial">
+    <p class="eyebrow">Entorno de Demostración</p>
+    <h2>Cuentas para probar la plataforma</h2>
+    <p class="seccion-bajada">
+      Explora los diferentes roles del sistema MVC: cliente general, socio VIP con pago en sitio, o personal con control de citas.
+    </p>
+  </div>
+  <div class="demo-grid demo-grid--lujo">
+    <article class="demo-card">
+      <div class="demo-card__header">
+        <span class="demo-card__icono">👤</span>
+        <div>
+          <strong>Cliente General</strong>
+          <span class="demo-card__rol">Reserva con adelanto (30%)</span>
+        </div>
+      </div>
+      <div class="demo-card__credenciales">
+        <code>cliente@brindis.co</code>
+        <code>Cliente123!</code>
+      </div>
+    </article>
+
+    <article class="demo-card demo-card--vip">
+      <div class="demo-card__header">
+        <span class="demo-card__icono">👑</span>
+        <div>
+          <strong>Cliente VIP</strong>
+          <span class="demo-card__rol">Pago en sitio & Zona VIP</span>
+        </div>
+      </div>
+      <div class="demo-card__credenciales">
+        <code>vip@brindis.co</code>
+        <code>Vip123!</code>
+      </div>
+    </article>
+
+    <article class="demo-card">
+      <div class="demo-card__header">
+        <span class="demo-card__icono">🛎️</span>
+        <div>
+          <strong>Empleado de Sala</strong>
+          <span class="demo-card__rol">Agenda diaria & gestión de citas</span>
+        </div>
+      </div>
+      <div class="demo-card__credenciales">
+        <code>empleado@brindis.co</code>
+        <code>Empleado123!</code>
+      </div>
+    </article>
+
+    <article class="demo-card">
+      <div class="demo-card__header">
+        <span class="demo-card__icono">🏛️</span>
+        <div>
+          <strong>Administrador</strong>
+          <span class="demo-card__rol">Control total & asignación VIP</span>
+        </div>
+      </div>
+      <div class="demo-card__credenciales">
+        <code>brindis.rust@gmail.com</code>
+        <code>Admin123!</code>
+      </div>
+    </article>
   </div>
 </section>
 {% endblock %}

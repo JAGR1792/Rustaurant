@@ -1,4 +1,4 @@
-﻿% Brindis en Rust --- Analisis y diseno OO del modulo de reservas
+% Brindis en Rust --- Analisis y diseno OO del modulo de reservas
 % Adaptación fiel del PDF original (Java/Spring) a Rust (Axum + sqlx).
 % Cambios mínimos y justos para que sea idiomático en Rust, manteniendo
 % trazabilidad con el documento base (mismos CU, RF, RN, figuras y tablas).
@@ -179,7 +179,7 @@
 {\Large \bf Patrones de dise\~no de software}
 \vskip 0.4cm
 
-{\large Brindis --- Sistema de reservas de restaurantes por ocasi\'on}
+{\large Brindis --- Sistema de reservas de restaurantes}
 \vskip 0.8cm
 {\bf Yslen Natalia Moreno Gutierrez \\ Jorge Antonio Garc\'ia Romero
 \\
@@ -802,20 +802,29 @@ La interfaz sigue la direcci{\'o}n visual ``Le Jardin'' (ADR 0004): paleta marfi
 
 \noindent\textbf{Cancelaci{\'o}n y correo.} La cancelaci{\'o}n de una reserva pide confirmaci{\'o}n en un di{\'a}logo propio. Al confirmar una reserva se avisa por correo al cliente y a la administraci{\'o}n, recordando la fecha y el plazo de cancelaci{\'o}n antes del cobro; en la demo los mensajes quedan en un buz{\'o}n visible para el personal en la agenda y, con credenciales SMTP en el entorno, la entrega a buzones reales es efectiva (ADRs 0008 y 0009).
 
-\noindent\textbf{Acceso y tablas.} El acceso y el registro usan un panel ilustrado a dos columnas; mis reservas y la agenda comparten una tabla editorial con insignias de estado. Los mensajes siguen las heur{\'i}sticas de Nielsen (1993). Prototipos: Figs.~13--16 (baja fidelidad).
+\noindent\textbf{Acceso, tablas y experiencia visual.} La plataforma implementa el sistema de diseño de alta gama \textit{Le Jardin Élite}, fundamentado en una paleta cromática de borgoña aterciopelado (\texttt{\#4a121a}), oro envejecido champán (\texttt{\#c5a059}) y fondos en marfil suave, con tipografía refinada (Playfair Display e Inter). El acceso y registro ofrecen un diseño editorial a dos columnas; las tablas presentan bordes sutiles e insignias de estado con alto contraste.
 
-\noindent\textit{Decisi{\'o}n de stack frontend (vinculante).}
+\noindent\textbf{Dashboard del usuario y membresía VIP (\texttt{/dashboard}).} Provee un panel integral para el cliente que incorpora una tarjeta digital de membresía VIP con acabado metalizado, simulación de chip EMV y código de socio. El panel desglosa el contador hacia la próxima cita y clarifica los tres caminos de acceso y permanencia VIP: (1) fidelidad por visitas acumuladas (barra de progreso hacia 3 reservas efectivas), (2) pase directo anual mediante pago único (\$95.000 COP simulado con activación en un clic), y (3) asignación directa por cortesía de la administración.
+
+\noindent\textbf{Panel de empleado y agenda con calendario (\texttt{/panel-empleado} y \texttt{/agenda}).} Centraliza la operación del restaurante:
 \begin{itemize}
-  \item \textbf{Plantillas HTML} con bloques estilo Jinja/Askama en \texttt{templates/}: \texttt{base}, \texttt{inicio}, \texttt{login}, \texttt{registro}, \texttt{reservar}, \texttt{mis\_reservas} y \texttt{agenda}.
-  \item \textbf{CSS vanilla} en \texttt{static/css/}: tokens de \texttt{tema.css} (colores de estado de mesa, tipograf{\'i}a y componentes) y fuentes \textit{self-hosted} de \texttt{fuentes.css}.
-  \item \textbf{JS vanilla} en \texttt{static/js/}: \texttt{plano.js} pinta el plano SVG, gestiona la selecci{\'o}n y la ficha de mesa, gu{\'i}a el pedido por porciones y consulta \texttt{GET /api/disponibilidad?fecha=\&hora=\&zona=} sin recargar; \texttt{ui.js} implementa los toasts y el di{\'a}logo de confirmaci{\'o}n propios; \texttt{chroma.js} y \texttt{counter.js} alimentan la carta y la cuenta regresiva.
-  \item \textbf{Carta de la portada} (\texttt{\#carta} en \texttt{templates/inicio.html}): un spotlight que sigue al cursor revela la foto a color de cada plato; efecto adaptado a JS/CSS vanilla desde el componente ChromaGrid de React Bits (MIT) y portado como c{\'o}digo propio en \texttt{static/js/chroma.js} y \texttt{static/css/chroma.css}, con las fotos reales de \texttt{static/img/fotos/}.
-  \item \textbf{Cuenta regresiva} en \texttt{/mis-reservas}: d{\'i}as, horas, minutos y segundos para la pr{\'o}xima reserva vigente; port vanilla del componente Counter de React Bits (MIT) en \texttt{static/js/counter.js} y \texttt{static/css/counter.css}, alimentado por la fecha en ISO 8601 con desfase UTC-5.
-  \item \textbf{Fotos del men{\'u}}: las fotos (carta, sal{\'o}n y mesas) se descargan con \texttt{static/img/fotos/descargar\_fotos.py}, que verifica la licencia por la API de Wikimedia Commons y escribe \texttt{creditos.md} (ADR 0005); \texttt{convertir\_webp.py} deja la variante WebP que sirven los \texttt{<picture>} de la UI (respaldo JPEG, ADR 0007); los PNG deterministas de \texttt{generar\_*.py} quedan como respaldo \textit{offline}.
-  \item \textbf{C{\'o}digo propio:} no se usa htmx ni librer{\'i}as; las adaptaciones de la carta y del contador est{\'a}n acreditadas a React Bits y todo lo dem{\'a}s es c{\'o}digo original del repo, sin copiar de otros proyectos.
+  \item \textbf{Próximas citas inmediatas:} módulo prioritario en la cabecera que resalta las reservas más urgentes con temporizador y botones operacionales en vivo: sentar en mesa (\textit{ClienteEnMesa}), completar servicio (\textit{Completada}) o asentar inasistencia (\textit{Inasistida}, computando \textit{strike} y degradando a cliente general si alcanza el tercer incumplimiento).
+  \item \textbf{Calendario mensual interactivo:} cuadrícula visual con selector de días, conteo de reservas por fecha y navegación entre meses para inspeccionar la demanda.
+  \item \textbf{Listado detallado y gestión de clientes:} tabla del día con distintivos VIP y alertas destacadas de alergias/restricciones (RN08), junto a un módulo administrativo para conmutar estado VIP y limpiar penalizaciones (\textit{strikes}).
 \end{itemize}
 
-\noindent\textbf{Rutas y estado (fase 1).} El servidor expone \texttt{/static} y las rutas \texttt{/}, \texttt{/login}, \texttt{/registro}, \texttt{/reservar} (GET y POST), \texttt{/mis-reservas}, \texttt{/reservas/\{id\}/cancelar} y \texttt{/agenda}. El flujo completo corre sobre un almac{\'e}n en memoria (\texttt{src/estado.rs}) con seed de demostraci{\'o}n; los DAO sqlx ya definidos son la ruta de conexi{\'o}n al motor.
+\noindent\textit{Decisión de stack frontend (vinculante).}
+\begin{itemize}
+  \item \textbf{Plantillas HTML} con bloques estilo Jinja/Askama en \texttt{templates/}: \texttt{base}, \texttt{inicio}, \texttt{login}, \texttt{registro}, \texttt{reservar}, \texttt{mis\_reservas}, \texttt{agenda} y \texttt{dashboard}.
+  \item \textbf{CSS vanilla} en \texttt{static/css/}: tokens de \texttt{tema.css} (paleta \textit{Le Jardin Élite}, tarjetas VIP, grilla de calendario, botones de acción rápida y estados de mesa) y fuentes \textit{self-hosted} de \texttt{fuentes.css}.
+  \item \textbf{JS vanilla} en \texttt{static/js/}: \texttt{plano.js} pinta el plano SVG, gestiona la selección y la ficha de mesa, guía el pedido por porciones y consulta \texttt{GET /api/disponibilidad?fecha=\&hora=\&zona=} sin recargar; \texttt{ui.js} implementa los toasts y el diálogo de confirmación propios; \texttt{chroma.js} y \texttt{counter.js} alimentan la carta y la cuenta regresiva.
+  \item \textbf{Carta de la portada} (\texttt{\#carta} en \texttt{templates/inicio.html}): un spotlight que sigue al cursor revela la foto a color de cada plato; efecto adaptado a JS/CSS vanilla desde el componente ChromaGrid de React Bits (MIT) y portado como código propio en \texttt{static/js/chroma.js} y \texttt{static/css/chroma.css}, con las fotos reales de \texttt{static/img/fotos/}.
+  \item \textbf{Cuenta regresiva} en \texttt{/mis-reservas} y \texttt{/dashboard}: días, horas, minutos y segundos para la próxima reserva vigente; port vanilla del componente Counter de React Bits (MIT) en \texttt{static/js/counter.js} y \texttt{static/css/counter.css}, alimentado por la fecha en ISO 8601 con desfase UTC-5.
+  \item \textbf{Fotos del menú}: las fotos (carta, salón y mesas) se descargan con \texttt{static/img/fotos/descargar\_fotos.py}, que verifica la licencia por la API de Wikimedia Commons y escribe \texttt{creditos.md} (ADR 0005); \texttt{convertir\_webp.py} deja la variante WebP que sirven los \texttt{<picture>} de la UI (respaldo JPEG, ADR 0007); los PNG deterministas de \texttt{generar\_*.py} quedan como respaldo \textit{offline}.
+  \item \textbf{Código propio:} no se usa htmx ni librerías externas pesadas; las adaptaciones de la carta y del contador están acreditadas a React Bits y todo lo demás es código original del repo, sin copiar de otros proyectos.
+\end{itemize}
+
+\noindent\textbf{Rutas y estado (fase 1 extendida).} El servidor expone \texttt{/static} y las rutas \texttt{/}, \texttt{/login}, \texttt{/registro}, \texttt{/reservar} (GET y POST), \texttt{/mis-reservas}, \texttt{/reservas/\{id\}/cancelar}, \texttt{/dashboard}, \texttt{/dashboard/hacer-vip}, \texttt{/panel-empleado}, \texttt{/empleado/reserva/\{id\}/estado}, \texttt{/admin/cliente/\{id\}/toggle-vip} y \texttt{/admin/cliente/\{id\}/reset-strikes}. El flujo completo corre sobre un almacén en memoria (\texttt{src/estado.rs}) con seed de demostración; los DAO sqlx ya definidos son la ruta de conexión al motor relacional.
 \begin{figure}[H]\centering
 {\small\textbf{Figura 13}}\\{\small\textit{Prototipos de inicio de sesi{\'o}n y paso 1 (ocasi{\'o}n)}}\\[4pt]
 \begin{tikzpicture}
