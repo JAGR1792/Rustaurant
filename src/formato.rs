@@ -32,8 +32,18 @@ pub(crate) fn fecha_iso_local(dt: DateTime<Utc>) -> String {
 /// Nombres de mes en español (calendario del panel y correos).
 #[allow(dead_code)]
 const MESES: [&str; 12] = [
-    "enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre",
-    "octubre", "noviembre", "diciembre",
+    "enero",
+    "febrero",
+    "marzo",
+    "abril",
+    "mayo",
+    "junio",
+    "julio",
+    "agosto",
+    "septiembre",
+    "octubre",
+    "noviembre",
+    "diciembre",
 ];
 #[allow(dead_code)]
 const MESES_CORTOS: [&str; 12] = [

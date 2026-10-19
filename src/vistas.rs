@@ -12,7 +12,7 @@ use axum::{
     response::{IntoResponse, Redirect, Response},
 };
 use axum_extra::extract::cookie::{Cookie, CookieJar, SameSite};
-use chrono::{Datelike, DateTime, Duration, NaiveDate, NaiveTime, Utc};
+use chrono::{DateTime, Datelike, Duration, NaiveDate, NaiveTime, Utc};
 use serde::{Deserialize, Serialize};
 
 use crate::builder::{ReservaBuilder, validar_modalidad};
@@ -1338,7 +1338,9 @@ pub async fn dashboard(
     }
     let aviso = q.get("ok").map(|ok| {
         match ok.as_str() {
-            "vip_activado" => "¡Felicidades! Tu membresía VIP Brindis Club ha sido activada con éxito.",
+            "vip_activado" => {
+                "¡Felicidades! Tu membresía VIP Brindis Club ha sido activada con éxito."
+            }
             "bienvenida" => "¡Bienvenido a Brindis! Tu cuenta ha sido creada exitosamente.",
             _ => "Operación completada.",
         }
@@ -1686,7 +1688,11 @@ mod tests {
 
     #[test]
     fn aviso_cancelacion_vip_tarde_menciona_strike_y_retencion() {
-        let mut r = reserva_prueba(9, Utc::now() + Duration::minutes(30), EstadoReserva::Vigente);
+        let mut r = reserva_prueba(
+            9,
+            Utc::now() + Duration::minutes(30),
+            EstadoReserva::Vigente,
+        );
         r.pago.modalidad = ModalidadPago::Completo;
         r.pago.porcentaje = 100;
         r.pago.monto_total = 100_000;
