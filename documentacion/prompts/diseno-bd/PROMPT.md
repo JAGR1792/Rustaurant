@@ -15,11 +15,11 @@ Entradas (léelas todas antes de escribir):
   (`1`, `0..1`, `1..*`, `0..*`).
 - `contexto/dominio.rs` — entidades y lógica ya implementada en Rust
   (strikes RN10, ciclo de vida, solape de bloqueos).
-- `contexto/reglas-brindis.md` — las 13 tablas, RN01–RN15 e índices.
+- `contexto/reglas-brindis.md` — las 14 tablas, RN01–RN15 e índices.
 
 Requisitos del script:
 1. `CREATE DATABASE brindis_db` + `USE`, en orden de dependencias.
-2. Las 13 tablas con PK, FK (`ON DELETE` explícito), `UNIQUE`, `CHECK`
+2. Las 14 tablas con PK, FK (`ON DELETE` explícito), `UNIQUE`, `CHECK`
    (capacidad 1..20, porcentaje 0..100, modalidad, estados, rol, ocasión),
    `DEFAULT` (duración 120, strikes 0, activo 1) y los índices pedidos.
 3. Intermedias con precio congelado: `reserva_mesa`, `reserva_detalle_pedido`

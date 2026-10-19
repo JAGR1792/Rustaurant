@@ -2,28 +2,32 @@
 
 Fuente: `documentacion/brindis_rust.tex` (Tablas 2, 5, 10 y sec. 6.3).
 
-## 1. Las 13 tablas (3FN) y para qué sirve cada una
+## 1. Las 14 tablas (3FN) y para qué sirve cada una
 
 1. `usuario` — las 3 subclases en una sola tabla (`rol`: CLIENTE/EMPLEADO/ADMINISTRADOR).
    Cliente agrega tipo (VIP/GENERAL), strikes y última actividad; empleado, fecha de
-   contratación. Únicos: `correo` y `(tipo_documento, documento)`.
+   contratación y `tipo_empleado` NULABLE (GERENTE/MESERO/COCINA, coherente con el rol).
+   Únicos: `correo` y `(tipo_documento, documento)`.
 2. `token_reactivacion` — reactivar clientes inactivos (RN13): token, expiración, usado.
-3. `zona` — VIP, General, Terraza.
-4. `mesa` — SOLO estado físico (`DISPONIBLE`/`FUERA_DE_SERVICIO`); `capacidad` 1..20;
+3. `jornada` — turnos del personal (RF15): `id_empleado`, inicio/fin y zona; la asignación
+   de mesero a una reserva exige jornada que cubra la franja.
+4. `zona` — VIP, General, Terraza.
+5. `mesa` — SOLO estado físico (`DISPONIBLE`/`FUERA_DE_SERVICIO`); `capacidad` 1..20;
    `numero_mesa`; `zona_id`. Lo de reservada/bloqueada es por franja (abajo).
-5. `bloqueo_mesa` — bloqueo temporal RN03 (5 min): inicio, fin, expiración.
-6. `horario_atencion` — día semana + apertura/cierre (RN05).
-7. `reserva` — código único 8 alfanumérico (RN15); `id_cliente` (1 cliente→1..* reservas);
-   `id_creador` NULABLE (0..1 empleado→1..* reservas; NULL = autogestión); flag de
+6. `bloqueo_mesa` — bloqueo temporal RN03 (5 min): inicio, fin, expiración.
+7. `horario_atencion` — día semana + apertura/cierre (RN05).
+8. `reserva` — código único 8 alfanumérico (RN15); `id_cliente` (1 cliente→1..* reservas);
+   `id_creador` NULABLE (0..1 empleado→1..* reservas; NULL = autogestión); `id_mesero`
+   NULABLE (asignación de servicio, distinta del creador); flag de
    restaurante completo; inicio + duración 120 (RN01); comensales; ocasión; estado
    (VIGENTE/CLIENTE_EN_MESA/COMPLETADA/CANCELADA/INASISTIDA).
-8. `reserva_mesa` — intermedia Reserva↔Mesa (1..* ↔ 0..*).
-9. `item_menu` — carta: nombre, tipo (ENTRADA/PLATO_FUERTE/POSTRE/BEBIDA), precio vigente.
-10. `reserva_detalle_pedido` — intermedia con `cantidad` + `precio_unitario` CONGELADO (RN07).
-11. `plan_servicio_extra` — base de decoración/barra: nombre, tarifa, descripción,
+9. `reserva_mesa` — intermedia Reserva↔Mesa (1..* ↔ 0..*).
+10. `item_menu` — carta: nombre, tipo (ENTRADA/PLATO_FUERTE/POSTRE/BEBIDA), precio vigente.
+11. `reserva_detalle_pedido` — intermedia con `cantidad` + `precio_unitario` CONGELADO (RN07).
+12. `plan_servicio_extra` — base de decoración/barra: nombre, tarifa, descripción,
     por_persona. Subtipos: decoración (motivo, nivel) y barra (tipo, cobra_por_persona).
-12. `reserva_servicio_extra` — intermedia con `precio` CONGELADO (RN07).
-13. `detalle_pago` + `comprobante_pago` — modalidad (ADELANTO/COMPLETO/EN_RESTAURANTE),
+13. `reserva_servicio_extra` — intermedia con `precio` CONGELADO (RN07).
+14. `detalle_pago` + `comprobante_pago` — modalidad (ADELANTO/COMPLETO/EN_RESTAURANTE),
     porcentaje 0..100 (100/0 según modalidad), medio, montos y retención 10% (RN08/RN09);
     `id_empleado` NULABLE. Cada movimiento genera comprobante (RN14).
 
@@ -47,5 +51,6 @@ Fuente: `documentacion/brindis_rust.tex` (Tablas 2, 5, 10 y sec. 6.3).
 ## 3. Índices y unicidades mínimas
 
 - UNIQUE: `usuario.correo`, `(usuario.tipo_documento, usuario.documento)`, `reserva.codigo`.
-- Índices: `reserva_mesa(id_mesa)`, `reserva(fecha_hora_inicio)`, `bloqueo_mesa(mesa_id, inicio, fin)`.
+- Índices: `reserva_mesa(id_mesa)`, `reserva(fecha_hora_inicio)`, `reserva(id_mesero)`,
+  `jornada(id_empleado, fecha_hora_inicio)`, `bloqueo_mesa(mesa_id, inicio, fin)`.
 - FK con `ON DELETE` explícito y documentado (pedido/comprobantes en cascada con la reserva).

@@ -461,6 +461,7 @@ mod tests {
             codigo: "TEST0001".into(),
             id_cliente: 3,
             id_creador: None,
+            id_mesero: None,
             tipo_restaurante_completo: false,
             mesa_ids: vec![1, 2],
             inicio: Utc::now() + chrono::Duration::days(2),
