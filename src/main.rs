@@ -54,7 +54,12 @@ async fn main() {
         .route("/dashboard/hacer-vip", post(vistas::hacer_vip_cliente))
         .route("/agenda", get(vistas::agenda))
         .route("/agenda/dia", get(vistas::agenda_dia))
-        .route("/panel-empleado", get(vistas::agenda))
+        .route("/panel-empleado", get(vistas::panel_empleado))
+        .route("/panel-admin", get(vistas::panel_admin))
+        .route(
+            "/admin/reserva/{id}/mesero",
+            post(vistas::asignar_mesero_reserva),
+        )
         .route(
             "/empleado/reserva/{id}/estado",
             post(vistas::cambiar_estado_reserva),

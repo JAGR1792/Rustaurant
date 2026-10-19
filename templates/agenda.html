@@ -10,6 +10,12 @@
     <p class="subtitulo-editorial">
       Gestión integral del servicio: próximas citas en sala, calendario de disponibilidad, ocupación y miembros VIP.
     </p>
+    <p class="acciones-panel">
+      <a class="boton secundario" href="/panel-empleado">Panel por tipo de empleado</a>
+      {% if es_admin %}
+      <a class="boton secundario" href="/panel-admin">Panel de administración</a>
+      {% endif %}
+    </p>
   </div>
   <div class="empleado-kpis" id="agenda-kpis">{% include "agenda_kpis.html" %}</div>
 </div>

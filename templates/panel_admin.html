@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+{# Panel de administracion (RF15): KPIs globales, personal con tipo y
+   jornada de hoy, y asignacion de meseros por reserva. Solo rol Administrador. #}
+{% block titulo %}Panel de Administración — Brindis{% endblock %}
+{% block contenido %}
+<div class="empleado-cabecera">
+  <div>
+    <p class="eyebrow">Dirección del salón</p>
+    <h1>Panel de Administración</h1>
+    <p class="subtitulo-editorial">
+      Personal en turno, jornadas de hoy y asignación de meseros para cada reserva.
+    </p>
+  </div>
+  <div class="acciones-rapidas">
+    <a class="boton secundario" href="/panel-empleado">Mi panel de empleado</a>
+    <a class="boton" href="/agenda">Abrir la agenda operativa</a>
+  </div>
+</div>
+
+{% if let Some(a) = aviso %}
+<p class="exito" role="status">{{ a }}</p>
+{% endif %}
+{% if let Some(err) = error %}
+<p class="error" role="alert">{{ err }}</p>
+{% endif %}
+
+<section class="empleado-kpis kpis-admin" aria-label="Indicadores generales">
+  <div class="kpi-tarjeta">
+    <span class="kpi-valor">{{ activas }}</span>
+    <span class="kpi-rotulo">Reservas activas</span>
+  </div>
+  <div class="kpi-tarjeta">
+    <span class="kpi-valor">{{ comensales_activos }}</span>
+    <span class="kpi-rotulo">Comensales por atender</span>
+  </div>
+  <div class="kpi-tarjeta">
+    <span class="kpi-valor">{{ meseros_en_turno }}</span>
+    <span class="kpi-rotulo">Meseros en turno</span>
+  </div>
+  <div class="kpi-tarjeta">
+    <span class="kpi-valor">$ {{ abonado }}</span>
+    <span class="kpi-rotulo">Abonado registrado</span>
+  </div>
+</section>
+
+<section class="seccion" aria-label="Personal y jornadas">
+  <p class="eyebrow">Equipo</p>
+  <h2>Personal y jornadas de hoy</h2>
+  <div class="tabla-scroll">
+    <table class="tabla">
+      <thead>
+        <tr>
+          <th>ID</th><th>Nombre</th><th>Correo</th><th>Rol</th><th>Tipo</th>
+          <th>Jornada de hoy</th><th>Estado</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for p in personal %}
+        <tr>
+          <td>#{{ p.id }}</td>
+          <td><strong>{{ p.nombre }}</strong></td>
+          <td>{{ p.correo }}</td>
+          <td>{{ p.rol }}</td>
+          <td><span class="tag-tipo tag-tipo--{{ p.tipo_clave }}">{{ p.tipo }}</span></td>
+          <td>{{ p.jornada }}</td>
+          <td>
+            <span class="chip-estado {% if p.en_turno %}chip-estado--ok{% else %}chip-estado--off{% endif %}">
+              {% if p.en_turno %}En turno{% else %}Fuera de turno{% endif %}
+            </span>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="seccion" aria-label="Asignación de meseros">
+  <p class="eyebrow">Servicio de sala</p>
+  <h2>Asignación de meseros</h2>
+  <p class="pedido-ayuda">
+    Solo se ofrecen meseros con jornada que cubre la franja de cada reserva;
+    elige "Sin asignar" para dejarla pendiente.
+  </p>
+  {% if asignaciones.is_empty() %}
+  <div class="vacio-reservas">
+    <p>No hay reservas activas para asignar en este momento.</p>
+  </div>
+  {% else %}
+  <div class="tabla-scroll">
+    <table class="tabla">
+      <thead>
+        <tr>
+          <th>Reserva</th><th>Cuándo</th><th>Cliente</th><th>Mesas</th>
+          <th>Mesero</th><th>Actual</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for a in asignaciones %}
+        <tr>
+          <td><code>{{ a.codigo }}</code></td>
+          <td>{{ a.fecha }}</td>
+          <td>{{ a.cliente }}</td>
+          <td>{{ a.mesas }}</td>
+          <td>
+            <form method="post" action="/admin/reserva/{{ a.reserva_id }}/mesero" class="form-asignar">
+              <select name="mesero" aria-label="Mesero para {{ a.codigo }}">
+                <option value="">Sin asignar</option>
+                {% for m in a.meseros %}
+                <option value="{{ m.id }}" {% if m.actual %}selected{% endif %}>{{ m.nombre }}</option>
+                {% endfor %}
+              </select>
+              <button type="submit" class="btn-micro">Guardar</button>
+            </form>
+          </td>
+          <td class="texto-suave">{{ a.actual }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+</section>
+{% endblock %}

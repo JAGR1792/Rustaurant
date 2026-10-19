@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+{# Panel del empleado (RF15): el foco depende del tipo de empleado —
+   mesero: sus mesas asignadas; cocina: restricciones por preparar;
+   gerente: acceso directo al panel de administracion. #}
+{% block titulo %}Panel de Empleado — Brindis{% endblock %}
+{% block contenido %}
+<div class="empleado-cabecera">
+  <div>
+    <p class="eyebrow">Operación por turno</p>
+    <h1>Panel de Empleado</h1>
+    <p class="subtitulo-editorial">
+      Tu jornada de hoy y las tareas de tu frente de trabajo.
+    </p>
+  </div>
+  <div class="ficha-turno">
+    <span class="tag-tipo tag-tipo--{{ tipo_clave }}">{{ tipo }}</span>
+    {% if let Some(j) = jornada_hoy %}
+    <p class="ficha-turno__rango">{{ j }}</p>
+    <span class="chip-estado {% if en_turno %}chip-estado--ok{% else %}chip-estado--off{% endif %}">
+      {% if en_turno %}En turno ahora{% else %}Fuera de turno{% endif %}
+    </span>
+    {% else %}
+    <p class="ficha-turno__rango">Sin jornada registrada hoy</p>
+    {% endif %}
+  </div>
+</div>
+
+{% if let Some(a) = aviso %}
+<p class="exito" role="status">{{ a }}</p>
+{% endif %}
+{% if let Some(err) = error %}
+<p class="error" role="alert">{{ err }}</p>
+{% endif %}
+
+{% if es_gerente %}
+<aside class="panel-aviso-gerente">
+  <p>
+    Como gerente tienes el <a href="/panel-admin">panel de administración</a>
+    (personal, jornadas y asignación de meseros); la operación completa está en la
+    <a href="/agenda">agenda</a>.
+  </p>
+</aside>
+{% endif %}
+
+{% if es_mesero %}
+<section class="seccion" aria-label="Mis mesas asignadas">
+  <p class="eyebrow">Servicio de sala</p>
+  <h2>Mis mesas asignadas</h2>
+  {% if mis_mesas.is_empty() %}
+  <div class="vacio-reservas">
+    <p>No tienes mesas asignadas por ahora; la gerencia las asigna desde el panel de administración.</p>
+  </div>
+  {% else %}
+  <div class="tabla-scroll">
+    <table class="tabla">
+      <thead>
+        <tr>
+          <th>Hora</th><th>Fecha</th><th>Código</th><th>Cliente</th><th>Mesas</th>
+          <th>Comensales</th><th>Estado</th><th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for p in mis_mesas %}
+        <tr>
+          <td><strong>{{ p.hora }}</strong></td>
+          <td>{{ p.fecha }}</td>
+          <td><code>{{ p.codigo }}</code></td>
+          <td>
+            {{ p.cliente }}
+            {% if p.es_vip %}<span class="badge-vip-pill">VIP</span>{% endif %}
+          </td>
+          <td>{{ p.mesas }}</td>
+          <td>{{ p.comensales }}</td>
+          <td><span class="badge {{ p.estado_clase }}">{{ p.estado }}</span></td>
+          <td>
+            {% if p.puede_sentar %}
+            <form method="post" action="/empleado/reserva/{{ p.id }}/estado" style="display:inline;">
+              <input type="hidden" name="nuevo" value="en-mesa">
+              <input type="hidden" name="volver" value="/panel-empleado">
+              <button type="submit" class="secundario btn-micro">Sentar</button>
+            </form>
+            {% endif %}
+            {% if p.puede_completar %}
+            <form method="post" action="/empleado/reserva/{{ p.id }}/estado" style="display:inline;">
+              <input type="hidden" name="nuevo" value="completada">
+              <input type="hidden" name="volver" value="/panel-empleado">
+              <button type="submit" class="secundario btn-micro">Completar</button>
+            </form>
+            {% endif %}
+            {% if p.puede_inasistir %}
+            <form method="post" action="/empleado/reserva/{{ p.id }}/estado" style="display:inline;"
+                  data-confirmar="¿Marcar la reserva {{ p.codigo }} como inasistida? (RN10 sumará strike si corresponde).">
+              <input type="hidden" name="nuevo" value="inasistida">
+              <input type="hidden" name="volver" value="/panel-empleado">
+              <button type="submit" class="secundario btn-micro">Inasistencia</button>
+            </form>
+            {% endif %}
+          </td>
+        </tr>
+        {% if p.alerta %}
+        <tr>
+          <td colspan="8" class="alerta-celda">Alerta: {{ p.restricciones }}</td>
+        </tr>
+        {% endif %}
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+</section>
+{% endif %}
+
+<section class="seccion" aria-label="Restricciones por preparar">
+  <p class="eyebrow">Cocina y alergias</p>
+  <h2>Restricciones para preparar (hoy y mañana)</h2>
+  {% if restricciones.is_empty() %}
+  <div class="vacio-reservas">
+    <p>Sin restricciones especiales en las próximas citas.</p>
+  </div>
+  {% else %}
+  <div class="tabla-scroll">
+    <table class="tabla">
+      <thead>
+        <tr><th>Cuándo</th><th>Código</th><th>Cliente</th><th>Comensales</th><th>Restricción</th></tr>
+      </thead>
+      <tbody>
+        {% for r in restricciones %}
+        <tr>
+          <td>{{ r.fecha }}</td>
+          <td><code>{{ r.codigo }}</code></td>
+          <td>{{ r.cliente }}</td>
+          <td>{{ r.comensales }}</td>
+          <td class="texto-alerta">{{ r.restriccion }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+</section>
+{% endblock %}
