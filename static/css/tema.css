@@ -920,6 +920,9 @@ section[id^="paso-"] { margin-bottom: 2rem; }
 .btn-inasistir:hover { background: rgba(169, 79, 66, .1); color: var(--reservada); border-color: var(--reservada); }
 
 /* Calendario Visual */
+#agenda-panel, #agenda-kpis { transition: opacity .15s ease; }
+#agenda-seccion[aria-busy="true"] #agenda-panel,
+#agenda-kpis[aria-busy="true"] { opacity: .55; }
 .calendario-contenedor {
   background: var(--marfil-claro); border: 1px solid var(--linea); border-radius: 18px;
   padding: 1.4rem 1.6rem; margin-bottom: 1.5rem;

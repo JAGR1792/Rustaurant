@@ -310,6 +310,27 @@ struct Agenda {
     aviso: Option<String>,
 }
 
+/// Fragmento del panel de agenda: lo sirve GET /agenda/dia para navegar por
+/// días y meses sin recargar la página completa.
+#[derive(Template)]
+#[template(path = "agenda_dia.html")]
+struct AgendaDia {
+    fecha: String,
+    dia_ant: String,
+    dia_sig: String,
+    mes_nombre: String,
+    mes_anterior: String,
+    mes_siguiente: String,
+    calendario: Vec<DiaCalendarioVista>,
+    espacios_mes: usize,
+    filas: Vec<AgendaFila>,
+    total_hoy: usize,
+    comensales_hoy: u32,
+    ocupacion_mesas_hoy: usize,
+    total_mesas: usize,
+    vacio: bool,
+}
+
 #[derive(Template)]
 #[template(path = "dashboard.html")]
 struct Dashboard {
@@ -1027,6 +1048,174 @@ pub async fn cancelar(State(e): State<Estado>, jar: CookieJar, Path(id): Path<i6
     }
 }
 
+// -------------------------------------------------------------------- agenda
+
+/// Fila de la agenda: una reserva con su cliente, mesas y acciones posibles.
+fn fila_agenda(r: &Reserva, usuarios: &[UsuarioSesion]) -> AgendaFila {
+    let cliente_obj = usuarios.iter().find(|x| x.id() == r.id_cliente);
+    let cliente = cliente_obj
+        .map(|x| x.nombre().to_string())
+        .unwrap_or_else(|| format!("Cliente {}", r.id_cliente));
+    let es_vip = cliente_obj.map(|x| x.es_vip()).unwrap_or(false);
+    let restricciones = r.restricciones.clone();
+    AgendaFila {
+        id: r.id,
+        hora: utc_a_local(r.inicio).format("%H:%M").to_string(),
+        fecha: utc_a_local(r.inicio).format("%Y-%m-%d").to_string(),
+        codigo: r.codigo.clone(),
+        cliente,
+        es_vip,
+        mesas: r
+            .mesa_ids
+            .iter()
+            .map(|m| format!("M{m}"))
+            .collect::<Vec<_>>()
+            .join(", "),
+        comensales: r.num_comensales,
+        ocasion: r.ocasion.nombre().into(),
+        indicacion: r.ocasion.indicacion_personal().into(),
+        alerta: !restricciones.is_empty() && !restricciones.eq_ignore_ascii_case("sin alergias"),
+        restricciones,
+        estado: r.estado.etiqueta().into(),
+        estado_clase: r.estado.clase().into(),
+        puede_sentar: r.estado == EstadoReserva::Vigente,
+        puede_completar: r.estado == EstadoReserva::ClienteEnMesa,
+        puede_inasistir: r.estado == EstadoReserva::Vigente,
+    }
+}
+
+/// Contadores y filas del día seleccionado.
+struct ResumenDia {
+    filas: Vec<AgendaFila>,
+    total_hoy: usize,
+    comensales_hoy: u32,
+    ocupacion_mesas_hoy: usize,
+    vacio: bool,
+}
+
+/// Resumen del día para el panel de agenda: lo comparten la página completa
+/// y el fragmento dinámico GET /agenda/dia.
+fn resumen_del_dia(usuarios: &[UsuarioSesion], reservas: &[Reserva], dia: NaiveDate) -> ResumenDia {
+    let mut del_dia: Vec<&Reserva> = reservas
+        .iter()
+        .filter(|r| utc_a_local(r.inicio).date() == dia)
+        .collect();
+    del_dia.sort_by_key(|r| r.inicio);
+    let total_hoy = del_dia
+        .iter()
+        .filter(|r| r.estado != EstadoReserva::Cancelada)
+        .count();
+    let comensales_hoy = del_dia
+        .iter()
+        .filter(|r| r.estado != EstadoReserva::Cancelada)
+        .map(|r| r.num_comensales)
+        .sum();
+    let mut mesas_ocupadas = std::collections::HashSet::new();
+    for r in &del_dia {
+        if matches!(
+            r.estado,
+            EstadoReserva::Vigente | EstadoReserva::ClienteEnMesa
+        ) {
+            for m in &r.mesa_ids {
+                mesas_ocupadas.insert(*m);
+            }
+        }
+    }
+    let filas: Vec<AgendaFila> = del_dia.iter().map(|r| fila_agenda(r, usuarios)).collect();
+    let vacio = filas.is_empty();
+    ResumenDia {
+        filas,
+        total_hoy,
+        comensales_hoy,
+        ocupacion_mesas_hoy: mesas_ocupadas.len(),
+        vacio,
+    }
+}
+
+/// Nombre del mes y primeros días de los meses vecinos (navegación de mes).
+fn mes_etiquetas(anio: i32, mes: u32) -> (String, String, String) {
+    let nombre = match mes {
+        1 => "Enero",
+        2 => "Febrero",
+        3 => "Marzo",
+        4 => "Abril",
+        5 => "Mayo",
+        6 => "Junio",
+        7 => "Julio",
+        8 => "Agosto",
+        9 => "Septiembre",
+        10 => "Octubre",
+        11 => "Noviembre",
+        12 => "Diciembre",
+        _ => "",
+    }
+    .to_string();
+    let primero_de = |m: u32, a: i32| {
+        NaiveDate::from_ymd_opt(a, m, 1)
+            .expect("mes válido")
+            .format("%Y-%m-%d")
+            .to_string()
+    };
+    let (anio_ant, mes_ant) = if mes == 1 {
+        (anio - 1, 12)
+    } else {
+        (anio, mes - 1)
+    };
+    let (anio_sig, mes_sig) = if mes == 12 {
+        (anio + 1, 1)
+    } else {
+        (anio, mes + 1)
+    };
+    (
+        nombre,
+        primero_de(mes_ant, anio_ant),
+        primero_de(mes_sig, anio_sig),
+    )
+}
+
+/// Cuadrícula del mes con el conteo de reservas por fecha y el desfase de la
+/// primera semana (0 = lunes).
+fn cuadricula_mes(
+    reservas: &[Reserva],
+    anio: i32,
+    mes: u32,
+    dia: NaiveDate,
+    hoy: NaiveDate,
+) -> (Vec<DiaCalendarioVista>, usize) {
+    let dias_en_mes: u32 = match mes {
+        1 | 3 | 5 | 7 | 8 | 10 | 12 => 31,
+        4 | 6 | 9 | 11 => 30,
+        2 => {
+            if (anio % 4 == 0 && anio % 100 != 0) || anio % 400 == 0 {
+                29
+            } else {
+                28
+            }
+        }
+        _ => 30,
+    };
+    let espacios = NaiveDate::from_ymd_opt(anio, mes, 1)
+        .map(|f| f.weekday().num_days_from_monday() as usize)
+        .unwrap_or(0);
+    let mut celdas = Vec::with_capacity(dias_en_mes as usize);
+    for d_num in 1..=dias_en_mes {
+        if let Some(fecha_dia) = NaiveDate::from_ymd_opt(anio, mes, d_num) {
+            let num_reservas = reservas
+                .iter()
+                .filter(|r| utc_a_local(r.inicio).date() == fecha_dia)
+                .count();
+            celdas.push(DiaCalendarioVista {
+                dia: d_num,
+                fecha_iso: fecha_dia.format("%Y-%m-%d").to_string(),
+                es_hoy: fecha_dia == hoy,
+                es_seleccionado: fecha_dia == dia,
+                num_reservas,
+            });
+        }
+    }
+    (celdas, espacios)
+}
+
 pub async fn agenda(
     State(e): State<Estado>,
     jar: CookieJar,
@@ -1052,6 +1241,7 @@ pub async fn agenda(
         .unwrap_or(hoy);
     let anio = dia.year();
     let mes = dia.month();
+    let (mes_nombre, mes_anterior, mes_siguiente) = mes_etiquetas(anio, mes);
 
     let mut denegado = false;
     let mut filas: Vec<AgendaFila> = vec![];
@@ -1065,88 +1255,17 @@ pub async fn agenda(
     let mut ocupacion_mesas_hoy = 0;
     let mut total_mesas = 0;
 
-    let mes_nombre = match mes {
-        1 => "Enero",
-        2 => "Febrero",
-        3 => "Marzo",
-        4 => "Abril",
-        5 => "Mayo",
-        6 => "Junio",
-        7 => "Julio",
-        8 => "Agosto",
-        9 => "Septiembre",
-        10 => "Octubre",
-        11 => "Noviembre",
-        12 => "Diciembre",
-        _ => "",
-    }
-    .to_string();
-
-    let mes_anterior = if mes == 1 {
-        NaiveDate::from_ymd_opt(anio - 1, 12, 1)
-            .unwrap()
-            .format("%Y-%m-%d")
-            .to_string()
-    } else {
-        NaiveDate::from_ymd_opt(anio, mes - 1, 1)
-            .unwrap()
-            .format("%Y-%m-%d")
-            .to_string()
-    };
-
-    let mes_siguiente = if mes == 12 {
-        NaiveDate::from_ymd_opt(anio + 1, 1, 1)
-            .unwrap()
-            .format("%Y-%m-%d")
-            .to_string()
-    } else {
-        NaiveDate::from_ymd_opt(anio, mes + 1, 1)
-            .unwrap()
-            .format("%Y-%m-%d")
-            .to_string()
-    };
-
     match servicio(&e).agenda(&u).await {
         Err(_) => denegado = true,
         Ok(reservas) => {
             let d = e.lock().unwrap();
             total_mesas = d.mesas.len();
 
-            // Calendario del mes
-            let dias_en_mes = match mes {
-                1 | 3 | 5 | 7 | 8 | 10 | 12 => 31,
-                4 | 6 | 9 | 11 => 30,
-                2 => {
-                    if (anio % 4 == 0 && anio % 100 != 0) || (anio % 400 == 0) {
-                        29
-                    } else {
-                        28
-                    }
-                }
-                _ => 30,
-            };
-            // Desfase de la primera semana: 0 = lunes, 6 = domingo.
-            espacios_mes = NaiveDate::from_ymd_opt(anio, mes, 1)
-                .map(|f| f.weekday().num_days_from_monday() as usize)
-                .unwrap_or(0);
-            for d_num in 1..=dias_en_mes {
-                if let Some(fecha_dia) = NaiveDate::from_ymd_opt(anio, mes, d_num) {
-                    let num_reservas = reservas
-                        .iter()
-                        .filter(|r| utc_a_local(r.inicio).date() == fecha_dia)
-                        .count();
-                    calendario.push(DiaCalendarioVista {
-                        dia: d_num,
-                        fecha_iso: fecha_dia.format("%Y-%m-%d").to_string(),
-                        es_hoy: fecha_dia == hoy,
-                        es_seleccionado: fecha_dia == dia,
-                        num_reservas,
-                    });
-                }
-            }
+            // Calendario del mes (cuadrícula compartida con el fragmento)
+            (calendario, espacios_mes) = cuadricula_mes(&reservas, anio, mes, dia, hoy);
 
             // Próximas reservas inmediatas (activas en mesa o vigentes futuras)
-            let mut proximas_raw: Vec<_> = reservas
+            let mut proximas_raw: Vec<&Reserva> = reservas
                 .iter()
                 .filter(|r| {
                     matches!(
@@ -1154,111 +1273,20 @@ pub async fn agenda(
                         EstadoReserva::Vigente | EstadoReserva::ClienteEnMesa
                     )
                 })
-                .cloned()
                 .collect();
             proximas_raw.sort_by_key(|r| r.inicio);
             proximas = proximas_raw
                 .iter()
                 .take(4)
-                .map(|r| {
-                    let cliente_obj = d.usuarios.iter().find(|x| x.id() == r.id_cliente);
-                    let cliente_nom = cliente_obj
-                        .map(|x| x.nombre().to_string())
-                        .unwrap_or_else(|| format!("Cliente {}", r.id_cliente));
-                    let es_vip = cliente_obj.map(|x| x.es_vip()).unwrap_or(false);
-                    let restricciones = r.restricciones.clone();
-                    AgendaFila {
-                        id: r.id,
-                        hora: utc_a_local(r.inicio).format("%H:%M").to_string(),
-                        fecha: utc_a_local(r.inicio).format("%Y-%m-%d").to_string(),
-                        codigo: r.codigo.clone(),
-                        cliente: cliente_nom,
-                        es_vip,
-                        mesas: r
-                            .mesa_ids
-                            .iter()
-                            .map(|m| format!("M{m}"))
-                            .collect::<Vec<_>>()
-                            .join(", "),
-                        comensales: r.num_comensales,
-                        ocasion: r.ocasion.nombre().into(),
-                        indicacion: r.ocasion.indicacion_personal().into(),
-                        alerta: !restricciones.is_empty()
-                            && !restricciones.eq_ignore_ascii_case("sin alergias"),
-                        restricciones,
-                        estado: r.estado.etiqueta().into(),
-                        estado_clase: r.estado.clase().into(),
-                        puede_sentar: r.estado == EstadoReserva::Vigente,
-                        puede_completar: r.estado == EstadoReserva::ClienteEnMesa,
-                        puede_inasistir: r.estado == EstadoReserva::Vigente,
-                    }
-                })
+                .map(|r| fila_agenda(r, &d.usuarios))
                 .collect();
 
-            // Reservas del día seleccionado
-            let mut del_dia: Vec<_> = reservas
-                .iter()
-                .filter(|r| utc_a_local(r.inicio).date() == dia)
-                .collect();
-            del_dia.sort_by_key(|r| r.inicio);
-            total_hoy = del_dia
-                .iter()
-                .filter(|r| r.estado != EstadoReserva::Cancelada)
-                .count();
-            comensales_hoy = del_dia
-                .iter()
-                .filter(|r| r.estado != EstadoReserva::Cancelada)
-                .map(|r| r.num_comensales)
-                .sum();
-            let mut mesas_ocupadas_set = std::collections::HashSet::new();
-            for r in &del_dia {
-                if matches!(
-                    r.estado,
-                    EstadoReserva::Vigente | EstadoReserva::ClienteEnMesa
-                ) {
-                    for m in &r.mesa_ids {
-                        mesas_ocupadas_set.insert(*m);
-                    }
-                }
-            }
-            ocupacion_mesas_hoy = mesas_ocupadas_set.len();
-
-            filas = del_dia
-                .iter()
-                .map(|r| {
-                    let cliente_obj = d.usuarios.iter().find(|x| x.id() == r.id_cliente);
-                    let cliente = cliente_obj
-                        .map(|x| x.nombre().to_string())
-                        .unwrap_or_else(|| format!("Cliente {}", r.id_cliente));
-                    let es_vip = cliente_obj.map(|x| x.es_vip()).unwrap_or(false);
-                    let restricciones = r.restricciones.clone();
-                    AgendaFila {
-                        id: r.id,
-                        hora: utc_a_local(r.inicio).format("%H:%M").to_string(),
-                        fecha: utc_a_local(r.inicio).format("%Y-%m-%d").to_string(),
-                        codigo: r.codigo.clone(),
-                        cliente,
-                        es_vip,
-                        mesas: r
-                            .mesa_ids
-                            .iter()
-                            .map(|m| format!("M{m}"))
-                            .collect::<Vec<_>>()
-                            .join(", "),
-                        comensales: r.num_comensales,
-                        ocasion: r.ocasion.nombre().into(),
-                        indicacion: r.ocasion.indicacion_personal().into(),
-                        alerta: !restricciones.is_empty()
-                            && !restricciones.eq_ignore_ascii_case("sin alergias"),
-                        restricciones,
-                        estado: r.estado.etiqueta().into(),
-                        estado_clase: r.estado.clase().into(),
-                        puede_sentar: r.estado == EstadoReserva::Vigente,
-                        puede_completar: r.estado == EstadoReserva::ClienteEnMesa,
-                        puede_inasistir: r.estado == EstadoReserva::Vigente,
-                    }
-                })
-                .collect();
+            // Resumen del día seleccionado (compartido con /agenda/dia)
+            let resumen = resumen_del_dia(&d.usuarios, &reservas, dia);
+            total_hoy = resumen.total_hoy;
+            comensales_hoy = resumen.comensales_hoy;
+            ocupacion_mesas_hoy = resumen.ocupacion_mesas_hoy;
+            filas = resumen.filas;
 
             // Lista de clientes registrados para gestión VIP
             clientes = d
@@ -1321,6 +1349,48 @@ pub async fn agenda(
         vacio,
         correos,
         aviso,
+    })
+    .into_response()
+}
+
+/// Fragmento del panel de agenda (KPIs del día, calendario, barra de día y
+/// tabla): alimenta la navegación dinámica sin recargar la página completa.
+pub async fn agenda_dia(
+    State(e): State<Estado>,
+    jar: CookieJar,
+    Query(q): Query<HashMap<String, String>>,
+) -> Response {
+    let Some(u) = sesion_actual(&jar, &e) else {
+        return Redirect::to("/login").into_response();
+    };
+    let Ok(reservas) = servicio(&e).agenda(&u).await else {
+        return StatusCode::FORBIDDEN.into_response();
+    };
+    let hoy = utc_a_local(Utc::now()).date();
+    let dia = q
+        .get("dia")
+        .and_then(|s| NaiveDate::parse_from_str(s, "%Y-%m-%d").ok())
+        .unwrap_or(hoy);
+
+    let (mes_nombre, mes_anterior, mes_siguiente) = mes_etiquetas(dia.year(), dia.month());
+    let (calendario, espacios_mes) = cuadricula_mes(&reservas, dia.year(), dia.month(), dia, hoy);
+    let d = e.lock().unwrap();
+    let resumen = resumen_del_dia(&d.usuarios, &reservas, dia);
+    Html(AgendaDia {
+        fecha: dia.format("%Y-%m-%d").to_string(),
+        dia_ant: (dia - Duration::days(1)).format("%Y-%m-%d").to_string(),
+        dia_sig: (dia + Duration::days(1)).format("%Y-%m-%d").to_string(),
+        mes_nombre,
+        mes_anterior,
+        mes_siguiente,
+        calendario,
+        espacios_mes,
+        filas: resumen.filas,
+        total_hoy: resumen.total_hoy,
+        comensales_hoy: resumen.comensales_hoy,
+        ocupacion_mesas_hoy: resumen.ocupacion_mesas_hoy,
+        total_mesas: d.mesas.len(),
+        vacio: resumen.vacio,
     })
     .into_response()
 }
@@ -1714,5 +1784,61 @@ mod tests {
         );
         assert!(aviso.contains("100.000"), "sin reembolso total: {aviso}");
         assert!(!aviso.contains("strike"));
+    }
+
+    #[test]
+    fn resumen_del_dia_cuenta_solo_no_canceladas_y_ocupa_mesas() {
+        let ahora = Utc::now();
+        let hoy = utc_a_local(ahora).date();
+        let reservas = vec![
+            reserva_prueba(1, ahora, EstadoReserva::Vigente),
+            reserva_prueba(2, ahora, EstadoReserva::Cancelada),
+            reserva_prueba(3, ahora + Duration::days(1), EstadoReserva::Vigente),
+        ];
+        let r = resumen_del_dia(&[], &reservas, hoy);
+        assert_eq!(r.filas.len(), 2, "la tabla muestra también canceladas");
+        assert_eq!(r.total_hoy, 1, "la cancelada no cuenta como cita");
+        assert_eq!(r.comensales_hoy, 2);
+        assert_eq!(r.ocupacion_mesas_hoy, 1);
+        assert!(!r.vacio);
+        assert_eq!(r.filas[0].cliente, "Cliente 3");
+    }
+
+    #[test]
+    fn fragmento_agenda_dia_renderiza_kpis_y_panel() {
+        let e = estado::sembrar();
+        let d = e.lock().unwrap();
+        let hoy = utc_a_local(Utc::now()).date();
+        let (mes_nombre, mes_anterior, mes_siguiente) = mes_etiquetas(hoy.year(), hoy.month());
+        let (calendario, espacios_mes) =
+            cuadricula_mes(&d.reservas, hoy.year(), hoy.month(), hoy, hoy);
+        let resumen = resumen_del_dia(&d.usuarios, &d.reservas, hoy);
+        assert!(!resumen.filas.is_empty(), "el seed deja una reserva hoy");
+        let html = AgendaDia {
+            fecha: hoy.format("%Y-%m-%d").to_string(),
+            dia_ant: (hoy - Duration::days(1)).format("%Y-%m-%d").to_string(),
+            dia_sig: (hoy + Duration::days(1)).format("%Y-%m-%d").to_string(),
+            mes_nombre,
+            mes_anterior,
+            mes_siguiente,
+            calendario,
+            espacios_mes,
+            filas: resumen.filas,
+            total_hoy: resumen.total_hoy,
+            comensales_hoy: resumen.comensales_hoy,
+            ocupacion_mesas_hoy: resumen.ocupacion_mesas_hoy,
+            total_mesas: d.mesas.len(),
+            vacio: resumen.vacio,
+        }
+        .render()
+        .expect("el fragmento renderiza");
+        assert!(html.contains("id=\"agenda-kpis\""), "sin KPIs");
+        assert!(html.contains("id=\"agenda-panel\""), "sin panel");
+        assert!(html.contains("calendario-dias-grid"), "sin calendario");
+        assert!(
+            html.contains("dia-seleccionado"),
+            "el día elegido sin marcar"
+        );
+        assert!(html.contains("Servicio del"), "sin barra de día");
     }
 }
