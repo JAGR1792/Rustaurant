@@ -46,13 +46,33 @@ El PDF del documento se genera en `documentacion/brindis_rust.pdf`.
 | Admin | `brindis.rust@gmail.com` | `Admin123!` |
 
 La fase 1 guarda todo en memoria (`src/estado.rs` + seed de demo);
-los DAO de `src/dao.rs` son la ruta de conexión a SQL Server.
+los DAO de `src/dao.rs` son la ruta de conexión a SQL Server y el
+esquema completo vive en `db/brindis_db.sql` (ver Base de datos).
+
+## Base de datos `brindis_db`
+
+El modelo relacional que documenta la Figura 5 vive en
+`db/brindis_db.sql`: 13 tablas 3FN (usuarios, mesa y zona, agenda,
+reservas, pagos y tokens) con restricciones, índices y datos de prueba.
+Se carga en SQL Server 2025 con SSMS abriendo el script, o por línea
+de comandos:
+
+```powershell
+sqlcmd -S .\SQLEXPRESS -E -i db/brindis_db.sql
+```
+
+El diagrama de la Figura 5 se genera desde esa misma base con la
+herramienta de diagramas de SQL Server Management Studio (exportado en
+`diagramas/brindis/Fig5_DiagramaBD.png`). La app de la fase 1 no
+depende de la base (corre en memoria); el script es el entregable del
+modelo relacional.
 
 ## Estructura
 
 ```text
 Dockerfile            # imagen multietapa (build Rust -> runtime Debian)
 render.yaml           # servicio web en Render (ADR 0010)
+db/                   # brindis_db.sql (13 tablas 3FN: esquema, indices, datos de prueba)
 src/                  # Axum + dominio + 4 patrones + DAO
   dominio.rs          # entidades (Figura 4)
   factory.rs          # Factory Method (Figura 7)
@@ -74,7 +94,7 @@ static/img/fotos/     # fotos Commons (jpg+webp) + descargar_fotos.py + converti
 static/img/carta/     # PNGs de platos + generar_carta.py (respaldo offline)
 static/img/salon/     # salon-hero/salon-acceso.png + generar_salon.py
 static/img/mesas/     # mesa-general/terraza/vip.png + generar_mesas.py
-diagramas/brindis/    # Fig6-11 PNG/SVG + .drawio (Fig1, Fig4)
+diagramas/brindis/    # Fig1/4/5 y Fig6-16 (PNG/SVG) + .drawio (Fig1, Fig4)
 documentacion/        # brindis_rust.tex + decisiones/ (ADRs) + usa.png + entregables/
 ```
 

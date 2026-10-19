@@ -12,14 +12,14 @@ use axum::{
     response::{IntoResponse, Redirect, Response},
 };
 use axum_extra::extract::cookie::{Cookie, CookieJar, SameSite};
-use chrono::{DateTime, Duration, NaiveDate, NaiveTime, Utc};
+use chrono::{Datelike, DateTime, Duration, NaiveDate, NaiveTime, Utc};
 use serde::{Deserialize, Serialize};
 
 use crate::builder::{ReservaBuilder, validar_modalidad};
 use crate::dao::DaoError;
 use crate::dominio::{
     DetallePago, DetallePedido, EstadoReserva, ModalidadPago, Ocasion, Reserva,
-    ReservaServicioExtra, TipoCliente, UsuarioSesion,
+    ReservaServicioExtra, UMBRAL_VISITAS_VIP, UsuarioSesion,
 };
 use crate::estado::{self, Datos, Estado};
 use crate::factory::{ClienteFactory, DatosRegistro, registrar_con};
@@ -66,11 +66,11 @@ fn sesion_actual(jar: &CookieJar, e: &Estado) -> Option<UsuarioSesion> {
     d.usuarios.iter().find(|u| u.id() == id).cloned()
 }
 
-/// Nombre y bandera de personal para la barra de navegación.
-fn barra(jar: &CookieJar, e: &Estado) -> (String, bool) {
+/// Nombre, bandera de personal y bandera de VIP para la barra de navegación.
+fn barra(jar: &CookieJar, e: &Estado) -> (String, bool, bool) {
     match sesion_actual(jar, e) {
-        Some(u) => (u.nombre().to_string(), u.es_personal()),
-        None => (String::new(), false),
+        Some(u) => (u.nombre().to_string(), u.es_personal(), u.es_vip()),
+        None => (String::new(), false, false),
     }
 }
 
@@ -172,9 +172,12 @@ struct CuentaRegresiva {
 }
 
 struct AgendaFila {
+    id: i64,
     hora: String,
+    fecha: String,
     codigo: String,
     cliente: String,
+    es_vip: bool,
     mesas: String,
     comensales: u32,
     ocasion: String,
@@ -183,6 +186,27 @@ struct AgendaFila {
     alerta: bool,
     estado: String,
     estado_clase: String,
+    puede_sentar: bool,
+    puede_completar: bool,
+    puede_inasistir: bool,
+}
+
+struct DiaCalendarioVista {
+    dia: u32,
+    fecha_iso: String,
+    es_hoy: bool,
+    es_seleccionado: bool,
+    num_reservas: usize,
+}
+
+struct ClienteGestionVista {
+    id: i64,
+    nombre: String,
+    correo: String,
+    documento: String,
+    telefono: String,
+    es_vip: bool,
+    strikes: u8,
 }
 
 /// Fila del buzón de demostración que ve el personal en la agenda.
@@ -200,6 +224,7 @@ struct CorreoVista {
 struct Inicio {
     usuario: String,
     es_personal: bool,
+    es_vip: bool,
     zonas: Vec<ZonaVista>,
     carta: Vec<ItemCartaVista>,
 }
@@ -209,6 +234,7 @@ struct Inicio {
 struct Login {
     usuario: String,
     es_personal: bool,
+    es_vip: bool,
     error: Option<String>,
     reactivar: bool,
     correo: String,
@@ -219,6 +245,7 @@ struct Login {
 struct Registro {
     usuario: String,
     es_personal: bool,
+    es_vip: bool,
     error: Option<String>,
 }
 
@@ -227,8 +254,8 @@ struct Registro {
 struct Reservar {
     usuario: String,
     es_personal: bool,
-    error: Option<String>,
     es_vip: bool,
+    error: Option<String>,
     fecha: String,
     fecha_hoy: String,
     fecha_max: String,
@@ -245,6 +272,7 @@ struct Reservar {
 struct MisReservas {
     usuario: String,
     es_personal: bool,
+    es_vip: bool,
     aviso: Option<String>,
     filas: Vec<ReservaFila>,
     vacio: bool,
@@ -256,13 +284,49 @@ struct MisReservas {
 struct Agenda {
     usuario: String,
     es_personal: bool,
+    es_vip: bool,
     denegado: bool,
     fecha: String,
     dia_ant: String,
     dia_sig: String,
+    mes_nombre: String,
+    mes_anterior: String,
+    mes_siguiente: String,
+    calendario: Vec<DiaCalendarioVista>,
+    espacios_mes: usize,
     filas: Vec<AgendaFila>,
+    proximas: Vec<AgendaFila>,
+    clientes: Vec<ClienteGestionVista>,
+    total_hoy: usize,
+    comensales_hoy: u32,
+    ocupacion_mesas_hoy: usize,
+    total_mesas: usize,
     vacio: bool,
     correos: Vec<CorreoVista>,
+    aviso: Option<String>,
+}
+
+#[derive(Template)]
+#[template(path = "dashboard.html")]
+struct Dashboard {
+    usuario: String,
+    es_personal: bool,
+    es_vip: bool,
+    nombre: String,
+    correo: String,
+    documento: String,
+    telefono: String,
+    tipo_cliente: String,
+    strikes: u8,
+    total_reservas: usize,
+    reservas_completadas: usize,
+    progreso_vip: usize,
+    progreso_meta: usize,
+    progreso_pct: u32,
+    puede_reclamar_vip: bool,
+    proxima: Option<ReservaFila>,
+    cuenta: Option<CuentaRegresiva>,
+    aviso: Option<String>,
 }
 
 #[derive(Template)]
@@ -270,6 +334,7 @@ struct Agenda {
 struct ErrorPagina {
     usuario: String,
     es_personal: bool,
+    es_vip: bool,
     mensaje: String,
 }
 
@@ -450,9 +515,8 @@ fn render_reservar(
     Html(Reservar {
         usuario: u.nombre().into(),
         es_personal: u.es_personal(),
+        es_vip: u.es_vip(),
         error,
-        es_vip: matches!(u, UsuarioSesion::Cliente(c) if c.tipo == TipoCliente::Vip)
-            || u.es_personal(),
         fecha,
         fecha_hoy,
         fecha_max,
@@ -469,7 +533,7 @@ fn render_reservar(
 // ------------------------------------------------------------------ handlers
 
 pub async fn inicio(State(e): State<Estado>, jar: CookieJar) -> Response {
-    let (usuario, es_personal) = barra(&jar, &e);
+    let (usuario, es_personal, es_vip) = barra(&jar, &e);
     let (zonas, carta_vista) = {
         let d = e.lock().unwrap();
         let zonas = ["VIP", "General", "Terraza"]
@@ -491,6 +555,7 @@ pub async fn inicio(State(e): State<Estado>, jar: CookieJar) -> Response {
     Html(Inicio {
         usuario,
         es_personal,
+        es_vip,
         zonas,
         carta: carta_vista,
     })
@@ -498,12 +563,17 @@ pub async fn inicio(State(e): State<Estado>, jar: CookieJar) -> Response {
 }
 
 pub async fn login_get(State(e): State<Estado>, jar: CookieJar) -> Response {
-    if sesion_actual(&jar, &e).is_some() {
-        return Redirect::to("/").into_response();
+    if let Some(u) = sesion_actual(&jar, &e) {
+        if u.es_personal() {
+            return Redirect::to("/agenda").into_response();
+        } else {
+            return Redirect::to("/dashboard").into_response();
+        }
     }
     Html(Login {
         usuario: String::new(),
         es_personal: false,
+        es_vip: false,
         error: None,
         reactivar: false,
         correo: String::new(),
@@ -534,6 +604,7 @@ pub async fn login_post(
         return Html(Login {
             usuario: String::new(),
             es_personal: false,
+            es_vip: false,
             // CU01 2a: error genérico, sin revelar cuál dato falló.
             error: Some("Correo o contraseña incorrectos.".into()),
             reactivar: false,
@@ -546,6 +617,7 @@ pub async fn login_post(
         return Html(Login {
             usuario: String::new(),
             es_personal: false,
+            es_vip: false,
             error: Some("Tu cuenta está inactiva.".into()),
             reactivar: true,
             correo: f.correo,
@@ -556,7 +628,7 @@ pub async fn login_post(
     let destino = if u.es_personal() {
         "/agenda"
     } else {
-        "/mis-reservas"
+        "/dashboard"
     };
     (jar, Redirect::to(destino)).into_response()
 }
@@ -568,6 +640,7 @@ pub async fn registro_get(State(e): State<Estado>, jar: CookieJar) -> Response {
     Html(Registro {
         usuario: String::new(),
         es_personal: false,
+        es_vip: false,
         error: None,
     })
     .into_response()
@@ -590,6 +663,7 @@ pub async fn registro_post(
         Html(Registro {
             usuario: String::new(),
             es_personal: false,
+            es_vip: false,
             error: Some(msg.into()),
         })
         .into_response()
@@ -624,7 +698,7 @@ pub async fn registro_post(
         }
     };
     let jar = poner_sesion(&e, jar, sesion.id());
-    (jar, Redirect::to("/mis-reservas?ok=bienvenida")).into_response()
+    (jar, Redirect::to("/dashboard?ok=bienvenida")).into_response()
 }
 
 pub async fn logout(State(e): State<Estado>, jar: CookieJar) -> Response {
@@ -741,6 +815,10 @@ pub async fn reserva_post(
         .get("restricciones")
         .map(|s| s.trim().to_string())
         .unwrap_or_default();
+    let propina_pct = campos
+        .get("propina_pct")
+        .and_then(|s| s.parse::<u8>().ok())
+        .unwrap_or(0);
 
     let construida = ReservaBuilder::nuevo()
         .cliente(u.id())
@@ -762,6 +840,7 @@ pub async fn reserva_post(
             porcentaje,
             medio: "TARJETA".into(),
             monto_total: 0, // el servicio lo recalcula con los decoradores
+            propina_pct,
         })
         .build();
     let reserva = match construida {
@@ -863,6 +942,7 @@ pub async fn mis_reservas(
     Html(MisReservas {
         usuario: u.nombre().into(),
         es_personal: u.es_personal(),
+        es_vip: u.es_vip(),
         aviso,
         filas,
         vacio,
@@ -880,6 +960,7 @@ pub async fn cancelar(State(e): State<Estado>, jar: CookieJar, Path(id): Path<i6
         Err(AccesoError::Denegado(m) | AccesoError::Negocio(m)) => Html(ErrorPagina {
             usuario: u.nombre().into(),
             es_personal: u.es_personal(),
+            es_vip: u.es_vip(),
             mensaje: m,
         })
         .into_response(),
@@ -894,38 +975,145 @@ pub async fn agenda(
     let Some(u) = sesion_actual(&jar, &e) else {
         return Redirect::to("/login").into_response();
     };
+    let aviso = q.get("ok").map(|ok| {
+        match ok.as_str() {
+            "cliente_actualizado" => "Estatus de cliente actualizado correctamente.",
+            "estado_actualizado" => "Estado de la reserva actualizado en el sistema.",
+            "strikes_reiniciados" => "Strikes del cliente restablecidos a 0.",
+            _ => "Operación completada.",
+        }
+        .to_string()
+    });
+
     let hoy = utc_a_local(Utc::now()).date();
     let dia = q
         .get("dia")
         .and_then(|s| NaiveDate::parse_from_str(s, "%Y-%m-%d").ok())
         .unwrap_or(hoy);
-    // El Proxy (Figura 9) verifica el rol antes de entregar la agenda (RF15).
+    let anio = dia.year();
+    let mes = dia.month();
+
     let mut denegado = false;
     let mut filas: Vec<AgendaFila> = vec![];
+    let mut proximas: Vec<AgendaFila> = vec![];
+    let mut clientes: Vec<ClienteGestionVista> = vec![];
     let mut correos: Vec<CorreoVista> = vec![];
+    let mut calendario: Vec<DiaCalendarioVista> = vec![];
+    let mut espacios_mes = 0usize;
+    let mut total_hoy = 0;
+    let mut comensales_hoy = 0;
+    let mut ocupacion_mesas_hoy = 0;
+    let mut total_mesas = 0;
+
+    let mes_nombre = match mes {
+        1 => "Enero",
+        2 => "Febrero",
+        3 => "Marzo",
+        4 => "Abril",
+        5 => "Mayo",
+        6 => "Junio",
+        7 => "Julio",
+        8 => "Agosto",
+        9 => "Septiembre",
+        10 => "Octubre",
+        11 => "Noviembre",
+        12 => "Diciembre",
+        _ => "",
+    }
+    .to_string();
+
+    let mes_anterior = if mes == 1 {
+        NaiveDate::from_ymd_opt(anio - 1, 12, 1)
+            .unwrap()
+            .format("%Y-%m-%d")
+            .to_string()
+    } else {
+        NaiveDate::from_ymd_opt(anio, mes - 1, 1)
+            .unwrap()
+            .format("%Y-%m-%d")
+            .to_string()
+    };
+
+    let mes_siguiente = if mes == 12 {
+        NaiveDate::from_ymd_opt(anio + 1, 1, 1)
+            .unwrap()
+            .format("%Y-%m-%d")
+            .to_string()
+    } else {
+        NaiveDate::from_ymd_opt(anio, mes + 1, 1)
+            .unwrap()
+            .format("%Y-%m-%d")
+            .to_string()
+    };
+
     match servicio(&e).agenda(&u).await {
         Err(_) => denegado = true,
         Ok(reservas) => {
             let d = e.lock().unwrap();
-            let mut del_dia: Vec<_> = reservas
-                .iter()
-                .filter(|r| utc_a_local(r.inicio).date() == dia)
-                .collect();
-            del_dia.sort_by_key(|r| r.inicio);
-            filas = del_dia
-                .iter()
-                .map(|r| {
-                    let cliente = d
-                        .usuarios
+            total_mesas = d.mesas.len();
+
+            // Calendario del mes
+            let dias_en_mes = match mes {
+                1 | 3 | 5 | 7 | 8 | 10 | 12 => 31,
+                4 | 6 | 9 | 11 => 30,
+                2 => {
+                    if (anio % 4 == 0 && anio % 100 != 0) || (anio % 400 == 0) {
+                        29
+                    } else {
+                        28
+                    }
+                }
+                _ => 30,
+            };
+            // Desfase de la primera semana: 0 = lunes, 6 = domingo.
+            espacios_mes = NaiveDate::from_ymd_opt(anio, mes, 1)
+                .map(|f| f.weekday().num_days_from_monday() as usize)
+                .unwrap_or(0);
+            for d_num in 1..=dias_en_mes {
+                if let Some(fecha_dia) = NaiveDate::from_ymd_opt(anio, mes, d_num) {
+                    let num_reservas = reservas
                         .iter()
-                        .find(|x| x.id() == r.id_cliente)
+                        .filter(|r| utc_a_local(r.inicio).date() == fecha_dia)
+                        .count();
+                    calendario.push(DiaCalendarioVista {
+                        dia: d_num,
+                        fecha_iso: fecha_dia.format("%Y-%m-%d").to_string(),
+                        es_hoy: fecha_dia == hoy,
+                        es_seleccionado: fecha_dia == dia,
+                        num_reservas,
+                    });
+                }
+            }
+
+            // Próximas reservas inmediatas (activas en mesa o vigentes futuras)
+            let mut proximas_raw: Vec<_> = reservas
+                .iter()
+                .filter(|r| {
+                    matches!(
+                        r.estado,
+                        EstadoReserva::Vigente | EstadoReserva::ClienteEnMesa
+                    )
+                })
+                .cloned()
+                .collect();
+            proximas_raw.sort_by_key(|r| r.inicio);
+            proximas = proximas_raw
+                .iter()
+                .take(4)
+                .map(|r| {
+                    let cliente_obj = d.usuarios.iter().find(|x| x.id() == r.id_cliente);
+                    let cliente_nom = cliente_obj
                         .map(|x| x.nombre().to_string())
                         .unwrap_or_else(|| format!("Cliente {}", r.id_cliente));
+                    let es_vip = cliente_obj.map(|x| x.es_vip()).unwrap_or(false);
                     let restricciones = r.restricciones.clone();
                     AgendaFila {
+                        id: r.id,
                         hora: utc_a_local(r.inicio).format("%H:%M").to_string(),
+                        fecha: utc_a_local(r.inicio).format("%Y-%m-%d").to_string(),
                         codigo: r.codigo.clone(),
-                        cliente,
+                        cliente: cliente_nom,
+                        es_vip,
                         mesas: r
                             .mesa_ids
                             .iter()
@@ -940,9 +1128,99 @@ pub async fn agenda(
                         restricciones,
                         estado: r.estado.etiqueta().into(),
                         estado_clase: r.estado.clase().into(),
+                        puede_sentar: r.estado == EstadoReserva::Vigente,
+                        puede_completar: r.estado == EstadoReserva::ClienteEnMesa,
+                        puede_inasistir: r.estado == EstadoReserva::Vigente,
                     }
                 })
                 .collect();
+
+            // Reservas del día seleccionado
+            let mut del_dia: Vec<_> = reservas
+                .iter()
+                .filter(|r| utc_a_local(r.inicio).date() == dia)
+                .collect();
+            del_dia.sort_by_key(|r| r.inicio);
+            total_hoy = del_dia
+                .iter()
+                .filter(|r| r.estado != EstadoReserva::Cancelada)
+                .count();
+            comensales_hoy = del_dia
+                .iter()
+                .filter(|r| r.estado != EstadoReserva::Cancelada)
+                .map(|r| r.num_comensales)
+                .sum();
+            let mut mesas_ocupadas_set = std::collections::HashSet::new();
+            for r in &del_dia {
+                if matches!(
+                    r.estado,
+                    EstadoReserva::Vigente | EstadoReserva::ClienteEnMesa
+                ) {
+                    for m in &r.mesa_ids {
+                        mesas_ocupadas_set.insert(*m);
+                    }
+                }
+            }
+            ocupacion_mesas_hoy = mesas_ocupadas_set.len();
+
+            filas = del_dia
+                .iter()
+                .map(|r| {
+                    let cliente_obj = d.usuarios.iter().find(|x| x.id() == r.id_cliente);
+                    let cliente = cliente_obj
+                        .map(|x| x.nombre().to_string())
+                        .unwrap_or_else(|| format!("Cliente {}", r.id_cliente));
+                    let es_vip = cliente_obj.map(|x| x.es_vip()).unwrap_or(false);
+                    let restricciones = r.restricciones.clone();
+                    AgendaFila {
+                        id: r.id,
+                        hora: utc_a_local(r.inicio).format("%H:%M").to_string(),
+                        fecha: utc_a_local(r.inicio).format("%Y-%m-%d").to_string(),
+                        codigo: r.codigo.clone(),
+                        cliente,
+                        es_vip,
+                        mesas: r
+                            .mesa_ids
+                            .iter()
+                            .map(|m| format!("M{m}"))
+                            .collect::<Vec<_>>()
+                            .join(", "),
+                        comensales: r.num_comensales,
+                        ocasion: r.ocasion.nombre().into(),
+                        indicacion: r.ocasion.indicacion_personal().into(),
+                        alerta: !restricciones.is_empty()
+                            && !restricciones.eq_ignore_ascii_case("sin alergias"),
+                        restricciones,
+                        estado: r.estado.etiqueta().into(),
+                        estado_clase: r.estado.clase().into(),
+                        puede_sentar: r.estado == EstadoReserva::Vigente,
+                        puede_completar: r.estado == EstadoReserva::ClienteEnMesa,
+                        puede_inasistir: r.estado == EstadoReserva::Vigente,
+                    }
+                })
+                .collect();
+
+            // Lista de clientes registrados para gestión VIP
+            clientes = d
+                .usuarios
+                .iter()
+                .filter_map(|usr| {
+                    if let UsuarioSesion::Cliente(c) = usr {
+                        Some(ClienteGestionVista {
+                            id: c.base.id,
+                            nombre: c.base.nombre.clone(),
+                            correo: c.base.correo.clone(),
+                            documento: format!("{} {}", c.base.tipo_documento, c.base.documento),
+                            telefono: c.base.telefono.clone(),
+                            es_vip: c.es_vip(),
+                            strikes: c.strikes,
+                        })
+                    } else {
+                        None
+                    }
+                })
+                .collect();
+
             // Buzón de demostración: los últimos correos "enviados" (ADR 0008).
             correos = d
                 .correos
@@ -963,15 +1241,239 @@ pub async fn agenda(
     Html(Agenda {
         usuario: u.nombre().into(),
         es_personal: u.es_personal(),
+        es_vip: u.es_vip(),
         denegado,
         fecha: dia.format("%Y-%m-%d").to_string(),
         dia_ant: (dia - Duration::days(1)).format("%Y-%m-%d").to_string(),
         dia_sig: (dia + Duration::days(1)).format("%Y-%m-%d").to_string(),
+        mes_nombre,
+        mes_anterior,
+        mes_siguiente,
+        calendario,
+        espacios_mes,
         filas,
+        proximas,
+        clientes,
+        total_hoy,
+        comensales_hoy,
+        ocupacion_mesas_hoy,
+        total_mesas,
         vacio,
         correos,
+        aviso,
     })
     .into_response()
+}
+
+pub async fn dashboard(
+    State(e): State<Estado>,
+    jar: CookieJar,
+    Query(q): Query<HashMap<String, String>>,
+) -> Response {
+    let Some(u) = sesion_actual(&jar, &e) else {
+        return Redirect::to("/login").into_response();
+    };
+    if u.es_personal() {
+        return Redirect::to("/agenda").into_response();
+    }
+    let aviso = q.get("ok").map(|ok| {
+        match ok.as_str() {
+            "vip_activado" => "¡Felicidades! Tu membresía VIP Brindis Club ha sido activada con éxito.",
+            "bienvenida" => "¡Bienvenido a Brindis! Tu cuenta ha sido creada exitosamente.",
+            _ => "Operación completada.",
+        }
+        .to_string()
+    });
+    let d = e.lock().unwrap();
+    let cliente_id = u.id();
+    let cliente_reservas: Vec<_> = d
+        .reservas
+        .iter()
+        .filter(|r| r.id_cliente == cliente_id)
+        .cloned()
+        .collect();
+    let total_reservas = cliente_reservas.len();
+    let reservas_completadas = cliente_reservas
+        .iter()
+        .filter(|r| r.estado == EstadoReserva::Completada)
+        .count();
+    let es_vip = u.es_vip();
+    let progreso_meta = UMBRAL_VISITAS_VIP;
+    let progreso_vip = reservas_completadas.min(progreso_meta);
+    let progreso_pct = ((progreso_vip as f32 / progreso_meta as f32) * 100.0) as u32;
+    let puede_reclamar_vip = !es_vip && reservas_completadas >= progreso_meta;
+
+    // Próxima reserva
+    let mut reservas_futuras = cliente_reservas.clone();
+    reservas_futuras.sort_by_key(|r| r.inicio);
+    let prox_reserva = proxima_reserva(&reservas_futuras, Utc::now()).cloned();
+    let cuenta = prox_reserva.as_ref().map(|r| CuentaRegresiva {
+        codigo: r.codigo.clone(),
+        detalle: format!(
+            "{} · {} comensales · {}",
+            r.mesa_ids
+                .iter()
+                .map(|m| format!("M{m}"))
+                .collect::<Vec<_>>()
+                .join(", "),
+            r.num_comensales,
+            r.ocasion.nombre()
+        ),
+        iso: fecha_iso_local(r.inicio),
+    });
+    let proxima = prox_reserva.map(|r| ReservaFila {
+        id: r.id,
+        codigo: r.codigo.clone(),
+        fecha: fecha_hora_fmt(r.inicio),
+        mesas: r
+            .mesa_ids
+            .iter()
+            .map(|m| format!("M{m}"))
+            .collect::<Vec<_>>()
+            .join(", "),
+        comensales: r.num_comensales,
+        ocasion: r.ocasion.nombre().into(),
+        total: if r.pago.monto_total > 0 {
+            format!("$ {}", cop(r.pago.monto_total))
+        } else {
+            "—".into()
+        },
+        movimiento: String::new(),
+        estado: r.estado.etiqueta().into(),
+        estado_clase: r.estado.clase().into(),
+        puede_cancelar: r.estado == EstadoReserva::Vigente,
+    });
+
+    let (documento, telefono, strikes) = match &u {
+        UsuarioSesion::Cliente(c) => (
+            format!("{} {}", c.base.tipo_documento, c.base.documento),
+            c.base.telefono.clone(),
+            c.strikes,
+        ),
+        _ => (String::new(), String::new(), 0),
+    };
+
+    Html(Dashboard {
+        usuario: u.nombre().into(),
+        es_personal: false,
+        es_vip,
+        nombre: u.nombre().into(),
+        correo: u.correo().into(),
+        documento,
+        telefono,
+        tipo_cliente: if es_vip {
+            "Socio VIP Club"
+        } else {
+            "Cliente General"
+        }
+        .into(),
+        strikes,
+        total_reservas,
+        reservas_completadas,
+        progreso_vip,
+        progreso_meta,
+        progreso_pct,
+        puede_reclamar_vip,
+        proxima,
+        cuenta,
+        aviso,
+    })
+    .into_response()
+}
+
+#[derive(Deserialize)]
+pub struct FormHacerVip {
+    #[allow(dead_code)]
+    motivo: Option<String>,
+}
+
+pub async fn hacer_vip_cliente(
+    State(e): State<Estado>,
+    jar: CookieJar,
+    Form(_f): Form<FormHacerVip>,
+) -> Response {
+    let Some(u) = sesion_actual(&jar, &e) else {
+        return Redirect::to("/login").into_response();
+    };
+    if let UsuarioSesion::Cliente(c) = u {
+        let mut d = e.lock().unwrap();
+        d.actualizar_vip_cliente(c.base.id, true);
+    }
+    Redirect::to("/dashboard?ok=vip_activado").into_response()
+}
+
+pub async fn toggle_vip_cliente(
+    State(e): State<Estado>,
+    jar: CookieJar,
+    Path(id): Path<i64>,
+) -> Response {
+    let Some(u) = sesion_actual(&jar, &e) else {
+        return Redirect::to("/login").into_response();
+    };
+    if !u.es_personal() {
+        return Redirect::to("/login").into_response();
+    }
+    {
+        let mut d = e.lock().unwrap();
+        let es_vip_actual = d.usuarios.iter().any(|usr| {
+            if let UsuarioSesion::Cliente(c) = usr {
+                c.base.id == id && c.es_vip()
+            } else {
+                false
+            }
+        });
+        d.actualizar_vip_cliente(id, !es_vip_actual);
+    }
+    Redirect::to("/agenda?ok=cliente_actualizado").into_response()
+}
+
+#[derive(Deserialize)]
+pub struct FormCambioEstado {
+    nuevo: String,
+}
+
+pub async fn cambiar_estado_reserva(
+    State(e): State<Estado>,
+    jar: CookieJar,
+    Path(id): Path<i64>,
+    Form(f): Form<FormCambioEstado>,
+) -> Response {
+    let Some(u) = sesion_actual(&jar, &e) else {
+        return Redirect::to("/login").into_response();
+    };
+    if !u.es_personal() {
+        return Redirect::to("/login").into_response();
+    }
+    let nuevo_estado = match f.nuevo.as_str() {
+        "en-mesa" => EstadoReserva::ClienteEnMesa,
+        "completada" => EstadoReserva::Completada,
+        "inasistida" => EstadoReserva::Inasistida,
+        "cancelada" => EstadoReserva::Cancelada,
+        _ => return Redirect::to("/agenda").into_response(),
+    };
+    {
+        let mut d = e.lock().unwrap();
+        let _ = d.cambiar_estado_reserva(id, nuevo_estado);
+    }
+    Redirect::to("/agenda?ok=estado_actualizado").into_response()
+}
+
+pub async fn reset_strikes_cliente(
+    State(e): State<Estado>,
+    jar: CookieJar,
+    Path(id): Path<i64>,
+) -> Response {
+    let Some(u) = sesion_actual(&jar, &e) else {
+        return Redirect::to("/login").into_response();
+    };
+    if !u.es_personal() {
+        return Redirect::to("/login").into_response();
+    }
+    {
+        let mut d = e.lock().unwrap();
+        d.limpiar_strikes_cliente(id);
+    }
+    Redirect::to("/agenda?ok=strikes_reiniciados").into_response()
 }
 
 #[derive(Deserialize)]
@@ -1060,6 +1562,7 @@ mod tests {
                 porcentaje: 30,
                 medio: "TARJETA".into(),
                 monto_total: 0,
+                propina_pct: 0,
             },
             estado,
         }

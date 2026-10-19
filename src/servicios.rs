@@ -217,6 +217,7 @@ mod tests {
                 porcentaje: 30,
                 medio: "TARJETA".into(),
                 monto_total: 0,
+                propina_pct: 0,
             },
             estado: EstadoReserva::Vigente,
         }

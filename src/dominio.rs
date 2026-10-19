@@ -24,6 +24,11 @@ pub enum TipoCliente {
     Vip,
 }
 
+/// Programa de socios Brindis Privé (ADR 0012): visitas completadas que
+/// desbloquean el pase de fidelidad y precio (simulado) del pase anual.
+pub const UMBRAL_VISITAS_VIP: usize = 3;
+pub const PRECIO_PASE_VIP: i64 = 95_000;
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum EstadoReserva {
     Vigente,
@@ -207,6 +212,21 @@ impl Cliente {
             self.tipo = TipoCliente::General;
         }
     }
+
+    /// Asigna estatus VIP al cliente.
+    pub fn hacer_vip(&mut self) {
+        self.tipo = TipoCliente::Vip;
+    }
+
+    /// Revoca el estatus VIP devolviendo a General.
+    pub fn quitar_vip(&mut self) {
+        self.tipo = TipoCliente::General;
+    }
+
+    /// Restablece el conteo de strikes a 0.
+    pub fn limpiar_strikes(&mut self) {
+        self.strikes = 0;
+    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -336,6 +356,14 @@ impl UsuarioSesion {
             _ => TipoCliente::General,
         }
     }
+
+    /// Determina si la sesión corresponde a un cliente con membresía VIP.
+    pub fn es_vip(&self) -> bool {
+        match self {
+            UsuarioSesion::Cliente(c) => c.es_vip(),
+            _ => false,
+        }
+    }
 }
 
 // ------------------------------------------------------------------ mesas, zonas y carta
@@ -448,6 +476,16 @@ pub struct DetallePago {
     pub porcentaje: u8, // 0..100; 100 si COMPLETO, 0 si EN_RESTAURANTE
     pub medio: String,  // TARJETA, TRANSFERENCIA, EFECTIVO
     pub monto_total: i64,
+    /// Propina voluntaria elegida en el paso 4 (0, 5 o 10 %); se cobra en mesa.
+    #[serde(default)]
+    pub propina_pct: u8,
+}
+
+impl DetallePago {
+    /// Monto de la propina sugerida sobre el total de la reserva.
+    pub fn monto_propina(&self) -> i64 {
+        self.monto_total * self.propina_pct as i64 / 100
+    }
 }
 
 /// Comprobante RN14: 1 DetallePago -> 0..* Comprobantes.
@@ -599,6 +637,7 @@ mod tests {
                 porcentaje: 30,
                 medio: "TARJETA".into(),
                 monto_total: 100_000,
+                propina_pct: 0,
             },
             estado: EstadoReserva::Vigente,
         };
@@ -622,5 +661,35 @@ mod tests {
         let ini2 = Utc.with_ymd_and_hms(2026, 10, 20, 21, 0, 0).unwrap();
         let fin2 = Utc.with_ymd_and_hms(2026, 10, 20, 23, 0, 0).unwrap();
         assert!(!b.se_solapa(ini2, fin2));
+    }
+
+    #[test]
+    fn promocion_y_degradacion_vip() {
+        let mut c = Cliente {
+            base: BaseUsuario {
+                id: 10,
+                correo: "test@brindis.co".into(),
+                hash_pw: "".into(),
+                tipo_documento: "CC".into(),
+                documento: "10".into(),
+                nombre: "Test".into(),
+                telefono: "300".into(),
+                activo: true,
+                debe_cambiar_pw: false,
+            },
+            tipo: TipoCliente::General,
+            strikes: 2,
+            fecha_ultima_actividad: None,
+        };
+        assert!(!c.es_vip());
+        c.hacer_vip();
+        assert!(c.es_vip());
+        c.limpiar_strikes();
+        assert_eq!(c.strikes, 0);
+        c.quitar_vip();
+        assert!(!c.es_vip());
+
+        let sesion = UsuarioSesion::Cliente(c);
+        assert!(!sesion.es_vip());
     }
 }

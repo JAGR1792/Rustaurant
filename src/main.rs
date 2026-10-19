@@ -50,7 +50,22 @@ async fn main() {
         )
         .route("/mis-reservas", get(vistas::mis_reservas))
         .route("/reservas/{id}/cancelar", post(vistas::cancelar))
+        .route("/dashboard", get(vistas::dashboard))
+        .route("/dashboard/hacer-vip", post(vistas::hacer_vip_cliente))
         .route("/agenda", get(vistas::agenda))
+        .route("/panel-empleado", get(vistas::agenda))
+        .route(
+            "/empleado/reserva/{id}/estado",
+            post(vistas::cambiar_estado_reserva),
+        )
+        .route(
+            "/admin/cliente/{id}/toggle-vip",
+            post(vistas::toggle_vip_cliente),
+        )
+        .route(
+            "/admin/cliente/{id}/reset-strikes",
+            post(vistas::reset_strikes_cliente),
+        )
         .route("/api/disponibilidad", get(vistas::disponibilidad))
         .nest_service("/static", ServeDir::new("static"))
         .layer(TraceLayer::new_for_http())
