@@ -378,6 +378,37 @@ pub fn notificar_reserva(d: &mut Datos, r: &Reserva) -> Vec<Mensaje> {
 /// Entrega por SMTP los mensajes recién redactados (ADR 0009). Se llama
 /// con el lock del estado ya liberado; un fallo de red no pierde el aviso:
 /// se queda en el buzón y solo se registra el error.
+/// Redacta el aviso de recuperacion de contrasena y lo deja en el buzon.
+/// Devuelve los mensajes para entregar por SMTP.
+pub fn notificar_recuperacion(d: &mut Datos, correo: &str, token: &str) -> Vec<Mensaje> {
+    let base = base_url();
+    let enlace = format!("{base}/restablecer?token={token}");
+    let asunto = "Brindis: restablece tu contrasena".to_string();
+    let cuerpo = format!(
+        "Hola,\n\nRecibimos una solicitud para restablecer tu contrasena.\n\
+         Abre este enlace para crear una nueva (valido por 1 hora):\n{enlace}\n\n\
+         Si no fuiste tu, ignora este mensaje.\n\nBrindis"
+    );
+    let html = Some(format!(
+        "<p>Hola,</p><p>Recibimos una solicitud para restablecer tu contrasena.</p>\
+         <p><a href=\"{enlace}\">Restablecer contrasena</a> (valido por 1 hora)</p>\
+         <p>Si no fuiste tu, ignora este mensaje.</p><p>Brindis</p>"
+    ));
+    let id = d.correos.iter().map(|m| m.id).max().unwrap_or(0) + 1;
+    let mensaje = Mensaje {
+        id,
+        para: correo.to_string(),
+        asunto,
+        cuerpo,
+        html,
+        enviado_en: Utc::now(),
+        entregado: false,
+    };
+    tracing::info!(destino = %correo, "correo de recuperacion en el buzon de demostracion");
+    d.correos.push(mensaje.clone());
+    vec![mensaje]
+}
+
 pub async fn entregar(estado: &Estado, mensajes: &[Mensaje]) {
     let Some(smtp) = Smtp::desde_entorno() else {
         return;

@@ -73,18 +73,16 @@ modelo relacional.
 Dockerfile            # imagen multietapa (build Rust -> runtime Debian)
 render.yaml           # servicio web en Render (ADR 0010)
 db/                   # brindis_db.sql (13 tablas 3FN: esquema, indices, datos de prueba)
-src/                  # Axum + dominio + 4 patrones + DAO
-  dominio.rs          # entidades (Figura 4)
-  factory.rs          # Factory Method (Figura 7)
-  builder.rs          # Builder (Figura 8)
-  proxy.rs            # Proxy (Figura 9)
-  decorator.rs        # Decorator (Figura 10)
-  dao.rs              # GenericDAO + pool (Figura 6)
-  estado.rs           # almacen demo en memoria + seed
-  servicios.rs        # sujeto real del Proxy sobre el almacen
-  correo.rs           # avisos al cliente/admin (buzon demo + SMTP, ADR 0008/0009)
-  formato.rs          # fechas UTC-5 y pesos para vistas y correos
-  vistas.rs           # controladores Axum + structs Askama
+src/                  # Axum + MVC por capas (vistas/controladores/modelo)
+  main.rs             # wiring: router + estado + capas
+  vistas/             # CAPA VISTA: structs Askama
+  controladores/      # CAPA CONTROLADOR: handlers Axum (auth, reserva, agenda, dashboard, recuperar)
+  modelo/             # CAPA MODELO
+    entidades/        # dominio (Figura 4) + formato
+    servicios/        # logica de negocio + patrones aplicados + correo
+    repositorios/     # DAO (Figura 6) + almacen demo en memoria + seed
+    patrones/         # creacionales (fabrica, constructor, prototipo, singleton)
+                      # y estructurales (proxy, decorador, adaptador, fachada)
 templates/            # base + inicio/login/registro/reservar/mis-reservas/agenda/error
 static/css/           # tema.css + fuentes.css + chroma.css + counter.css
 static/js/            # plano.js (plano SVG, ficha y pedido guiado) + ui.js (toasts y confirmacion)
