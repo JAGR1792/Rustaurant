@@ -46,21 +46,58 @@
     bloqueada: { cuerpo: "#cfc7b8", borde: "#9b9282", texto: "#6d675e", silla: "#a89f90", guion: "5 4" },
   };
 
-  function aviso(msg) {
-    if (typeof toast === "function") toast(msg);
-    else alert(msg);
+  function avisoSeleccion() {
+    const t = $("bloqueo-aviso");
+    if (!t) return;
+    t.textContent = `La selección no cubre a los ${comensales()} comensales: agrega otra mesa libre o ajusta el número.`;
+    t.classList.add("texto-alerta");
   }
 
+  /// Errores de validación en línea (sin toasts): texto junto al campo.
+  function mostrarErrorPaso1(msg) {
+    const p = $("error-paso1");
+    if (!p) return;
+    p.textContent = msg;
+    p.hidden = false;
+  }
+
+  function limpiarErrorPaso1() {
+    const p = $("error-paso1");
+    if (!p) return;
+    p.textContent = "";
+    p.hidden = true;
+  }
+
+  let pasoActual = 1;
+
   function mostrarPaso(n) {
+    pasoActual = n;
     for (const s of document.querySelectorAll("section[id^='paso-']")) {
       s.hidden = s.id !== `paso-${n}`;
     }
     for (const li of document.querySelectorAll(".progreso li")) {
-      if (Number(li.dataset.paso) === n) li.setAttribute("aria-current", "step");
+      const paso = Number(li.dataset.paso);
+      if (paso === n) li.setAttribute("aria-current", "step");
       else li.removeAttribute("aria-current");
+      li.classList.toggle("completado", paso < n);
     }
+    actualizarStepper();
     const h = document.querySelector(`#paso-${n} h2`);
     if (h && typeof h.focus === "function") h.focus();
+  }
+
+  // Stepper navegable: volver a lo visitado siempre; avanzar un paso
+  // solo cuando el paso actual quedó completo.
+  function actualizarStepper() {
+    const ocasion = !!document.querySelector("input[name=ocasion]:checked");
+    const listo = seleccion.size > 0 && capacidadSeleccionada() >= comensales();
+    const completo = { 2: ocasion, 3: listo, 4: true };
+    for (const b of document.querySelectorAll(".progreso button[data-ir]")) {
+      const p = Number(b.dataset.ir);
+      const volver = p <= pasoActual;
+      const avanzar = p === pasoActual + 1 && completo[p];
+      b.disabled = !(volver || avanzar);
+    }
   }
 
   function sincronizarOcultos() {
@@ -272,19 +309,24 @@
     if (!texto) return;
     const comensales = Number($("comensales").value || 0);
     const capacidad = capacidadSeleccionada();
+    const listo = seleccion.size > 0 && capacidad >= comensales;
     if (seleccion.size === 0) {
       texto.textContent = "Ninguna mesa seleccionada todavía.";
+      texto.classList.remove("texto-alerta");
     } else {
       texto.textContent =
         `Mesas ${[...seleccion].join(", ")} — capacidad ${capacidad} ` +
-        `para ${comensales} comensales.`;
+        `para ${comensales} comensales.` +
+        (listo ? "" : " Falta capacidad: agrega otra mesa libre.");
+      texto.classList.toggle("texto-alerta", !listo);
     }
-    $("btn-paso3").disabled = !(seleccion.size > 0 && capacidad >= comensales);
+    $("btn-paso3").disabled = !listo;
     const sel = $("ficha-comensales");
     if (sel && sel.options.length > 0 && seleccion.size > 0) {
       sel.value = String(Math.min(Math.max(comensales, 1), sel.options.length));
     }
     pintarPedido();
+    actualizarStepper();
   }
 
   // --- plano -----------------------------------------------------------------
@@ -312,13 +354,30 @@
     actualizarFicha();
   }
 
+  let retrasoPlano = null;
+
+  // La recarga se programa con un respiro para no disparar una consulta
+  // por cada tecla o clic en los campos de fecha, hora y zona.
+  function programarCargaPlano() {
+    clearTimeout(retrasoPlano);
+    retrasoPlano = setTimeout(cargarPlano, 350);
+  }
+
   async function cargarPlano() {
     const fecha = $("fecha").value;
     const hora = $("hora").value;
     const zona = $("zona").value;
+    const estado = $("plano-estado");
     if (!fecha || !hora) {
-      aviso("Elige fecha y hora antes de ver el plano.");
+      if (estado) {
+        estado.textContent = "Elige fecha y hora para consultar la disponibilidad.";
+        estado.classList.add("plano-estado--error");
+      }
       return;
+    }
+    if (estado) {
+      estado.textContent = "Buscando disponibilidad…";
+      estado.classList.remove("plano-estado--error");
     }
     try {
       const r = await fetch(
@@ -333,8 +392,14 @@
       }
       if (!seleccion.has(ultimaMesa)) ultimaMesa = null;
       pintarPlano();
+      if (estado) {
+        estado.textContent = "Disponibilidad actualizada: elige tus mesas en el plano.";
+      }
     } catch {
-      aviso("No se pudo cargar el plano. Revisa la fecha y la hora e inténtalo de nuevo.");
+      if (estado) {
+        estado.textContent = "No se pudo cargar el plano: revisa la fecha y la hora e inténtalo de nuevo.";
+        estado.classList.add("plano-estado--error");
+      }
     }
   }
 
@@ -425,8 +490,11 @@
     const mesasTxt = seleccion.size
       ? [...seleccion].map((id) => `M${id}`).join(", ") + (mesa ? ` · ${mesa.zona}` : "")
       : "—";
+    const ocasion =
+      document.querySelector("input[name=ocasion]:checked")?.closest("label")?.querySelector("strong")?.textContent || "—";
     datos.innerHTML = "";
     for (const [clave, valor] of [
+      ["Ocasión", ocasion.trim()],
       ["Fecha", fechaTxt],
       ["Hora", $("hora").value || "—"],
       ["Comensales", String(n)],
@@ -436,6 +504,14 @@
       dt.textContent = clave;
       const dd = document.createElement("dd");
       dd.textContent = valor;
+      datos.append(dt, dd);
+    }
+    const restricciones = document.querySelector("input[name=restricciones]")?.value.trim();
+    if (restricciones) {
+      const dt = document.createElement("dt");
+      dt.textContent = "Restricciones";
+      const dd = document.createElement("dd");
+      dd.textContent = restricciones;
       datos.append(dt, dd);
     }
 
@@ -485,21 +561,38 @@
   function iniciar() {
     if (!$("form-reserva")) return;
 
+    // Stepper: se puede volver a cualquier paso ya recorrido.
+    for (const b of document.querySelectorAll(".progreso button[data-ir]")) {
+      b.addEventListener("click", () => {
+        if (b.disabled) return;
+        const ir = Number(b.dataset.ir);
+        if (ir === 2) cargarPlano();
+        if (ir === 3) {
+          sincronizarOcultos();
+          pintarPedido();
+        }
+        if (ir === 4) pintarResumen();
+        mostrarPaso(ir);
+      });
+    }
+
     for (const b of document.querySelectorAll("[data-hacia]")) {
       b.addEventListener("click", () => {
         const destino = Number(b.dataset.hacia);
         if (destino === 2 && b.closest("#paso-1")) {
           if (!document.querySelector("input[name=ocasion]:checked")) {
-            aviso("Elige la ocasión de tu reserva.");
+            mostrarErrorPaso1("Elige la ocasión de tu reserva para continuar.");
+            document.querySelector("input[name=ocasion]")?.focus();
             return;
           }
+          limpiarErrorPaso1();
           mostrarPaso(2);
           cargarPlano();
           return;
         }
         if (destino === 3) {
-          if (seleccion.size === 0) {
-            aviso("Selecciona al menos una mesa.");
+          if (!(seleccion.size > 0 && capacidadSeleccionada() >= comensales())) {
+            avisoSeleccion();
             return;
           }
           sincronizarOcultos();
@@ -511,7 +604,18 @@
       });
     }
 
-    $("btn-ver-plano").addEventListener("click", cargarPlano);
+    // Ocasión: al cambiarla se limpia el error en línea y se recalcula el stepper.
+    for (const r of document.querySelectorAll("input[name=ocasion]")) {
+      r.addEventListener("change", () => {
+        limpiarErrorPaso1();
+        actualizarStepper();
+      });
+    }
+
+    // El plano se recarga solo (con un respiro) al cambiar fecha, hora o zona.
+    for (const id of ["fecha", "hora", "zona"]) {
+      $(id).addEventListener("change", programarCargaPlano);
+    }
     $("comensales").addEventListener("change", resumenSeleccion);
     const selFicha = $("ficha-comensales");
     if (selFicha) {
@@ -525,7 +629,7 @@
       btnFicha.addEventListener("click", () => {
         const btn = $("btn-paso3");
         if (btn.disabled) {
-          aviso("La selección aún no cubre a todos los comensales.");
+          avisoSeleccion();
           return;
         }
         btn.click();
@@ -549,6 +653,8 @@
     for (const r of document.querySelectorAll("input[name=modalidad]")) {
       r.addEventListener("change", pintarResumen);
     }
+    const restr = document.querySelector("input[name=restricciones]");
+    if (restr) restr.addEventListener("input", pintarResumen);
     $("form-reserva").addEventListener("submit", sincronizarOcultos);
     pintarPlano();
     pintarPedido();

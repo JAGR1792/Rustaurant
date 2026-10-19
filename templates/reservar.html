@@ -11,10 +11,10 @@
   <input type="hidden" id="mesas" name="mesas" value="">
   <input type="hidden" id="extras" name="extras" value="">
   <ol class="progreso" aria-label="Progreso de la reserva">
-    <li data-paso="1" aria-current="step">Ocasión</li>
-    <li data-paso="2">Mesas</li>
-    <li data-paso="3">Pedido y extras</li>
-    <li data-paso="4">Pago</li>
+    <li data-paso="1" aria-current="step"><button type="button" data-ir="1">Ocasión</button></li>
+    <li data-paso="2"><button type="button" data-ir="2" disabled>Mesas</button></li>
+    <li data-paso="3"><button type="button" data-ir="3" disabled>Pedido y extras</button></li>
+    <li data-paso="4"><button type="button" data-ir="4" disabled>Pago</button></li>
   </ol>
 
   <section id="paso-1">
@@ -23,12 +23,16 @@
       {% for o in ocasiones %}
       <label class="tarjeta">
         <input type="radio" name="ocasion" value="{{ o.clave }}" {% if o.activa %}checked{% endif %} required>
+        <span class="tarjeta-marca-sel" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+        </span>
         <strong>{{ o.nombre }}</strong>
         <span>Zona sugerida: {{ o.zona }}</span>
         {% if let Some(d) = o.decoracion %}<span>Decoración: {{ d }}</span>{% endif %}
       </label>
       {% endfor %}
     </div>
+    <p class="campo-error" id="error-paso1" role="alert" hidden></p>
     <div class="acciones">
       <button type="button" data-hacia="2">Continuar</button>
     </div>
@@ -54,7 +58,7 @@
         </select>
       </label>
     </div>
-    <p><button type="button" id="btn-ver-plano">Ver disponibilidad</button></p>
+    <p class="texto-movimiento" id="plano-estado" role="status">El plano se actualiza solo al cambiar la fecha, la hora o la zona.</p>
     <div class="reserva-grid">
       <div class="plano-envoltura">
         <div id="plano" role="group" aria-label="Plano del salón: mesas por zona según disponibilidad"></div>

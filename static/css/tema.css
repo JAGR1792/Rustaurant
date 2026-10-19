@@ -276,20 +276,39 @@ legend { font-family: var(--serif); font-size: 1.15rem; font-weight: 600; color:
 }
 .progreso [aria-current="step"] { color: var(--carbon); font-weight: 600; }
 .progreso [aria-current="step"]::before { border-color: var(--dorado); background: var(--vino); color: #fdf9f1; }
+.progreso li.completado::before { border-color: var(--dorado-claro); background: #f2e6cf; color: var(--vino); }
+.progreso li button {
+  font: inherit; color: inherit; background: none; border: 0; padding: .2rem 0;
+  border-radius: 6px; cursor: pointer;
+}
+.progreso li button:disabled { cursor: default; opacity: .5; }
+.progreso li button:not(:disabled):hover { color: var(--vino); text-decoration: underline; text-underline-offset: 3px; }
+.progreso li button:focus-visible { outline: 2px solid var(--dorado); outline-offset: 2px; }
 section[id^="paso-"] { margin-bottom: 2rem; }
 
 /* Tarjetas (ocasiones, zonas, cuentas) */
 .tarjetas { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); }
 .tarjeta {
+  position: relative;
   background: var(--marfil-claro); border: 1px solid var(--linea); border-radius: 14px;
-  padding: 1.05rem 1.1rem; display: grid; gap: .4rem; cursor: pointer;
+  padding: 1.05rem 2.6rem 1.05rem 1.1rem; display: grid; gap: .4rem; cursor: pointer;
   transition: border-color .18s ease, transform .18s ease, box-shadow .18s ease;
 }
 .tarjeta:hover { border-color: var(--dorado-claro); transform: translateY(-2px); box-shadow: 0 14px 30px -22px rgba(38, 35, 31, .5); }
 .tarjeta strong { font-family: var(--serif); font-size: 1.2rem; font-weight: 600; }
 .tarjeta span { color: var(--carbon-suave); font-size: .87rem; }
-.tarjeta input { justify-self: start; accent-color: var(--vino); }
+.tarjeta input { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+.tarjeta:has(input:focus-visible) { outline: 3px solid var(--dorado-claro); outline-offset: 2px; }
 .tarjeta:has(input:checked) { border-color: var(--vino); box-shadow: 0 0 0 1px var(--vino), 0 14px 30px -22px rgba(38, 35, 31, .5); }
+.tarjeta-marca-sel {
+  position: absolute; top: .7rem; right: .7rem; width: 1.5rem; height: 1.5rem;
+  border-radius: 50%; display: grid; place-items: center;
+  background: var(--vino); color: #fdf9f1; border: 1px solid var(--dorado);
+  opacity: 0; transform: scale(.6);
+  transition: opacity .18s ease, transform .18s ease;
+}
+.tarjeta-marca-sel svg { width: .85rem; height: .85rem; display: block; }
+.tarjeta:has(input:checked) .tarjeta-marca-sel { opacity: 1; transform: scale(1); }
 
 /* Plano SVG del salón + ficha de mesa */
 .reserva-grid {
@@ -702,6 +721,8 @@ section[id^="paso-"] { margin-bottom: 2rem; }
 .texto-dorado { color: #8c6f37; font-weight: 600; }
 .texto-apagado { color: var(--carbon-suave); }
 .texto-movimiento { font-size: .85rem; color: var(--carbon-suave); }
+.campo-error { color: var(--reservada); font-size: .88rem; font-weight: 600; margin: .6rem 0 0; }
+.plano-estado--error { color: var(--reservada) !important; font-weight: 600; }
 
 /* Strikes del comensal (RN09/RN10): panel y chip */
 .strikes-panel {
