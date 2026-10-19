@@ -8,7 +8,7 @@ import os
 import sys
 
 AQUI = os.path.dirname(os.path.abspath(__file__))
-SRC = os.path.join(AQUI, "..", "creacionales", "codigo-fuente")
+SRC = AQUI
 sys.path.insert(0, SRC)
 
 from uml import Canvas  # noqa: E402
