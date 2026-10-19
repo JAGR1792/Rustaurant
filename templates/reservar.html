@@ -1,0 +1,180 @@
+{% extends "base.html" %}
+{# Asistente CU04 en 4 pasos: ocasion -> mesas -> pedido/extras -> pago.
+   POST unico a /reserva; plano.js llena los campos ocultos mesas/extras. #}
+{% block titulo %}Reservar — Brindis{% endblock %}
+{% block contenido %}
+<h1>Reserva en 4 pasos</h1>
+{% if let Some(e) = error %}
+<p class="error" role="alert">{{ e }}</p>
+{% endif %}
+<form id="form-reserva" method="post" action="/reservar" autocomplete="off">
+  <input type="hidden" id="mesas" name="mesas" value="">
+  <input type="hidden" id="extras" name="extras" value="">
+  <ol class="progreso" aria-label="Progreso de la reserva">
+    <li data-paso="1" aria-current="step"><button type="button" data-ir="1">Ocasión</button></li>
+    <li data-paso="2"><button type="button" data-ir="2" disabled>Mesas</button></li>
+    <li data-paso="3"><button type="button" data-ir="3" disabled>Pedido y extras</button></li>
+    <li data-paso="4"><button type="button" data-ir="4" disabled>Pago</button></li>
+  </ol>
+
+  <section id="paso-1">
+    <h2 tabindex="-1">1. ¿Qué celebras?</h2>
+    <div class="tarjetas">
+      {% for o in ocasiones %}
+      <label class="tarjeta">
+        <input type="radio" name="ocasion" value="{{ o.clave }}" {% if o.activa %}checked{% endif %} required>
+        <span class="tarjeta-marca-sel" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+        </span>
+        <strong>{{ o.nombre }}</strong>
+        <span>Zona sugerida: {{ o.zona }}</span>
+        {% if let Some(d) = o.decoracion %}<span>Decoración: {{ d }}</span>{% endif %}
+      </label>
+      {% endfor %}
+    </div>
+    <p class="campo-error" id="error-paso1" role="alert" hidden></p>
+    <div class="acciones">
+      <button type="button" data-hacia="2">Continuar</button>
+    </div>
+  </section>
+
+  <section id="paso-2" hidden>
+    <h2 tabindex="-1">2. Fecha, hora y mesas</h2>
+    <div class="campos">
+      <label>Fecha
+        <input type="date" id="fecha" name="fecha" value="{{ fecha }}" min="{{ fecha_hoy }}" max="{{ fecha_max }}" required>
+      </label>
+      <label>Hora
+        <input type="time" id="hora" name="hora" value="{{ hora }}" required>
+      </label>
+      <label>Comensales
+        <input type="number" id="comensales" name="comensales" value="{{ comensales }}" min="1" max="20" required>
+      </label>
+      <label>Zona
+        <select id="zona" name="zona">
+          {% for z in zonas %}
+          <option value="{{ z.nombre }}" {% if z.seleccionada %}selected{% endif %}>{{ z.nombre }}</option>
+          {% endfor %}
+        </select>
+      </label>
+    </div>
+    <p class="texto-movimiento" id="plano-estado" role="status">El plano se actualiza solo al cambiar la fecha, la hora o la zona.</p>
+    <div class="reserva-grid">
+      <div class="plano-envoltura">
+        <div id="plano" role="group" aria-label="Plano del salón: mesas por zona según disponibilidad"></div>
+        <div class="plan-leyenda" aria-hidden="true">
+          <span><i class="lm-libre"></i> Libre</span>
+          <span><i class="lm-sel"></i> Seleccionada</span>
+          <span><i class="lm-res"></i> Reservada</span>
+          <span><i class="lm-blo"></i> Bloqueada</span>
+        </div>
+      </div>
+      <aside class="ficha" id="ficha">
+        <div id="ficha-vacia">
+          <p class="eyebrow">Tu mesa</p>
+          <h3>Elige una mesa del plano</h3>
+          <p class="ficha-linea">Pulsa una mesa libre para ver su foto, su zona y su capacidad.</p>
+        </div>
+        <div id="ficha-contenido" hidden>
+          <picture>
+            <source id="ficha-webp" srcset="/static/img/fotos/mesa-general.webp" type="image/webp">
+            <img class="ficha-foto" id="ficha-foto" src="/static/img/fotos/mesa-general.jpg" alt="" width="800" height="600">
+          </picture>
+          <p class="eyebrow">Tu mesa</p>
+          <h3 id="ficha-titulo">M—</h3>
+          <p class="ficha-linea" id="ficha-zona"></p>
+          <p class="ficha-linea" id="ficha-capacidad"></p>
+          <label>Comensales de la reserva
+            <select id="ficha-comensales"></select>
+          </label>
+          <button type="button" id="ficha-continuar" class="secundario">Continuar la reserva</button>
+        </div>
+      </aside>
+    </div>
+    <p id="bloqueo-aviso" aria-live="polite">Ninguna mesa seleccionada todavía.</p>
+    <div class="acciones">
+      <button type="button" class="secundario" data-hacia="1">Atrás</button>
+      <button type="button" id="btn-paso3" data-hacia="3" disabled>Continuar</button>
+    </div>
+  </section>
+
+  <section id="paso-3" hidden>
+    <h2 tabindex="-1">3. Pedido anticipado y servicios extra</h2>
+    <p class="pedido-ayuda">Pedido opcional con precios congelados. Suma porciones con los botones o pide
+      «toda la mesa» cuando todos quieran lo mismo; también pueden pedir en el salón.</p>
+    <div class="cobertura">
+      <div class="cobertura-barra" aria-hidden="true"><i id="cobertura-fill"></i></div>
+      <p id="cobertura-texto" aria-live="polite"></p>
+    </div>
+    <fieldset>
+      <legend>El pedido</legend>
+      <div class="pedido-lista">
+        {% for it in items %}
+        <div class="plato">
+          <picture class="plato-picture">
+            <source srcset="{{ it.imagen_webp }}" type="image/webp">
+            <img class="plato-foto" src="{{ it.imagen }}" alt="" width="88" height="88" loading="lazy" decoding="async">
+          </picture>
+          <div class="plato-info">
+            <strong>{{ it.nombre }}</strong>
+            <span class="plato-precio">$ {{ it.precio_fmt }}</span>
+          </div>
+          <div class="paso-ctl">
+            <button type="button" class="paso-menos" aria-label="Quitar una porción de {{ it.nombre }}">−</button>
+            <input type="number" name="item_{{ it.id }}" min="0" max="20" value="0"
+                   inputmode="numeric" data-precio="{{ it.precio }}" data-nombre="{{ it.nombre }}"
+                   aria-label="Porciones de {{ it.nombre }}">
+            <button type="button" class="paso-mas" aria-label="Agregar una porción de {{ it.nombre }}">+</button>
+          </div>
+          <button type="button" class="todo-mesa">Toda la mesa</button>
+        </div>
+        {% endfor %}
+      </div>
+    </fieldset>
+    <fieldset>
+      <legend>Servicios extra</legend>
+      <div class="extras-lista">
+        {% for p in planes %}
+        <label class="extra-linea">
+          <input type="checkbox" class="extra" value="{{ p.id }}" data-tarifa="{{ p.tarifa }}" data-porpersona="{% if p.por_persona %}1{% else %}0{% endif %}">
+          <span class="extra-info">
+            <strong>{{ p.nombre }}</strong>
+            <span>$ {{ p.tarifa_fmt }}{% if p.por_persona %} por persona{% endif %}</span>
+          </span>
+          <span class="extra-costo" data-costo aria-hidden="true"></span>
+        </label>
+        {% endfor %}
+      </div>
+    </fieldset>
+    <div class="acciones">
+      <button type="button" class="secundario" data-hacia="2">Atrás</button>
+      <button type="button" data-hacia="4">Continuar</button>
+    </div>
+  </section>
+
+  <section id="paso-4" hidden>
+    <h2 tabindex="-1">4. Pago y confirmación</h2>
+    <label>Restricciones alimentarias (alergias)
+      <input type="text" name="restricciones" maxlength="200" placeholder="Ej.: maní, lactosa… (opcional)">
+    </label>
+    <fieldset>
+      <legend>Modalidad de pago</legend>
+      <label class="linea"><input type="radio" name="modalidad" value="adelanto" checked> <span>Adelanto del 30 %</span></label>
+      <label class="linea"><input type="radio" name="modalidad" value="completo"> <span>Pago completo</span></label>
+      <label class="linea"><input type="radio" name="modalidad" value="restaurante"> <span>Pagar en el restaurante{% if !es_vip %} (solo clientes VIP){% endif %}</span></label>
+    </fieldset>
+    <div class="resumen" id="resumen-reserva">
+      <h3>Revisión de tu reserva</h3>
+      <dl class="resumen-datos" id="resumen-datos" aria-live="polite"></dl>
+      <div id="resumen-pedido" aria-live="polite"></div>
+      <p id="resumen-pago" aria-live="polite"></p>
+      <p id="total-estimado" aria-live="polite"></p>
+    </div>
+    <div class="acciones">
+      <button type="button" class="secundario" data-hacia="3">Atrás</button>
+      <button type="submit">Confirmar reserva</button>
+    </div>
+  </section>
+</form>
+{% endblock %}
+{% block scripts %}<script src="/static/js/plano.js" defer></script>{% endblock %}

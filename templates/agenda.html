@@ -1,0 +1,203 @@
+{% extends "base.html" %}
+{# Panel de empleado y agenda de servicio con calendario visual interactivo,
+   proximas citas inmediatas con acciones en vivo, gestion de clientes VIP y buzon. #}
+{% block titulo %}Panel de Empleado — Brindis{% endblock %}
+{% block contenido %}
+<div class="empleado-cabecera">
+  <div>
+    <p class="eyebrow">Control de Sala & Operaciones</p>
+    <h1>Panel de Empleado</h1>
+    <p class="subtitulo-editorial">
+      Gestión integral del servicio: próximas citas en sala, calendario de disponibilidad, ocupación y miembros VIP.
+    </p>
+  </div>
+  <div class="empleado-kpis" id="agenda-kpis">{% include "agenda_kpis.html" %}</div>
+</div>
+
+{% if let Some(a) = aviso %}
+<div class="exito" role="status">
+  <strong>{{ a }}</strong>
+</div>
+{% endif %}
+
+{% if denegado %}
+<p class="error" role="alert">Solo el personal autorizado puede ver el panel de empleado (RF15).</p>
+{% else %}
+
+<!-- SECCIÓN 1: PRÓXIMAS CITAS INMEDIATAS (SERVICIO EN VIVO) -->
+<section class="seccion seccion-destacada" aria-label="Próximas citas inmediatas">
+  <div class="seccion-cabecera-flex">
+    <div>
+      <p class="eyebrow">Atención Inmediata</p>
+      <h2>Próximas Citas y Servicio en Vivo</h2>
+    </div>
+    <span class="badge-en-vivo">Monitoreo en sala</span>
+  </div>
+
+  {% if proximas.is_empty() %}
+  <div class="vacio-reservas">
+    <p>No hay citas vigentes inmediatas pendientes por atender en este momento.</p>
+  </div>
+  {% else %}
+  <div class="proximas-citas-grid">
+    {% for p in proximas %}
+    <article class="proxima-cita-card {% if p.es_vip %}cita-vip-borde{% endif %}">
+      <div class="proxima-cita-header">
+        <span class="cita-hora-tag">{{ p.hora }}</span>
+        <span class="cita-fecha-tag">{{ p.fecha }}</span>
+        <span class="badge {{ p.estado_clase }}">{{ p.estado }}</span>
+      </div>
+
+      <div class="proxima-cita-cuerpo">
+        <div class="cita-cliente-fila">
+          <strong class="cliente-nombre">{{ p.cliente }}</strong>
+          {% if p.es_vip %}
+          <span class="badge-vip-pequeno">VIP</span>
+          {% endif %}
+        </div>
+        <p class="cita-mesa-info">
+          Código <code>{{ p.codigo }}</code> · Mesa(s) <strong>{{ p.mesas }}</strong> · <strong>{{ p.comensales }}</strong> comensales
+        </p>
+        <p class="cita-ocasion-info">
+          Ocasión: <em>{{ p.ocasion }}</em> — {{ p.indicacion }}
+        </p>
+        {% if p.alerta %}
+        <div class="alerta-alergia-box" role="alert">
+          <strong>Alerta:</strong> {{ p.restricciones }}
+        </div>
+        {% endif %}
+      </div>
+
+      <div class="proxima-cita-acciones">
+        {% if p.puede_sentar %}
+        <form method="post" action="/empleado/reserva/{{ p.id }}/estado" style="display:inline;">
+          <input type="hidden" name="nuevo" value="en-mesa">
+          <button type="submit" class="boton-accion-sala btn-sentar">Sentar en mesa</button>
+        </form>
+        {% endif %}
+        {% if p.puede_completar %}
+        <form method="post" action="/empleado/reserva/{{ p.id }}/estado" style="display:inline;">
+          <input type="hidden" name="nuevo" value="completada">
+          <button type="submit" class="boton-accion-sala btn-completar">Completar servicio</button>
+        </form>
+        {% endif %}
+        {% if p.puede_inasistir %}
+        <form method="post" action="/empleado/reserva/{{ p.id }}/estado" style="display:inline;"
+              data-confirmar="¿Marcar la reserva {{ p.codigo }} como inasistida? (RN10 sumará strike si corresponde).">
+          <input type="hidden" name="nuevo" value="inasistida">
+          <button type="submit" class="boton-accion-sala btn-inasistir">Inasistencia</button>
+        </form>
+        {% endif %}
+      </div>
+    </article>
+    {% endfor %}
+  </div>
+  {% endif %}
+</section>
+
+<!-- SECCIÓN 2: CALENDARIO DE RESERVAS Y AGENDA DIARIA (navegación dinámica) -->
+<section class="seccion" aria-label="Calendario interactivo de reservas" id="agenda-seccion">
+  <p class="eyebrow">Planificador Visual</p>
+  <h2>Calendario de Reservas</h2>
+
+  <div id="agenda-panel">
+    {% include "agenda_panel.html" %}
+  </div>
+</section>
+
+<!-- SECCIÓN 3: GESTIÓN DE CLIENTES Y MIEMBROS VIP -->
+<section class="seccion" aria-label="Gestión de clientes y miembros VIP">
+  <div class="seccion-cabecera-flex">
+    <div>
+      <p class="eyebrow">Dirección de Clientes</p>
+      <h2>Clientes Registrados y Membresías VIP</h2>
+    </div>
+  </div>
+  <p class="pedido-ayuda">
+    Otorga o revoca el estatus VIP de cortesía directamente. Los miembros VIP tienen acceso a la Zona VIP y pago en restaurante sin anticipo (RN06).
+  </p>
+
+  <div class="tabla-scroll">
+    <table class="tabla">
+      <thead>
+        <tr>
+          <th>ID</th><th>Nombre</th><th>Correo</th><th>Documento</th><th>Teléfono</th>
+          <th>Tipo</th><th>Strikes</th><th>Acción VIP</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for c in clientes %}
+        <tr>
+          <td>#{{ c.id }}</td>
+          <td><strong>{{ c.nombre }}</strong></td>
+          <td>{{ c.correo }}</td>
+          <td>{{ c.documento }}</td>
+          <td>{{ c.telefono }}</td>
+          <td>
+            {% if c.es_vip %}
+            <span class="badge-vip-pill">VIP</span>
+            {% else %}
+            <span class="badge">General</span>
+            {% endif %}
+          </td>
+          <td>
+            <span class="{% if c.strikes > 0 %}texto-alerta{% else %}texto-suave{% endif %}">
+              {{ c.strikes }}/3
+            </span>
+          </td>
+          <td>
+            <form method="post" action="/admin/cliente/{{ c.id }}/toggle-vip" style="display:inline;">
+              {% if c.es_vip %}
+              <button type="submit" class="btn-micro btn-quitar-vip">Quitar VIP</button>
+              {% else %}
+              <button type="submit" class="btn-micro btn-dar-vip">Hacer VIP</button>
+              {% endif %}
+            </form>
+            {% if c.strikes > 0 %}
+            <form method="post" action="/admin/cliente/{{ c.id }}/reset-strikes" style="display:inline; margin-left:.3rem;">
+              <button type="submit" class="btn-micro" title="Restablecer strikes a 0">Limpiar</button>
+            </form>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- SECCIÓN 4: BUZÓN DE CORREOS Y COMUNICACIONES -->
+<section class="correos" aria-label="Correos enviados">
+  <h2>Buzón de Demostración del Sistema</h2>
+  <p class="pedido-ayuda">
+    Avisos de reserva (ADR 0008): confirmaciones y notificaciones al cliente y a la administración.
+  </p>
+  {% if correos.is_empty() %}
+  <p>Todavía no se han enviado correos en esta sesión.</p>
+  {% else %}
+  {% for c in correos %}
+  <details class="correo">
+    <summary>
+      <span class="correo-para">{{ c.para }}</span> · {{ c.asunto }}
+      {% if c.entregado %}
+      <span class="correo-tag ok">enviado SMTP</span>
+      {% else %}
+      <span class="correo-tag">buzón demo</span>
+      {% endif %}
+      <time>{{ c.cuando }}</time>
+    </summary>
+    <pre class="correo-cuerpo">{{ c.cuerpo }}</pre>
+    {% if let Some(h) = c.html %}
+    <details class="correo-html">
+      <summary>Ver versión HTML</summary>
+      <iframe class="correo-marco" srcdoc="{{ h }}" sandbox title="Versión HTML del correo"></iframe>
+    </details>
+    {% endif %}
+  </details>
+  {% endfor %}
+  {% endif %}
+</section>
+
+{% endif %}
+{% endblock %}
+{% block scripts %}<script src="/static/js/agenda.js" defer></script>{% endblock %}

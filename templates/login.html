@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{# Login Brindis. Flujo: POST /login con correo+password; error generico sin decir cual fallo (CU01 2a); si inactivo se ofrece reactivacion (2b); si generica se exige cambio (4a). #}
+{% block titulo %}Entrar — Brindis{% endblock %}
+{% block contenido %}
+<section class="acceso">
+  <figure class="acceso-panel">
+    <picture>
+      <source srcset="/static/img/fotos/salon-acceso.webp" type="image/webp">
+      <img src="/static/img/fotos/salon-acceso.jpg" alt="Mesa preparada junto a un ventanal, con jarrón de flores y luz natural" width="1280" height="1920" fetchpriority="high">
+    </picture>
+    <figcaption>La mesa ya está puesta; solo falta tu ocasión.</figcaption>
+  </figure>
+  <div class="acceso-form">
+    <p class="eyebrow">Bienvenido de vuelta</p>
+    <h1>Iniciar sesión</h1>
+    {% if let Some(e) = error %}
+    <p class="error" role="alert">{{ e }}</p>
+    {% endif %}
+    {% if reactivar %}
+    <p><a href="/reactivar">Reactivar mi cuenta con token</a></p>
+    {% endif %}
+    <form method="post" action="/login">
+      <label>Correo
+        <input type="email" name="correo" required autocomplete="email" spellcheck="false" value="{{ correo }}" autofocus>
+      </label>
+      <label>Contraseña
+        <input type="password" name="password" required autocomplete="current-password">
+      </label>
+      <button type="submit">Entrar</button>
+    </form>
+    <p class="acceso-pie">¿Sin cuenta? <a href="/registro">Regístrate como cliente</a></p>
+  </div>
+</section>
+{% endblock %}

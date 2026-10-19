@@ -1,0 +1,14 @@
+{# KPIs del panel de empleado para el día seleccionado. Se reutiliza en la
+   página completa (agenda.html) y en el fragmento dinámico GET /agenda/dia. #}
+<div class="kpi-tarjeta">
+  <span class="kpi-valor">{{ total_hoy }}</span>
+  <span class="kpi-rotulo">Citas para el día</span>
+</div>
+<div class="kpi-tarjeta">
+  <span class="kpi-valor">{{ comensales_hoy }}</span>
+  <span class="kpi-rotulo">Comensales esperados</span>
+</div>
+<div class="kpi-tarjeta">
+  <span class="kpi-valor">{{ ocupacion_mesas_hoy }}/{{ total_mesas }}</span>
+  <span class="kpi-rotulo">Mesas ocupadas</span>
+</div>

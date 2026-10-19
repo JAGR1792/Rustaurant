@@ -1,0 +1,5 @@
+{# Fragmento dinámico del panel de agenda (GET /agenda/dia): KPIs del día,
+   calendario del mes, barra de día y tabla de citas. La página completa
+   (agenda.html) reutiliza agenda_kpis.html y agenda_panel.html por partes. #}
+<div class="empleado-kpis" id="agenda-kpis">{% include "agenda_kpis.html" %}</div>
+<div id="agenda-panel">{% include "agenda_panel.html" %}</div>

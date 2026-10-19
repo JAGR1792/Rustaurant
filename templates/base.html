@@ -1,0 +1,94 @@
+<!doctype html>
+{# Layout original Brindis — Estética Le Jardin Élite.
+   Cabecera editorial con monograma, navegación por rol, indicador VIP,
+   contenedor de toasts y modal de confirmación propio. #}
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#571f2d">
+  <title>{% block titulo %}Brindis — Alta Cocina & Reservas{% endblock %}</title>
+  <meta name="description" content="Brindis: restaurante de alta cocina en Bogotá. Reservas por ocasión con plano interactivo de salón, terraza y zona VIP.">
+  <link rel="preload" href="/static/fuentes/inter-400-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/static/fuentes/cormorant-garamond-500-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="/static/css/fuentes.css">
+  <link rel="stylesheet" href="/static/css/tema.css">
+  {% block head %}{% endblock %}
+</head>
+<body>
+  <a class="saltar" href="#contenido">Saltar al contenido</a>
+  <header class="barra">
+    <div class="barra-marca">
+      <a class="logo" href="/" aria-label="Brindis, inicio" translate="no">
+        <span class="logo-monograma">B</span>
+        <span class="logo-texto">Brindis</span>
+      </a>
+      <span class="logo-lema">Alta Cocina · Bogotá</span>
+    </div>
+    <nav class="menu" aria-label="Principal">
+      <a href="/reservar" class="menu-enlace">Reservar</a>
+      <a href="/mis-reservas" class="menu-enlace">Mis reservas</a>
+      {% if usuario != "" && !es_personal %}
+      <a href="/dashboard" class="menu-enlace nav-dashboard-link">
+        Mi Dashboard
+        {% if es_vip %}<span class="vip-corona-nav" title="Membresía VIP">VIP</span>{% endif %}
+      </a>
+      {% endif %}
+      {% if es_personal %}
+      <a href="/agenda" class="menu-enlace nav-personal-link">
+        Panel Empleado
+      </a>
+      {% endif %}
+      {% if usuario != "" %}
+      <div class="usuario-pill {% if es_vip %}usuario-pill--vip{% endif %}">
+        <span class="usuario-avatar" aria-hidden="true">{{ usuario.chars().next().unwrap_or('B') }}</span>
+        <span class="usuario-nombre">{{ usuario }}</span>
+        {% if es_vip %}
+        <span class="badge-vip-micro">VIP</span>
+        {% elif es_personal %}
+        <span class="badge-staff-micro">STAFF</span>
+        {% endif %}
+      </div>
+      <a href="/logout" class="menu-logout" title="Cerrar sesión">Salir</a>
+      {% else %}
+      <a href="/login" class="boton-acceso-nav">Iniciar sesión</a>
+      {% endif %}
+    </nav>
+  </header>
+  <main id="contenido">
+    {% block contenido %}{% endblock %}
+  </main>
+  <footer class="pie">
+    <div class="pie-interior">
+      <div class="pie-columna-marca">
+        <div class="pie-logo">
+          <span class="pie-monograma">B</span>
+          <p class="pie-marca" translate="no">Brindis</p>
+        </div>
+        <p class="pie-lema">Experiencias gastronómicas por ocasión. Salón clásico, terraza botánica y zona VIP reservada.</p>
+        <p class="pie-direccion">Calle 70 # 4-82 · Zona G · Bogotá, Colombia</p>
+      </div>
+      <div class="pie-columna-nav">
+        <strong>Explorar</strong>
+        <nav class="pie-nav" aria-label="Enlaces del pie">
+          <a href="/reservar">Reservar mesa</a>
+          <a href="/mis-reservas">Mis reservas</a>
+          <a href="/#carta">Nuestra carta</a>
+          {% if usuario != "" && !es_personal %}<a href="/dashboard">Mi Dashboard VIP</a>{% endif %}
+          {% if es_personal %}<a href="/agenda">Panel de Empleado</a>{% endif %}
+          {% if usuario == "" %}<a href="/login">Acceso de clientes</a>{% endif %}
+        </nav>
+      </div>
+      <div class="pie-columna-info">
+        <strong>Horarios de Atención</strong>
+        <p class="pie-horario">Martes a Sábado: 12:00 m — 11:00 pm<br>Domingos: 12:00 m — 6:00 pm</p>
+        <p class="pie-copy">Brindis Restaurante · Proyecto académico en Rust & Axum.</p>
+      </div>
+    </div>
+  </footer>
+  <div id="toasts" aria-live="polite"></div>
+  <dialog id="modal"></dialog>
+  <script src="/static/js/ui.js" defer></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

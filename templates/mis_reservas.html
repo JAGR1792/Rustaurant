@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{# Historial del cliente (o de todo el personal). El boton de cancelar hace
+   POST a /reservas/{id}/cancelar; el reembolso RN08/RN09 lo calcula el servicio. #}
+{% block titulo %}Mis reservas — Brindis{% endblock %}
+{% block head %}
+<link rel="stylesheet" href="/static/css/counter.css">
+{% endblock %}
+{% block contenido %}
+<div class="seccion-cabecera-flex">
+  <div>
+    <p class="eyebrow">Tu historial gastronómico</p>
+    <h1>Mis reservas</h1>
+    {% if !es_personal %}
+    <p>
+      <span class="strikes-chip {% if strikes == 0 %}strikes-chip--ok{% else %}strikes-chip--alerta{% endif %}">
+        Strikes: {{ strikes }} / 3
+      </span>
+    </p>
+    {% endif %}
+  </div>
+  {% if !es_personal %}
+  <div class="acciones-rapidas">
+    <a class="boton secundario" href="/dashboard">Ver Mi Dashboard VIP</a>
+    <a class="boton" href="/reservar">Nueva reserva</a>
+  </div>
+  {% endif %}
+</div>
+
+{% if let Some(a) = aviso %}
+<p class="exito" role="status">{{ a }}</p>
+{% endif %}
+
+{% if let Some(c) = cuenta %}
+<section class="cuenta-panel" data-cuenta data-objetivo="{{ c.iso }}"
+         aria-label="Cuenta regresiva para la reserva {{ c.codigo }}">
+  <p class="cuenta-panel__titulo">Tu próxima mesa — <strong>{{ c.codigo }}</strong> · {{ c.detalle }}</p>
+  <div class="cuenta-reloj" aria-hidden="true">
+    <span class="cuenta-reloj__campo">
+      <span class="contador" data-contador data-valor="0" data-min-digitos="2"
+            data-direccion="down" data-cuenta-unidad="dias"></span>
+      <span class="cuenta-reloj__rotulo">días</span>
+    </span>
+    <span class="cuenta-reloj__sep">:</span>
+    <span class="cuenta-reloj__campo">
+      <span class="contador" data-contador data-valor="0" data-min-digitos="2"
+            data-direccion="down" data-cuenta-unidad="horas"></span>
+      <span class="cuenta-reloj__rotulo">horas</span>
+    </span>
+    <span class="cuenta-reloj__sep">:</span>
+    <span class="cuenta-reloj__campo">
+      <span class="contador" data-contador data-valor="0" data-min-digitos="2"
+            data-direccion="down" data-cuenta-unidad="min"></span>
+      <span class="cuenta-reloj__rotulo">min</span>
+    </span>
+    <span class="cuenta-reloj__sep">:</span>
+    <span class="cuenta-reloj__campo">
+      <span class="contador" data-contador data-valor="0" data-min-digitos="2"
+            data-direccion="down" data-cuenta-unidad="seg"></span>
+      <span class="cuenta-reloj__rotulo">seg</span>
+    </span>
+  </div>
+  <p class="cuenta-panel__pie">Tiempo estimado para tu llegada</p>
+  <p class="cuenta-panel__ahora" role="status">¡Tu mesa te espera!</p>
+</section>
+{% endif %}
+
+{% if vacio %}
+<div class="vacio-reservas">
+  <p>Todavía no hay reservas en tu historial.</p>
+  <p><a class="boton" href="/reservar">Crear la primera reserva</a></p>
+</div>
+{% else %}
+<div class="tabla-scroll">
+  <table class="tabla">
+    <thead>
+      <tr>
+        <th>Código</th><th>Fecha & Hora</th><th>Mesas</th><th>Comensales</th>
+        <th>Ocasión</th><th>Total</th><th>Movimiento</th><th>Estado</th><th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for r in filas %}
+      <tr id="reserva-{{ r.codigo }}" class="{% if r.resaltada %}fila-resaltada{% endif %}">
+        <td><code>{{ r.codigo }}</code>{% if r.resaltada %} <span class="chip-correo">Desde tu correo</span>{% endif %}</td>
+        <td><strong>{{ r.fecha }}</strong></td>
+        <td>{{ r.mesas }}</td>
+        <td>{{ r.comensales }}</td>
+        <td>{{ r.ocasion }}</td>
+        <td><strong>{{ r.total }}</strong></td>
+        <td><span class="texto-movimiento">{{ r.movimiento }}</span></td>
+        <td><span class="badge {{ r.estado_clase }}">{{ r.estado }}</span></td>
+        <td>
+          {% if r.puede_cancelar %}
+          <form method="post" action="/reservas/{{ r.id }}/cancelar"
+                data-confirmar="¿Cancelar la reserva {{ r.codigo }}? {{ r.aviso_cancelacion }}">
+            <button type="submit" class="secundario btn-micro">Cancelar</button>
+          </form>
+          {% else %}
+          <span class="texto-apagado">—</span>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+{% endblock %}
+{% block scripts %}
+<script src="/static/js/counter.js" defer></script>
+{% endblock %}
