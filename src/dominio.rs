@@ -29,6 +29,46 @@ pub enum TipoCliente {
 pub const UMBRAL_VISITAS_VIP: usize = 3;
 pub const PRECIO_PASE_VIP: i64 = 95_000;
 
+/// Ventana de cancelación sin penalidad, en horas antes del inicio: la
+/// general (RN08) es de 4 h; para socios VIP (RN09) es de 1 h.
+pub const HORAS_CANCELACION_GENERAL: i64 = 4;
+pub const HORAS_CANCELACION_VIP: i64 = 1;
+/// Porcentaje de lo abonado que se retiene al cancelar fuera de la ventana.
+pub const RETENCION_CANCELACION_PCT: i64 = 10;
+
+/// Resultado de aplicar RN08/RN09 a una cancelación concreta.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct PoliticaCancelacion {
+    /// Horas de antelación que exige la ventana sin penalidad.
+    pub horas_gratis: i64,
+    /// `true` si con las horas restantes cancelar no tiene penalidad.
+    pub sin_penalidad: bool,
+    /// Porcentaje de lo abonado que se retiene (0 dentro de la ventana).
+    pub retencion_pct: i64,
+    /// `true` si además corresponde strike (VIP fuera de la ventana, RN09).
+    pub aplica_strike: bool,
+}
+
+/// Fuente única de la regla de cancelación: la usan el servicio (reembolso),
+/// las vistas (aviso del modal) y los correos, para no repetir criterios.
+pub fn politica_cancelacion(tipo: TipoCliente, horas_restantes: i64) -> PoliticaCancelacion {
+    let horas_gratis = match tipo {
+        TipoCliente::Vip => HORAS_CANCELACION_VIP,
+        TipoCliente::General => HORAS_CANCELACION_GENERAL,
+    };
+    let sin_penalidad = horas_restantes >= horas_gratis;
+    PoliticaCancelacion {
+        horas_gratis,
+        sin_penalidad,
+        retencion_pct: if sin_penalidad {
+            0
+        } else {
+            RETENCION_CANCELACION_PCT
+        },
+        aplica_strike: !sin_penalidad && tipo == TipoCliente::Vip,
+    }
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum EstadoReserva {
     Vigente,
@@ -613,6 +653,20 @@ mod tests {
         c.incrementar_strike();
         assert_eq!(c.strikes, 3);
         assert_eq!(c.tipo, TipoCliente::General);
+    }
+
+    #[test]
+    fn rn08_rn09_ventanas_de_cancelacion() {
+        // General: 4 h de gracia; tarde = 10 % sin strike.
+        let p = politica_cancelacion(TipoCliente::General, 4);
+        assert!(p.sin_penalidad && p.retencion_pct == 0 && !p.aplica_strike);
+        let p = politica_cancelacion(TipoCliente::General, 3);
+        assert!(!p.sin_penalidad && p.retencion_pct == 10 && !p.aplica_strike);
+        // VIP: 1 h de gracia; tarde = 10 % + strike.
+        let p = politica_cancelacion(TipoCliente::Vip, 1);
+        assert!(p.sin_penalidad && !p.aplica_strike);
+        let p = politica_cancelacion(TipoCliente::Vip, 0);
+        assert!(!p.sin_penalidad && p.retencion_pct == 10 && p.aplica_strike);
     }
 
     #[test]

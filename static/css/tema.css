@@ -690,7 +690,7 @@ section[id^="paso-"] { margin-bottom: 2rem; }
 .perfil-dato-valor { font-weight: 600; color: var(--carbon); }
 
 /* Metricas Grid */
-.metricas-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: .75rem; }
+.metricas-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: .75rem; }
 .metrica-caja {
   background: var(--marfil-claro); border: 1px solid var(--linea); border-radius: 12px;
   padding: .85rem .75rem; text-align: center; display: flex; flex-direction: column; gap: .2rem;
@@ -702,6 +702,34 @@ section[id^="paso-"] { margin-bottom: 2rem; }
 .texto-dorado { color: #8c6f37; font-weight: 600; }
 .texto-apagado { color: var(--carbon-suave); }
 .texto-movimiento { font-size: .85rem; color: var(--carbon-suave); }
+
+/* Strikes del comensal (RN09/RN10): panel y chip */
+.strikes-panel {
+  background: var(--marfil-claro); border: 1px solid var(--linea); border-radius: 12px;
+  padding: .85rem .9rem; display: grid; gap: .45rem;
+}
+.strikes-panel--ok { border-left: 3px solid #3c6647; }
+.strikes-panel--alerta { border-left: 3px solid var(--reservada); background: #fdf3f4; }
+.strikes-panel__cabecera { display: flex; justify-content: space-between; align-items: baseline; }
+.strikes-panel__titulo {
+  font-weight: 700; color: var(--carbon); font-size: .82rem;
+  letter-spacing: .06em; text-transform: uppercase;
+}
+.strikes-panel__conteo { font-family: var(--serif); font-size: 1.15rem; font-weight: 700; color: var(--vino); }
+.strikes-panel__puntos { display: flex; gap: .4rem; }
+.strikes-panel__puntos i {
+  width: 14px; height: 14px; border-radius: 50%;
+  background: var(--marfil); border: 1px solid var(--linea);
+}
+.strikes-panel__puntos i.on { background: var(--reservada); border-color: var(--reservada); }
+.strikes-panel__texto { margin: 0; font-size: .8rem; color: var(--carbon-suave); line-height: 1.45; }
+.strikes-chip {
+  display: inline-block; margin-top: .5rem; padding: .3rem .8rem; border-radius: 999px;
+  font-size: .78rem; font-weight: 700; border: 1px solid var(--linea);
+  background: var(--marfil-claro); color: var(--carbon-suave);
+}
+.strikes-chip--ok { color: #3c6647; border-color: #b9d3c2; }
+.strikes-chip--alerta { color: var(--reservada); border-color: #e6b9bf; background: #fdf3f4; }
 
 /* Módulo VIP */
 .vip-panel-modulo {
