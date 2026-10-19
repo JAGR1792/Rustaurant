@@ -10,6 +10,13 @@
   <div>
     <p class="eyebrow">Tu historial gastronómico</p>
     <h1>Mis reservas</h1>
+    {% if !es_personal %}
+    <p>
+      <span class="strikes-chip {% if strikes == 0 %}strikes-chip--ok{% else %}strikes-chip--alerta{% endif %}">
+        Strikes: {{ strikes }} / 3
+      </span>
+    </p>
+    {% endif %}
   </div>
   {% if !es_personal %}
   <div class="acciones-rapidas">
@@ -85,7 +92,7 @@
         <td>
           {% if r.puede_cancelar %}
           <form method="post" action="/reservas/{{ r.id }}/cancelar"
-                data-confirmar="¿Cancelar la reserva {{ r.codigo }}? El reembolso se calcula según las reglas de cancelación vigentes.">
+                data-confirmar="¿Cancelar la reserva {{ r.codigo }}? {{ r.aviso_cancelacion }}">
             <button type="submit" class="secundario btn-micro">Cancelar</button>
           </form>
           {% else %}

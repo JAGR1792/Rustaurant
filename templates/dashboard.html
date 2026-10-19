@@ -94,12 +94,28 @@
         <span class="metrica-caja__numero">{{ reservas_completadas }}</span>
         <span class="metrica-caja__etiqueta">Visitas disfrutadas</span>
       </div>
-      <div class="metrica-caja">
-        <span class="metrica-caja__numero {% if strikes == 0 %}texto-ok{% else %}texto-alerta{% endif %}">
-          {{ strikes }} / 3
-        </span>
-        <span class="metrica-caja__etiqueta">Strikes (RN10)</span>
+    </div>
+
+    <!-- Estado de penalizaciones (RN09/RN10): visible y con su consecuencia -->
+    <div class="strikes-panel {% if strikes == 0 %}strikes-panel--ok{% else %}strikes-panel--alerta{% endif %}" role="status">
+      <div class="strikes-panel__cabecera">
+        <span class="strikes-panel__titulo">Strikes</span>
+        <span class="strikes-panel__conteo">{{ strikes }} de 3</span>
       </div>
+      <div class="strikes-panel__puntos" aria-hidden="true">
+        <i class="{% if strikes >= 1 %}on{% endif %}"></i>
+        <i class="{% if strikes >= 2 %}on{% endif %}"></i>
+        <i class="{% if strikes >= 3 %}on{% endif %}"></i>
+      </div>
+      <p class="strikes-panel__texto">
+        {% if strikes == 0 %}
+        Sin strikes en tu historial. Se registran por inasistencias y por cancelar tarde siendo VIP (RN09).
+        {% elif strikes < 3 %}
+        Cada strike nace de una inasistencia o de una cancelación tardía siendo VIP; al llegar a 3 se pierde la membresía (RN10).
+        {% else %}
+        Alcanzaste los 3 strikes: la membresía VIP quedó desactivada automáticamente (RN10).
+        {% endif %}
+      </p>
     </div>
   </section>
 
@@ -136,7 +152,8 @@
       </li>
     </ul>
 
-    <!-- Los 3 caminos para ser VIP -->
+    {% if !es_vip %}
+    <!-- Los 3 caminos para ser VIP: solo para quienes aún no lo son -->
     <div class="vip-caminos-caja">
       <h3>¿Cómo ser VIP?</h3>
 
@@ -192,6 +209,9 @@
         <p>El personal administrativo y gerencial puede otorgar el estatus VIP de cortesía a clientes habituales o para eventos corporativos.</p>
       </div>
     </div>
+    {% else %}
+    <p class="texto-dorado">Tu membresía VIP está activa: estos privilegios ya son tuyos en cada visita.</p>
+    {% endif %}
   </section>
 </div>
 
@@ -226,7 +246,7 @@
       </p>
       {% if r.puede_cancelar %}
       <form method="post" action="/reservas/{{ r.id }}/cancelar"
-            data-confirmar="¿Cancelar la reserva {{ r.codigo }}? El reembolso se procesará de acuerdo con los plazos de cancelación.">
+            data-confirmar="¿Cancelar la reserva {{ r.codigo }}? {{ r.aviso_cancelacion }}">
         <button type="submit" class="secundario boton-cancelar-cita">Cancelar reserva</button>
       </form>
       {% endif %}

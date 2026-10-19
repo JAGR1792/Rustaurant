@@ -19,7 +19,7 @@ use crate::builder::{ReservaBuilder, validar_modalidad};
 use crate::dao::DaoError;
 use crate::dominio::{
     DetallePago, DetallePedido, EstadoReserva, ModalidadPago, Ocasion, Reserva,
-    ReservaServicioExtra, UMBRAL_VISITAS_VIP, UsuarioSesion,
+    ReservaServicioExtra, TipoCliente, UMBRAL_VISITAS_VIP, UsuarioSesion, politica_cancelacion,
 };
 use crate::estado::{self, Datos, Estado};
 use crate::factory::{ClienteFactory, DatosRegistro, registrar_con};
@@ -161,6 +161,8 @@ struct ReservaFila {
     estado: String,
     estado_clase: String,
     puede_cancelar: bool,
+    /// Consecuencia exacta de cancelar ahora, para el modal (RN08/RN09).
+    aviso_cancelacion: String,
 }
 
 /// Panel de cuenta regresiva para la próxima reserva del cliente
@@ -277,6 +279,8 @@ struct MisReservas {
     filas: Vec<ReservaFila>,
     vacio: bool,
     cuenta: Option<CuentaRegresiva>,
+    /// Strikes acumulados del cliente (RN10); solo aplica a clientes.
+    strikes: u8,
 }
 
 #[derive(Template)]
@@ -853,6 +857,48 @@ pub async fn reserva_post(
     }
 }
 
+/// Aviso para el modal de cancelación: qué pasará exactamente si se cancela
+/// ahora, según la política RN08/RN09 y el tipo del cliente de la reserva.
+fn aviso_cancelacion(r: &Reserva, tipo: TipoCliente) -> String {
+    let horas = (r.inicio - Utc::now()).num_hours();
+    let politica = politica_cancelacion(tipo, horas);
+    let abonado = r.pago.monto_total * r.pago.porcentaje as i64 / 100;
+    if politica.sin_penalidad {
+        return if abonado > 0 {
+            format!(
+                "Cancelas dentro de la ventana sin penalidad ({} h): se reembolsan $ {}.",
+                politica.horas_gratis,
+                cop(abonado)
+            )
+        } else {
+            format!(
+                "Cancelas dentro de la ventana sin penalidad ({} h).",
+                politica.horas_gratis
+            )
+        };
+    }
+    let mut consecuencias = Vec::new();
+    if abonado > 0 {
+        let retencion = abonado * politica.retencion_pct / 100;
+        consecuencias.push(format!(
+            "se retiene el {}% ($ {}) y se reembolsan $ {}",
+            politica.retencion_pct,
+            cop(retencion),
+            cop(abonado - retencion)
+        ));
+    } else {
+        consecuencias.push("no hay abono que retener".into());
+    }
+    if politica.aplica_strike {
+        consecuencias.push("se registra un strike en tu historial (RN09)".into());
+    }
+    format!(
+        "Quedan menos de {} h: {}.",
+        politica.horas_gratis,
+        consecuencias.join("; ")
+    )
+}
+
 pub async fn mis_reservas(
     State(e): State<Estado>,
     jar: CookieJar,
@@ -884,37 +930,46 @@ pub async fn mis_reservas(
         reservas.sort_by_key(|r| r.inicio);
         let filas: Vec<ReservaFila> = reservas
             .iter()
-            .map(|r| ReservaFila {
-                id: r.id,
-                codigo: r.codigo.clone(),
-                fecha: fecha_hora_fmt(r.inicio),
-                mesas: r
-                    .mesa_ids
+            .map(|r| {
+                let tipo_cliente = d
+                    .usuarios
                     .iter()
-                    .map(|m| format!("M{m}"))
-                    .collect::<Vec<_>>()
-                    .join(", "),
-                comensales: r.num_comensales,
-                ocasion: r.ocasion.nombre().into(),
-                total: if r.pago.monto_total > 0 {
-                    format!("$ {}", cop(r.pago.monto_total))
-                } else {
-                    "—".into()
-                },
-                movimiento: match d.comprobantes.iter().rev().find(|c| c.reserva_id == r.id) {
-                    Some(c) if c.tipo_movimiento == "INGRESO" => {
-                        format!("Pagado $ {}", cop(c.monto_total))
-                    }
-                    Some(c) => format!(
-                        "Reembolsado $ {} (retención $ {})",
-                        cop(c.monto_total),
-                        cop(c.monto_retencion)
-                    ),
-                    None => "—".into(),
-                },
-                estado: r.estado.etiqueta().into(),
-                estado_clase: r.estado.clase().into(),
-                puede_cancelar: r.estado == EstadoReserva::Vigente,
+                    .find(|u| u.id() == r.id_cliente)
+                    .map(UsuarioSesion::tipo_cliente)
+                    .unwrap_or(TipoCliente::General);
+                ReservaFila {
+                    id: r.id,
+                    codigo: r.codigo.clone(),
+                    fecha: fecha_hora_fmt(r.inicio),
+                    mesas: r
+                        .mesa_ids
+                        .iter()
+                        .map(|m| format!("M{m}"))
+                        .collect::<Vec<_>>()
+                        .join(", "),
+                    comensales: r.num_comensales,
+                    ocasion: r.ocasion.nombre().into(),
+                    total: if r.pago.monto_total > 0 {
+                        format!("$ {}", cop(r.pago.monto_total))
+                    } else {
+                        "—".into()
+                    },
+                    movimiento: match d.comprobantes.iter().rev().find(|c| c.reserva_id == r.id) {
+                        Some(c) if c.tipo_movimiento == "INGRESO" => {
+                            format!("Pagado $ {}", cop(c.monto_total))
+                        }
+                        Some(c) => format!(
+                            "Reembolsado $ {} (retención $ {})",
+                            cop(c.monto_total),
+                            cop(c.monto_retencion)
+                        ),
+                        None => "—".into(),
+                    },
+                    estado: r.estado.etiqueta().into(),
+                    estado_clase: r.estado.clase().into(),
+                    puede_cancelar: r.estado == EstadoReserva::Vigente,
+                    aviso_cancelacion: aviso_cancelacion(r, tipo_cliente),
+                }
             })
             .collect();
         let vacio = filas.is_empty();
@@ -939,6 +994,10 @@ pub async fn mis_reservas(
         };
         (filas, vacio, cuenta)
     };
+    let strikes = match &u {
+        UsuarioSesion::Cliente(c) => c.strikes,
+        _ => 0,
+    };
     Html(MisReservas {
         usuario: u.nombre().into(),
         es_personal: u.es_personal(),
@@ -947,6 +1006,7 @@ pub async fn mis_reservas(
         filas,
         vacio,
         cuenta,
+        strikes,
     })
     .into_response()
 }
@@ -1342,6 +1402,7 @@ pub async fn dashboard(
         estado: r.estado.etiqueta().into(),
         estado_clase: r.estado.clase().into(),
         puede_cancelar: r.estado == EstadoReserva::Vigente,
+        aviso_cancelacion: aviso_cancelacion(&r, u.tipo_cliente()),
     });
 
     let (documento, telefono, strikes) = match &u {
@@ -1621,5 +1682,31 @@ mod tests {
         let d = e.lock().unwrap();
         let p = proxima_reserva(&d.reservas, Utc::now());
         assert_eq!(p.map(|r| r.codigo.as_str()), Some("DEMO0001"));
+    }
+
+    #[test]
+    fn aviso_cancelacion_vip_tarde_menciona_strike_y_retencion() {
+        let mut r = reserva_prueba(9, Utc::now() + Duration::minutes(30), EstadoReserva::Vigente);
+        r.pago.modalidad = ModalidadPago::Completo;
+        r.pago.porcentaje = 100;
+        r.pago.monto_total = 100_000;
+        let aviso = aviso_cancelacion(&r, TipoCliente::Vip);
+        assert!(aviso.contains("strike"), "sin aviso de strike: {aviso}");
+        assert!(aviso.contains("10%"), "sin retención: {aviso}");
+        assert!(aviso.contains("90.000"), "sin reembolso neto: {aviso}");
+    }
+
+    #[test]
+    fn aviso_cancelacion_general_a_tiempo_reembolsa_todo() {
+        let mut r = reserva_prueba(10, Utc::now() + Duration::hours(5), EstadoReserva::Vigente);
+        r.pago.porcentaje = 100;
+        r.pago.monto_total = 100_000;
+        let aviso = aviso_cancelacion(&r, TipoCliente::General);
+        assert!(
+            aviso.contains("sin penalidad"),
+            "debía ser sin penalidad: {aviso}"
+        );
+        assert!(aviso.contains("100.000"), "sin reembolso total: {aviso}");
+        assert!(!aviso.contains("strike"));
     }
 }
