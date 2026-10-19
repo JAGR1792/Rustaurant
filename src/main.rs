@@ -8,16 +8,16 @@ pub mod vistas;
 
 // Compatibilidad (Etapa 1): re-exportar submódulos del modelo en la raíz
 // del crate para no romper referencias internas existentes.
-pub use modelo::entidades::dominio as dominio;
-pub use modelo::entidades::formato as formato;
-pub use modelo::repositorios::dao as dao;
-pub use modelo::repositorios::estado as estado;
-pub use modelo::servicios::correo as correo;
-pub use modelo::servicios::servicios as servicios;
+pub use modelo::entidades::dominio;
+pub use modelo::entidades::formato;
+pub use modelo::patrones::creacionales::builder;
 pub use modelo::patrones::creacionales::fabrica as factory;
-pub use modelo::patrones::creacionales::builder as builder;
-pub use modelo::patrones::estructurales::proxy as proxy;
 pub use modelo::patrones::estructurales::decorador as decorator;
+pub use modelo::patrones::estructurales::proxy;
+pub use modelo::repositorios::dao;
+pub use modelo::repositorios::estado;
+pub use modelo::servicios::correo;
+pub use modelo::servicios::reserva_servicio as servicios;
 
 use axum::{
     Router,
@@ -44,6 +44,14 @@ async fn main() {
     let app = Router::new()
         .route("/", get(vistas::inicio))
         .route("/login", get(vistas::login_get).post(vistas::login_post))
+        .route(
+            "/recuperar",
+            get(vistas::recuperar_get).post(vistas::recuperar_post),
+        )
+        .route(
+            "/restablecer",
+            get(vistas::restablecer_get).post(vistas::restablecer_post),
+        )
         .route(
             "/registro",
             get(vistas::registro_get).post(vistas::registro_post),

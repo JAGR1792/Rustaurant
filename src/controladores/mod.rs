@@ -1,1 +1,1 @@
-pub mod controladores;
+pub mod controlador;

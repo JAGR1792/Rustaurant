@@ -1,2 +1,2 @@
 pub mod correo;
-pub mod servicios;
+pub mod reserva_servicio;

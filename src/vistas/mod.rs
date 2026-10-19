@@ -1,1 +1,1 @@
-pub use crate::controladores::controladores::*;
+pub use crate::controladores::controlador::*;
