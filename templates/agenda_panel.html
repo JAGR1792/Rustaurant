@@ -1,0 +1,95 @@
+{# Panel de agenda del día: calendario del mes, barra de navegación de día y
+   tabla de citas. Lo comparten la página completa y el fragmento dinámico
+   GET /agenda/dia (navegación sin recarga). #}
+<div class="calendario-contenedor">
+  <div class="calendario-mes-nav">
+    <a href="/agenda?dia={{ mes_anterior }}" class="boton-mes">← Mes anterior</a>
+    <span class="calendario-mes-titulo">{{ mes_nombre }}</span>
+    <a href="/agenda?dia={{ mes_siguiente }}" class="boton-mes">Mes siguiente →</a>
+  </div>
+
+  <!-- Cuadrícula de Días del Mes (semana de lunes a domingo) -->
+  <div class="calendario-dias-grid">
+    <span class="dia-semana">Lun</span>
+    <span class="dia-semana">Mar</span>
+    <span class="dia-semana">Mié</span>
+    <span class="dia-semana">Jue</span>
+    <span class="dia-semana">Vie</span>
+    <span class="dia-semana">Sáb</span>
+    <span class="dia-semana">Dom</span>
+    {% if espacios_mes > 0 %}<div class="calendario-espacios" style="grid-column: span {{ espacios_mes }};" aria-hidden="true"></div>{% endif %}
+    {% for d in calendario %}
+    <a href="/agenda?dia={{ d.fecha_iso }}"
+       class="dia-celda {% if d.es_seleccionado %}dia-seleccionado{% endif %} {% if d.es_hoy %}dia-hoy{% endif %} {% if d.num_reservas > 0 %}dia-con-reservas{% endif %}"
+       aria-label="{{ d.dia }} {{ mes_nombre }}: {{ d.num_reservas }} reservas">
+      <span class="dia-numero">{{ d.dia }}</span>
+      {% if d.num_reservas > 0 %}
+      <span class="dia-punto" title="{{ d.num_reservas }} reserva(s)">{{ d.num_reservas }}</span>
+      {% endif %}
+    </a>
+    {% endfor %}
+  </div>
+</div>
+
+<!-- Barra de navegación del día actual -->
+<div class="dia-selector-barra">
+  <a class="boton secundario" href="/agenda?dia={{ dia_ant }}">← Día anterior</a>
+  <div class="dia-central">
+    <span class="dia-central-rotulo">Servicio del:</span>
+    <strong class="dia-central-fecha" aria-live="polite">{{ fecha }}</strong>
+  </div>
+  <a class="boton secundario" href="/agenda?dia={{ dia_sig }}">Día siguiente →</a>
+</div>
+
+<!-- Tabla de Citas del Día Seleccionado -->
+{% if vacio %}
+<div class="vacio-reservas">
+  <p>No hay citas programadas para el {{ fecha }}.</p>
+  <p class="ficha-linea">Haz clic en los días marcados en el calendario para explorar otros turnos de servicio.</p>
+</div>
+{% else %}
+<div class="tabla-scroll">
+  <table class="tabla tabla-empleado">
+    <thead>
+      <tr>
+        <th>Hora</th><th>Código</th><th>Cliente</th><th>Mesas</th><th>Comensales</th>
+        <th>Ocasión & Notas</th><th>Restricciones</th><th>Estado</th><th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for f in filas %}
+      <tr class="{% if f.es_vip %}fila-vip{% endif %}">
+        <td><strong>{{ f.hora }}</strong></td>
+        <td><code>{{ f.codigo }}</code></td>
+        <td>
+          {{ f.cliente }}
+          {% if f.es_vip %}<span class="badge-vip-pill" style="margin-left:.3rem;">VIP</span>{% endif %}
+        </td>
+        <td><strong>{{ f.mesas }}</strong></td>
+        <td>{{ f.comensales }}</td>
+        <td>
+          <strong>{{ f.ocasion }}</strong><br>
+          <span class="tabla-indicacion">{{ f.indicacion }}</span>
+        </td>
+        <td class="{% if f.alerta %}alerta-celda{% endif %}">{{ f.restricciones }}</td>
+        <td><span class="badge {{ f.estado_clase }}">{{ f.estado }}</span></td>
+        <td class="acciones-celda">
+          {% if f.puede_sentar %}
+          <form method="post" action="/empleado/reserva/{{ f.id }}/estado" style="display:inline;">
+            <input type="hidden" name="nuevo" value="en-mesa">
+            <button type="submit" class="btn-micro" title="Sentar cliente en mesa">Sentar</button>
+          </form>
+          {% endif %}
+          {% if f.puede_completar %}
+          <form method="post" action="/empleado/reserva/{{ f.id }}/estado" style="display:inline;">
+            <input type="hidden" name="nuevo" value="completada">
+            <button type="submit" class="btn-micro btn-micro-ok" title="Completar servicio">Completar</button>
+          </form>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
