@@ -1,1 +1,2 @@
-pub use crate::controladores::controlador::*;
+pub mod structs;
+pub use structs::*;

@@ -415,12 +415,12 @@ VIGENTE $\rightarrow$ CLIENTE\_EN\_MESA $\rightarrow$ COMPLETADA; VIGENTE $\righ
   \draw[fl] ($(vig.south)+(-0.75,0)$) .. controls +(-0.25,-1.2) and +(0.6,-1.2) .. ($(vig.south)+(-0.15,0)$);
   \node[ev, anchor=north, align=center] at ($(vig.south)+(-0.45,-1.5)$) {cliente o personal\\modifican la reserva};
 \end{tikzpicture}
-\\[3pt]{\small\textit{Nota.} Las transiciones inv{\'a}lidas (por ejemplo, completar una reserva cancelada) se rechazan en \texttt{cambiar\_estado()} (\texttt{src/dominio.rs}).}
+\\[3pt]{\small\textit{Nota.} Las transiciones inv{\'a}lidas (por ejemplo, completar una reserva cancelada) se rechazan en \texttt{cambiar\_estado()} (\texttt{src/modelo/entidades/dominio.rs}).}
 \end{figure}
 
 \section{Diseño}
 \subsection{Arquitectura MVC por capas}
-La Vista presenta la informaci\'on, el Controlador atiende las peticiones y el Modelo contiene la l\'ogica y los datos. Para separar mejor las responsabilidades, el modelo se divide a su vez en tres capas internas: servicios y patrones, acceso a datos y entidades; la Figura 3 muestra la organizaci{\'o}n resultante. Lo cr\'itico: los controladores no acceden a la l\'ogica de reservas sin pasar por el control de acceso (proxies de servicio); la verificaci\'on de cruces, el registro de la reserva y su comprobante se ejecutan en una misma transacci\'on.
+La Vista presenta la informaci\'on, el Controlador atiende las peticiones y el Modelo contiene la l\'ogica y los datos. Para separar mejor las responsabilidades, el modelo se divide a su vez en tres capas internas: servicios y patrones, acceso a datos y entidades; la Figura 3 muestra la organizaci{\'o}n resultante. En el c\'odigo fuente esta organizaci\'on se refleja en tres carpetas del crate (\texttt{src/vistas/}, \texttt{src/controladores/} y \texttt{src/modelo/}), con la Vista (structs de plantilla Askama y DTOs) separada del Controlador (handlers Axum) y el Modelo dividido a su vez en entidades, servicios con patrones y acceso a datos. Lo cr\'itico: los controladores no acceden a la l\'ogica de reservas sin pasar por el control de acceso (proxies de servicio); la verificaci\'on de cruces, el registro de la reserva y su comprobante se ejecutan en una misma transacci\'on.
 \begin{figure}[H]\centering
 {\small\textbf{Figura 3}}\\{\small\textit{Arquitectura MVC por capas}}\\[4pt]
 \begin{tikzpicture}[
@@ -836,17 +836,17 @@ La interfaz sigue la direcci{\'o}n visual ``Le Jardin'' (ADR 0004): paleta marfi
   \item \textbf{Carta de la portada} (\texttt{\#carta} en \texttt{templates/inicio.html}): un spotlight que sigue al cursor revela la foto a color de cada plato; efecto adaptado a JS/CSS vanilla desde el componente ChromaGrid de React Bits (MIT) y portado como código propio en \texttt{static/js/chroma.js} y \texttt{static/css/chroma.css}, con las fotos reales de \texttt{static/img/fotos/}.
   \item \textbf{Cuenta regresiva} en \texttt{/mis-reservas} y \texttt{/dashboard}: días, horas, minutos y segundos para la próxima reserva vigente; port vanilla del componente Counter de React Bits (MIT) en \texttt{static/js/counter.js} y \texttt{static/css/counter.css}, alimentado por la fecha en ISO 8601 con desfase UTC-5.
   \item \textbf{Fotos del menú}: las fotos (carta, salón y mesas) se descargan con \texttt{static/img/fotos/descargar\_fotos.py}, que verifica la licencia por la API de Wikimedia Commons y escribe \texttt{creditos.md} (ADR 0005); \texttt{convertir\_webp.py} deja la variante WebP que sirven los \texttt{<picture>} de la UI (respaldo JPEG, ADR 0007); los PNG deterministas de \texttt{generar\_*.py} quedan como respaldo \textit{offline}.
-  \item \textbf{Código propio:} no se usa htmx ni librerías externas pesadas; las adaptaciones de la carta y del contador están acreditadas a React Bits y todo lo demás es código original del repo, sin copiar de otros proyectos.
+  \item \textbf{Recuperaci\'on de contrase{\~n}a} en \texttt{/recuperar} y \texttt{/restablecer}: el cliente escribe su correo, el sistema genera un \textit{token} de un uso con una hora de validez y entrega por correo (SMTP, ADR 0009) un enlace a \texttt{/restablecer?token=...}; all\'i se fija la nueva contrase{\~n}a (hash \texttt{bcrypt}) y el token se invalida. La respuesta es gen\'erica para no revelar si el correo est\'a registrado. \item \textbf{C\'odigo propio:} no se usa htmx ni librerías externas pesadas; las adaptaciones de la carta y del contador están acreditadas a React Bits y todo lo demás es código original del repo, sin copiar de otros proyectos.
 \end{itemize}
 
 \noindent\textbf{Rutas y estado (fase 1 extendida).} El servidor expone \texttt{/static} (recursos propios) y las rutas del flujo, agrupadas por audiencia:
 \begin{itemize}
-  \item \textbf{Público:} \texttt{/} (portada), \texttt{/login} y \texttt{/registro} (GET y POST), \texttt{/logout}, \texttt{/reservar} (GET y POST) y \texttt{/api/disponibilidad} (fragmento JSON del plano).
+  \item \textbf{Público:} \texttt{/} (portada), \texttt{/login} y \texttt{/registro} (GET y POST), \texttt{/recuperar} y \texttt{/restablecer} (GET y POST, restablecimiento de contrase{\~n}a con token), \texttt{/logout}, \texttt{/reservar} (GET y POST) y \texttt{/api/disponibilidad} (fragmento JSON del plano).
   \item \textbf{Cliente autenticado:} \texttt{/mis-reservas}, \texttt{/reservas/\allowbreak\{id\}/\allowbreak cancelar} (POST), \texttt{/dashboard} y \texttt{/dashboard/\allowbreak hacer-vip} (POST).
   \item \textbf{Empleado:} \texttt{/agenda}, \texttt{/agenda/dia} (fragmento HTML), \texttt{/panel-empleado} y \texttt{/empleado/\allowbreak reserva/\allowbreak\{id\}/\allowbreak estado} (POST).
   \item \textbf{Administración:} \texttt{/admin/\allowbreak cliente/\allowbreak\{id\}/\allowbreak toggle-vip} y \texttt{/admin/\allowbreak cliente/\allowbreak\{id\}/\allowbreak reset-strikes} (ambas POST), desde el módulo administrativo del panel.
 \end{itemize}
-El flujo completo ---portada, registro, reserva con plano, pago y operación del salón--- corre sobre un almacén en memoria (\texttt{src/estado.rs}) con seed de demostración; los DAO sqlx ya definidos son la ruta de conexión al motor relacional.
+El flujo completo ---portada, registro, reserva con plano, pago y operación del salón--- corre sobre un almacén en memoria (\texttt{src/modelo/repositorios/estado.rs}) con seed de demostración; los DAO sqlx ya definidos son la ruta de conexión al motor relacional.
 \begin{figure}[H]\centering
 {\small\textbf{Figura 13}}\\{\small\textit{Prototipos de inicio de sesi{\'o}n y paso 1 (ocasi{\'o}n)}}\\[4pt]
 \begin{tikzpicture}
