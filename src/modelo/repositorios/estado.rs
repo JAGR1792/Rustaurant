@@ -28,6 +28,8 @@ pub struct Datos {
     pub correos: Vec<Mensaje>,
     /// token de sesión -> id de usuario
     pub sesiones: HashMap<String, i64>,
+    /// token de recuperacion de contrasena -> (id de usuario, expiracion)
+    pub tokens_recuperacion: HashMap<String, (i64, chrono::DateTime<Utc>)>,
 }
 
 pub type Estado = Arc<Mutex<Datos>>;
@@ -323,6 +325,46 @@ impl Datos {
 
     /// Cambia el estado de una reserva según las transiciones del ciclo de vida.
     /// Si queda inasistida, suma un strike al cliente (RN10: al tercero pierde VIP).
+    /// Genera un token de recuperacion de contrasena para el correo dado.
+    /// Devuelve Some(token) si el usuario existe, None si no.
+    pub fn generar_token_recuperacion(&mut self, correo: &str) -> Option<String> {
+        let usuario = self.usuarios.iter().find(|u| u.base().correo == correo)?;
+        let id = usuario.id();
+        let token = uuid::Uuid::new_v4().to_string();
+        let expira = Utc::now() + Duration::hours(1);
+        self.tokens_recuperacion.insert(token.clone(), (id, expira));
+        Some(token)
+    }
+
+    /// Valida un token de recuperacion y devuelve el id de usuario si es valido y no expiro.
+    pub fn validar_token_recuperacion(&self, token: &str) -> Option<i64> {
+        let (id, expira) = self.tokens_recuperacion.get(token)?;
+        if Utc::now() > *expira {
+            return None;
+        }
+        Some(*id)
+    }
+
+    /// Restablece la contrasena del usuario asociado al token. Devuelve true si ok.
+    pub fn restablecer_password(&mut self, token: &str, nueva: &str) -> bool {
+        let id = match self.validar_token_recuperacion(token) {
+            Some(i) => i,
+            None => return false,
+        };
+        let hash = match bcrypt::hash(nueva, bcrypt::DEFAULT_COST) {
+            Ok(h) => h,
+            Err(_) => return false,
+        };
+        for u in &mut self.usuarios {
+            if u.id() == id {
+                u.base_mut().hash_pw = hash;
+                self.tokens_recuperacion.remove(token);
+                return true;
+            }
+        }
+        false
+    }
+
     pub fn cambiar_estado_reserva(
         &mut self,
         id_reserva: i64,
