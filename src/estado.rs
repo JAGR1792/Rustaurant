@@ -322,9 +322,31 @@ impl Datos {
     }
 
     /// Cambia el estado de una reserva según las transiciones del ciclo de vida.
-    pub fn cambiar_estado_reserva(&mut self, id_reserva: i64, nuevo: EstadoReserva) -> Result<(), &'static str> {
-        let r = self.reservas.iter_mut().find(|r| r.id == id_reserva).ok_or("reserva no encontrada")?;
-        r.cambiar_estado(nuevo)
+    /// Si queda inasistida, suma un strike al cliente (RN10: al tercero pierde VIP).
+    pub fn cambiar_estado_reserva(
+        &mut self,
+        id_reserva: i64,
+        nuevo: EstadoReserva,
+    ) -> Result<(), &'static str> {
+        let id_cliente = {
+            let r = self
+                .reservas
+                .iter_mut()
+                .find(|r| r.id == id_reserva)
+                .ok_or("reserva no encontrada")?;
+            r.cambiar_estado(nuevo)?;
+            r.id_cliente
+        };
+        if nuevo == EstadoReserva::Inasistida {
+            if let Some(UsuarioSesion::Cliente(c)) = self
+                .usuarios
+                .iter_mut()
+                .find(|u| u.id() == id_cliente)
+            {
+                c.incrementar_strike();
+            }
+        }
+        Ok(())
     }
 }
 
@@ -436,6 +458,17 @@ mod tests {
         assert_eq!(r1.estado, EstadoReserva::ClienteEnMesa);
 
         assert!(d.limpiar_strikes_cliente(3));
+    }
+
+    #[test]
+    fn inasistencia_suma_strike_al_cliente() {
+        let e = sembrar();
+        let mut d = e.lock().unwrap();
+        assert!(d.cambiar_estado_reserva(1, EstadoReserva::Inasistida).is_ok());
+        match d.usuarios.iter().find(|u| u.id() == 3) {
+            Some(UsuarioSesion::Cliente(c)) => assert_eq!(c.strikes, 1),
+            _ => panic!("la semilla debe incluir al cliente 3"),
+        }
     }
 }
 
