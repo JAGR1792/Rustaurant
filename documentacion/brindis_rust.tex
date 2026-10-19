@@ -178,16 +178,15 @@
 \vskip 1cm
 {\Large \bf Patrones de dise\~no de software}
 \vskip 0.4cm
-{\Large \bf An\'alisis y dise\~no orientado a objetos del m\'odulo de gesti\'on de reservas de restaurantes}
-\vskip 0.3cm
-{\large Brindis --- Sistema de reservas de restaurantes por ocasi\'on \textbf{(Implementaci\'on en Rust)}}
+
+{\large Brindis --- Sistema de reservas de restaurantes por ocasi\'on}
 \vskip 0.8cm
 {\bf Yslen Natalia Moreno Gutierrez \\ Jorge Antonio Garc\'ia Romero
 \\
 Karla Mariana Duque Callejas }
 \vskip 3cm
 {\it Universidad Sergio Arboleda \\ Escuela de ciencias exactas e ingenier\'ia \\
-Bogot\'a D.C., 8 de octubre de 2026}
+Bogot\'a D.C., 18 de octubre de 2026}
 \end{center}
 
 \clearpage
@@ -791,9 +790,32 @@ El controlador hace una sola llamada; el proxy verifica el permiso antes de dele
 \\[3pt]{\small\textit{Nota.} Elaboraci{\'o}n propia. El retorno se dibuja en punteado; las barras marcan el per{\'i}odo de ejecuci{\'o}n de cada objeto y la operaci{\'o}n completa corre dentro de una transacci{\'o}n (RNF03): si la disponibilidad falla, nada se guarda.}
 \end{figure}
 \subsection{UI}
-La interfaz sigue la direcci{\'o}n visual ``Le Jardin'' (ADR 0004): paleta marfil, borgo{\~n}a, carb{\'o}n y dorado apagado; tipograf{\'i}a editorial (Cormorant Garamond para t{\'i}tulos e Inter para la interfaz) \textit{self-hosted} en \texttt{static/fuentes/} con licencia OFL, sin CDN. El asistente mantiene 4 pasos con progreso; el paso 2 pinta un plano SVG del sal{\'o}n (muros dobles, ventanales con parteluces, lavados de zona, plantas, barra y puerta con arco) con una silla por puesto: libre en arena, seleccionada en borgo{\~n}a con anillo dorado, reservada en gris c{\'a}lido y bloqueada en gris punteado, con roles ARIA, operaci{\'o}n por teclado (Enter/Espacio) y leyenda; al lado, la ficha de mesa muestra la foto real de su zona y sincroniza el selector de comensales con el campo del paso. El paso 3 gu{\'i}a el pedido por porciones (botones de restar y sumar, ``toda la mesa'' y medidor de cobertura sobre los comensales, con costos vivos en los extras) y el paso 4 revisa la reserva en vivo (fecha, mesas, pedido desglosado y monto seg{\'u}n la modalidad). La cancelaci{\'o}n de una reserva pide confirmaci{\'o}n en un di{\'a}logo propio. Al confirmar una reserva se avisa por correo al cliente y a la administraci{\'o}n, recordando la fecha y el plazo de cancelaci{\'o}n antes del cobro; en la demo los mensajes quedan en un buz{\'o}n visible para el personal en la agenda y, con credenciales SMTP en el entorno, la entrega a buzones reales es efectiva (ADRs 0008 y 0009). El acceso y el registro usan un panel ilustrado a dos columnas, y mis reservas y la agenda comparten tabla editorial con insignias de estado. Los mensajes siguen las heur{\'i}sticas de Nielsen (1993). Prototipos Figs.~13--16 (baja fidelidad).
+La interfaz sigue la direcci{\'o}n visual ``Le Jardin'' (ADR 0004): paleta marfil, borgo{\~n}a, carb{\'o}n y dorado apagado, y tipograf{\'i}a editorial (Cormorant Garamond para t{\'i}tulos e Inter para la interfaz) \textit{self-hosted} en \texttt{static/fuentes/} con licencia OFL, sin CDN.
 
-\textit{Decisi{\'o}n de stack frontend (vinculante):} plantillas HTML con bloques estilo Jinja/Askama en \texttt{templates/} (\texttt{base}, \texttt{inicio}, \texttt{login}, \texttt{registro}, \texttt{reservar}, \texttt{mis\_reservas} y \texttt{agenda}); CSS vanilla en \texttt{static/css/} con los tokens de \texttt{tema.css} (colores de estado de mesa, tipograf{\'i}a y componentes) y las fuentes \textit{self-hosted} de \texttt{fuentes.css}; JS vanilla en \texttt{static/js/plano.js} (pinta el plano SVG, gestiona la selecci{\'o}n y la ficha de mesa, gu{\'i}a el pedido por porciones y consulta \texttt{GET /api/disponibilidad?fecha=\&hora=\&zona=} sin recargar) y \texttt{static/js/ui.js} (toasts y di{\'a}logo de confirmaci{\'o}n propios). La portada incluye la carta de platos (\texttt{\#carta} en \texttt{templates/inicio.html}) con un spotlight que sigue al cursor y revela la foto a color de cada plato: efecto adaptado a JS/CSS vanilla desde el componente ChromaGrid de React Bits (MIT), portado como c{\'o}digo propio en \texttt{static/js/chroma.js} y \texttt{static/css/chroma.css}, con las fotos reales de \texttt{static/img/fotos/}. En \texttt{/mis-reservas} el cliente ve una cuenta regresiva (d{\'i}as, horas, minutos y segundos) para su pr{\'o}xima reserva vigente: port vanilla del componente Counter de React Bits (MIT) en \texttt{static/js/counter.js} y \texttt{static/css/counter.css}, alimentado por la fecha en ISO 8601 con desfase UTC-5. Las fotos (carta, sal{\'o}n y mesas) se descargan con \texttt{static/img/fotos/descargar\_fotos.py}, que verifica la licencia por la API de Wikimedia Commons y escribe \texttt{creditos.md} (ADR 0005), y \texttt{convertir\_webp.py} deja la variante WebP que sirven los \texttt{<picture>} de la UI (respaldo JPEG, ADR 0007); los PNG deterministas de \texttt{generar\_*.py} quedan como respaldo \textit{offline}. No se usa htmx ni librer{\'i}as: todo es c{\'o}digo original del repo (las adaptaciones de la carta y del contador est{\'a}n acreditadas a React Bits), sin copiar de otros proyectos. El servidor expone \texttt{/static} y las rutas \texttt{/}, \texttt{/login}, \texttt{/registro}, \texttt{/reservar} (GET y POST), \texttt{/mis-reservas}, \texttt{/reservas/\{id\}/cancelar} y \texttt{/agenda}. En la fase 1 el flujo completo corre sobre un almac{\'e}n en memoria (\texttt{src/estado.rs}) con seed de demostraci{\'o}n; los DAO sqlx ya definidos son la ruta de conexi{\'o}n al motor.
+\noindent\textbf{Asistente de reserva.} El asistente mantiene 4 pasos con progreso:
+\begin{itemize}
+  \item \textbf{Paso 1 --- ocasi{\'o}n:} tarjetas de ``¿Qu{\'e} celebras?'' con zona sugerida y decoraci{\'o}n por ocasi{\'o}n.
+  \item \textbf{Paso 2 --- fecha, hora y mesas:} un plano SVG del sal{\'o}n (muros dobles, ventanales con parteluces, lavados de zona, plantas, barra y puerta con arco) pinta una silla por puesto: libre en arena, seleccionada en borgo{\~n}a con anillo dorado, reservada en gris c{\'a}lido y bloqueada en gris punteado, con roles ARIA, operaci{\'o}n por teclado (Enter/Espacio) y leyenda. Al lado, la ficha de mesa muestra la foto real de su zona y sincroniza el selector de comensales con el campo del paso.
+  \item \textbf{Paso 3 --- pedido y extras:} el pedido se gu{\'i}a por porciones (botones de restar y sumar, ``toda la mesa'' y un medidor de cobertura sobre los comensales, con costos vivos en los extras).
+  \item \textbf{Paso 4 --- pago:} revisa la reserva en vivo (fecha, mesas, pedido desglosado y monto seg{\'u}n la modalidad).
+\end{itemize}
+
+\noindent\textbf{Cancelaci{\'o}n y correo.} La cancelaci{\'o}n de una reserva pide confirmaci{\'o}n en un di{\'a}logo propio. Al confirmar una reserva se avisa por correo al cliente y a la administraci{\'o}n, recordando la fecha y el plazo de cancelaci{\'o}n antes del cobro; en la demo los mensajes quedan en un buz{\'o}n visible para el personal en la agenda y, con credenciales SMTP en el entorno, la entrega a buzones reales es efectiva (ADRs 0008 y 0009).
+
+\noindent\textbf{Acceso y tablas.} El acceso y el registro usan un panel ilustrado a dos columnas; mis reservas y la agenda comparten una tabla editorial con insignias de estado. Los mensajes siguen las heur{\'i}sticas de Nielsen (1993). Prototipos: Figs.~13--16 (baja fidelidad).
+
+\noindent\textit{Decisi{\'o}n de stack frontend (vinculante).}
+\begin{itemize}
+  \item \textbf{Plantillas HTML} con bloques estilo Jinja/Askama en \texttt{templates/}: \texttt{base}, \texttt{inicio}, \texttt{login}, \texttt{registro}, \texttt{reservar}, \texttt{mis\_reservas} y \texttt{agenda}.
+  \item \textbf{CSS vanilla} en \texttt{static/css/}: tokens de \texttt{tema.css} (colores de estado de mesa, tipograf{\'i}a y componentes) y fuentes \textit{self-hosted} de \texttt{fuentes.css}.
+  \item \textbf{JS vanilla} en \texttt{static/js/}: \texttt{plano.js} pinta el plano SVG, gestiona la selecci{\'o}n y la ficha de mesa, gu{\'i}a el pedido por porciones y consulta \texttt{GET /api/disponibilidad?fecha=\&hora=\&zona=} sin recargar; \texttt{ui.js} implementa los toasts y el di{\'a}logo de confirmaci{\'o}n propios; \texttt{chroma.js} y \texttt{counter.js} alimentan la carta y la cuenta regresiva.
+  \item \textbf{Carta de la portada} (\texttt{\#carta} en \texttt{templates/inicio.html}): un spotlight que sigue al cursor revela la foto a color de cada plato; efecto adaptado a JS/CSS vanilla desde el componente ChromaGrid de React Bits (MIT) y portado como c{\'o}digo propio en \texttt{static/js/chroma.js} y \texttt{static/css/chroma.css}, con las fotos reales de \texttt{static/img/fotos/}.
+  \item \textbf{Cuenta regresiva} en \texttt{/mis-reservas}: d{\'i}as, horas, minutos y segundos para la pr{\'o}xima reserva vigente; port vanilla del componente Counter de React Bits (MIT) en \texttt{static/js/counter.js} y \texttt{static/css/counter.css}, alimentado por la fecha en ISO 8601 con desfase UTC-5.
+  \item \textbf{Fotos del men{\'u}}: las fotos (carta, sal{\'o}n y mesas) se descargan con \texttt{static/img/fotos/descargar\_fotos.py}, que verifica la licencia por la API de Wikimedia Commons y escribe \texttt{creditos.md} (ADR 0005); \texttt{convertir\_webp.py} deja la variante WebP que sirven los \texttt{<picture>} de la UI (respaldo JPEG, ADR 0007); los PNG deterministas de \texttt{generar\_*.py} quedan como respaldo \textit{offline}.
+  \item \textbf{C{\'o}digo propio:} no se usa htmx ni librer{\'i}as; las adaptaciones de la carta y del contador est{\'a}n acreditadas a React Bits y todo lo dem{\'a}s es c{\'o}digo original del repo, sin copiar de otros proyectos.
+\end{itemize}
+
+\noindent\textbf{Rutas y estado (fase 1).} El servidor expone \texttt{/static} y las rutas \texttt{/}, \texttt{/login}, \texttt{/registro}, \texttt{/reservar} (GET y POST), \texttt{/mis-reservas}, \texttt{/reservas/\{id\}/cancelar} y \texttt{/agenda}. El flujo completo corre sobre un almac{\'e}n en memoria (\texttt{src/estado.rs}) con seed de demostraci{\'o}n; los DAO sqlx ya definidos son la ruta de conexi{\'o}n al motor.
 \begin{figure}[H]\centering
 {\small\textbf{Figura 13}}\\{\small\textit{Prototipos de inicio de sesi{\'o}n y paso 1 (ocasi{\'o}n)}}\\[4pt]
 \begin{tikzpicture}
