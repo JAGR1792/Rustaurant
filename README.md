@@ -19,7 +19,11 @@ confirmar (buzón de demostración visible en la agenda, ADR 0008, con
 entrega real por SMTP si el entorno trae credenciales, ADR 0009), mis
 reservas con cancelación confirmada y reembolso (RN08/RN09), cuenta
 regresiva de la próxima reserva (contador de cifras rodantes, ver ADR
-0003) y agenda del personal protegida por el Proxy. La portada incluye
+0003) y agenda del personal protegida por el Proxy. El personal opera
+con paneles por tipo de empleado (RF15): panel propio con el turno del
+día, mesas asignadas y restricciones por preparar, y panel de
+administración con KPIs, jornadas y asignación de meseros (ADR 0011).
+La portada incluye
 la carta de platos con un efecto de spotlight que sigue al cursor y
 revela la foto a color (port vanilla del ChromaGrid de React Bits, ver
 ADR 0002).
@@ -43,6 +47,7 @@ El PDF del documento se genera en `documentacion/brindis_rust.pdf`.
 | Cliente | `cliente@brindis.co` | `Cliente123!` |
 | VIP | `vip@brindis.co` | `Vip123!` |
 | Empleado | `empleado@brindis.co` | `Empleado123!` |
+| Cocina | `cocina@brindis.co` | `Cocina123!` |
 | Admin | `brindis.rust@gmail.com` | `Admin123!` |
 
 La fase 1 guarda todo en memoria (`src/estado.rs` + seed de demo);
@@ -52,7 +57,7 @@ esquema completo vive en `db/brindis_db.sql` (ver Base de datos).
 ## Base de datos `brindis_db`
 
 El modelo relacional que documenta la Figura 5 vive en
-`db/brindis_db.sql`: 13 tablas 3FN (usuarios, mesa y zona, agenda,
+`db/brindis_db.sql`: 14 tablas 3FN (usuarios, jornadas, mesa y zona, agenda,
 reservas, pagos y tokens) con restricciones, índices y datos de prueba.
 Se carga en SQL Server 2025 con SSMS abriendo el script, o por línea
 de comandos:
@@ -72,7 +77,7 @@ modelo relacional.
 ```text
 Dockerfile            # imagen multietapa (build Rust -> runtime Debian)
 render.yaml           # servicio web en Render (ADR 0010)
-db/                   # brindis_db.sql (13 tablas 3FN: esquema, indices, datos de prueba)
+db/                   # brindis_db.sql (14 tablas 3FN: esquema, indices, datos de prueba)
 src/                  # Axum + dominio + 4 patrones + DAO
   dominio.rs          # entidades (Figura 4)
   factory.rs          # Factory Method (Figura 7)
@@ -85,7 +90,7 @@ src/                  # Axum + dominio + 4 patrones + DAO
   correo.rs           # avisos al cliente/admin (buzon demo + SMTP, ADR 0008/0009)
   formato.rs          # fechas UTC-5 y pesos para vistas y correos
   vistas.rs           # controladores Axum + structs Askama
-templates/            # base + inicio/login/registro/reservar/mis-reservas/agenda/error
+templates/            # base + inicio/login/registro/reservar/mis-reservas/agenda/panel_empleado/panel_admin/error
 static/css/           # tema.css + fuentes.css + chroma.css + counter.css
 static/js/            # plano.js (plano SVG, ficha y pedido guiado) + ui.js (toasts y confirmacion)
                       # + chroma.js (carta) + counter.js (cuenta regresiva)
