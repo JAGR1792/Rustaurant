@@ -1,5 +1,5 @@
 //! DAO genérico + interfaces (Figura 6). En Rust: traits async.
-//! Impl concreta con `sqlx::MySqlPool` + queries preparadas (RNF02/RNF03).
+//! Impl concreta con `sqlx::MssqlPool` + queries preparadas (RNF02/RNF03).
 
 use crate::dominio::{Mesa, Reserva, UsuarioSesion};
 use thiserror::Error;
@@ -70,5 +70,5 @@ pub trait PagoDao {
 #[derive(Debug, Clone)]
 pub struct DbPool {
     pub url: String,
-    // En la impl real: `pool: sqlx::MySqlPool`
+    // En la impl real: `pool: sqlx::MssqlPool`
 }
