@@ -17,9 +17,9 @@ por zonas, ficha de mesa con foto real y pedido guiado por porciones
 (ADR 0006), notificación por correo al cliente y a la administración al
 confirmar (buzón de demostración visible en la agenda, ADR 0008, con
 entrega real por SMTP si el entorno trae credenciales, ADR 0009), mis
-reservas con cancelaci��n confirmada y reembolso (RN08/RN09), c��digo de
-reserva de 8 caracteres (RN15), cuenta regresiva de la pr��xima reserva
-(contador de cifras rodantes, ver ADR 0003), recuperaci��n de contrase��a
+reservas con cancelación confirmada y reembolso (RN08/RN09), código de
+reserva de 8 caracteres (RN15), cuenta regresiva de la próxima reserva
+(contador de cifras rodantes, ver ADR 0003), recuperación de contraseña
 por correo con token (enlace de restablecimiento) y agenda del personal
 protegida por el Proxy. La portada incluye
 la carta de platos con un efecto de spotlight que sigue al cursor y
@@ -115,12 +115,6 @@ Controlador solo conoce las interfaces de servicio (los Proxy); los
 servicios usan los DAO y las entidades; las entidades no conocen a nadie.
 Ninguna capa salta a otra que no le corresponde (Figuras 3 y 11 del
 documento).
-
-## Diagramas
-
-Se regeneran sin solapes con `python diagramas/brindis/fig_brindis.py`
-(valida 0 incidencias). Los `.drawio` de Fig1 y Fig4 se exportan
-a PNG 300 ppp con el mismo nombre para que el `.tex` los tome.
 
 ## Variables
 
