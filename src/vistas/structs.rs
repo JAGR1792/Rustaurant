@@ -170,6 +170,26 @@ pub struct Registro {
     pub error: Option<String>,
 }
 #[derive(Template)]
+#[template(path = "recuperar.html")]
+pub struct Recuperar {
+    pub usuario: String,
+    pub es_personal: bool,
+    pub es_vip: bool,
+    pub correo: String,
+    pub enviado: bool,
+    pub error: Option<String>,
+}
+#[derive(Template)]
+#[template(path = "restablecer.html")]
+pub struct Restablecer {
+    pub usuario: String,
+    pub es_personal: bool,
+    pub es_vip: bool,
+    pub token: String,
+    pub error: Option<String>,
+    pub exito: bool,
+}
+#[derive(Template)]
 #[template(path = "reservar.html")]
 pub struct Reservar {
     pub usuario: String,

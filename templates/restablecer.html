@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{# Fijacion de nueva contrasena a partir del token de recuperacion. #}
+{% block titulo %}Restablecer contraseña — Brindis{% endblock %}
+{% block contenido %}
+<section class="acceso">
+  <figure class="acceso-panel">
+    <picture>
+      <source srcset="/static/img/fotos/salon-acceso.webp" type="image/webp">
+      <img src="/static/img/fotos/salon-acceso.jpg" alt="Mesa preparada junto a un ventanal, con jarrón de flores y luz natural" width="1280" height="1920" fetchpriority="high">
+    </picture>
+    <figcaption>Crea tu cuenta y reserva en menos de un minuto.</figcaption>
+  </figure>
+  <div class="acceso-form">
+    <p class="eyebrow">Nueva contraseña</p>
+    <h1>Restablecer contraseña</h1>
+    {% if let Some(e) = error %}
+    <p class="error" role="alert">{{ e }}</p>
+    {% endif %}
+    {% if exito %}
+    <p>Ya puedes iniciar sesión con tu nueva contraseña.</p>
+    <p class="acceso-pie"><a href="/login">Ir al login</a></p>
+    {% else %}
+    <form method="post" action="/restablecer">
+      <input type="hidden" name="token" value="{{ token }}">
+      <label>Nueva contraseña
+        <input type="password" name="password" required autocomplete="new-password" minlength="8" autofocus>
+      </label>
+      <label>Repetir
+        <input type="password" name="password2" required autocomplete="new-password" minlength="8">
+      </label>
+      <button type="submit">Guardar</button>
+    </form>
+    <p class="acceso-pie"><a href="/login">Volver al login</a></p>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

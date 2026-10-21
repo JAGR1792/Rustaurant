@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{# Solicitud de enlace de recuperacion de contrasena. #}
+{% block titulo %}Recuperar contraseña — Brindis{% endblock %}
+{% block contenido %}
+<section class="acceso">
+  <figure class="acceso-panel">
+    <picture>
+      <source srcset="/static/img/fotos/salon-acceso.webp" type="image/webp">
+      <img src="/static/img/fotos/salon-acceso.jpg" alt="Mesa preparada junto a un ventanal, con jarrón de flores y luz natural" width="1280" height="1920" fetchpriority="high">
+    </picture>
+    <figcaption>La mesa ya está puesta; solo falta tu ocasión.</figcaption>
+  </figure>
+  <div class="acceso-form">
+    <p class="eyebrow">¿Olvidaste tu contraseña?</p>
+    <h1>Recuperar contraseña</h1>
+    {% if let Some(e) = error %}
+    <p class="error" role="alert">{{ e }}</p>
+    {% endif %}
+    {% if enviado %}
+    <p>Si el correo está registrado, te enviamos un enlace para restablecer tu contraseña.</p>
+    <p class="acceso-pie"><a href="/login">Volver al login</a></p>
+    {% else %}
+    <form method="post" action="/recuperar">
+      <label>Correo
+        <input type="email" name="correo" required autocomplete="email" spellcheck="false" value="{{ correo }}" autofocus>
+      </label>
+      <button type="submit">Enviar enlace</button>
+    </form>
+    <p class="acceso-pie"><a href="/login">Volver al login</a></p>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}
