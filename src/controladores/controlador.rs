@@ -1324,17 +1324,14 @@ pub async fn disponibilidad(
 
 /// Formulario para solicitar recuperacion de contrasena.
 pub async fn recuperar_get() -> Response {
-    axum::response::Html(
-        r#"<!doctype html><html lang="es"><head><meta charset="utf-8"><title>Recuperar contrasena - Brindis</title></head><body>
-        <h1>Recuperar contrasena</h1>
-        <form method="post" action="/recuperar">
-            <label>Correo <input type="email" name="correo" required></label>
-            <button type="submit">Enviar enlace</button>
-        </form>
-        <p><a href="/login">Volver al login</a></p>
-        </body></html>"#
-            .to_string(),
-    )
+    Html(Recuperar {
+        usuario: String::new(),
+        es_personal: false,
+        es_vip: false,
+        correo: String::new(),
+        enviado: false,
+        error: None,
+    })
     .into_response()
 }
 
@@ -1351,14 +1348,14 @@ pub async fn recuperar_post(State(e): State<Estado>, Form(f): Form<FormRecuperar
         };
         crate::correo::entregar(&e, &mensajes).await;
     }
-    axum::response::Html(
-        r#"<!doctype html><html lang="es"><head><meta charset="utf-8"><title>Recuperar contrasena - Brindis</title></head><body>
-        <h1>Revisa tu correo</h1>
-        <p>Si el correo esta registrado, te enviamos un enlace para restablecer tu contrasena.</p>
-        <p><a href="/login">Volver al login</a></p>
-        </body></html>"#
-            .to_string(),
-    )
+    Html(Recuperar {
+        usuario: String::new(),
+        es_personal: false,
+        es_vip: false,
+        correo: correo.clone(),
+        enviado: true,
+        error: None,
+    })
     .into_response()
 }
 
@@ -1373,43 +1370,70 @@ pub async fn restablecer_get(
         d.validar_token_recuperacion(&token).is_some()
     };
     if !valido {
-        return axum::response::Html("Token invalido o expirado.".to_string()).into_response();
+        return Html(ErrorPagina {
+            usuario: String::new(),
+            es_personal: false,
+            es_vip: false,
+            mensaje: "Token inválido o expirado.".into(),
+        })
+        .into_response();
     }
-    axum::response::Html(format!(
-        r#"<!doctype html><html lang="es"><head><meta charset="utf-8"><title>Restablecer contrasena - Brindis</title></head><body>
-        <h1>Nueva contrasena</h1>
-        <form method="post" action="/restablecer">
-            <input type="hidden" name="token" value="{token}">
-            <label>Nueva contrasena <input type="password" name="password" required minlength="8"></label>
-            <label>Repetir <input type="password" name="password2" required minlength="8"></label>
-            <button type="submit">Guardar</button>
-        </form>
-        </body></html>"#,
-        token = token
-    ))
+    Html(Restablecer {
+        usuario: String::new(),
+        es_personal: false,
+        es_vip: false,
+        token,
+        error: None,
+        exito: false,
+    })
     .into_response()
 }
 
 pub async fn restablecer_post(State(e): State<Estado>, Form(f): Form<FormRestablecer>) -> Response {
     if f.password != f.password2 {
-        return axum::response::Html("Las contrasenas no coinciden.".to_string()).into_response();
+        return Html(Restablecer {
+            usuario: String::new(),
+            es_personal: false,
+            es_vip: false,
+            token: f.token.clone(),
+            error: Some("Las contraseñas no coinciden.".into()),
+            exito: false,
+        })
+        .into_response();
     }
     if f.password.len() < 8 {
-        return axum::response::Html("La contrasena debe tener al menos 8 caracteres.".to_string())
-            .into_response();
+        return Html(Restablecer {
+            usuario: String::new(),
+            es_personal: false,
+            es_vip: false,
+            token: f.token.clone(),
+            error: Some("La contraseña debe tener al menos 8 caracteres.".into()),
+            exito: false,
+        })
+        .into_response();
     }
     let ok = {
         let mut d = e.lock().unwrap();
         d.restablecer_password(&f.token, &f.password)
     };
     if ok {
-        axum::response::Html(r#"<!doctype html><html lang="es"><head><meta charset="utf-8"><title>Restablecer contrasena - Brindis</title></head><body>
-        <h1>Contrasena actualizada</h1>
-        <p>Ya puedes iniciar sesion con tu nueva contrasena.</p>
-        <p><a href="/login">Ir al login</a></p>
-        </body></html>"#.to_string()).into_response()
+        Html(Restablecer {
+            usuario: String::new(),
+            es_personal: false,
+            es_vip: false,
+            token: f.token,
+            error: None,
+            exito: true,
+        })
+        .into_response()
     } else {
-        axum::response::Html("Token invalido o expirado.".to_string()).into_response()
+        Html(ErrorPagina {
+            usuario: String::new(),
+            es_personal: false,
+            es_vip: false,
+            mensaje: "Token inválido o expirado.".into(),
+        })
+        .into_response()
     }
 }
 
